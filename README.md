@@ -6,6 +6,8 @@
    - [Optionale Anforderungen](#optionale-anforderungen)
 - [WEB-Server in Go](#web-server-in-go)
 - [Abgabeumfang](#abgabeumfang)
+- [Abgabe](#abgabe)
+- [Bewertungskriterien](#bewertungskriterien)
 
 ## Organisatorisches
 - Die Abgabe des Programmentwurfs erfolgt spätestens am Sonntag, den **10.01.2021** als gepackte Quellen im ZIP-Format per pushci.
@@ -124,26 +126,20 @@ Die Dokumentation setzt sich aus zwei Bestandteilen zusammen: Zum einen aus der 
 - Für die Bewertung werden nur die Sourcen und die eine PDF-Datei herangezogen.
 - Alle Source-Dateien und die PDF-Datei müssen die Matrikelnummern aller Gruppenmitglieder enthalten.
 
-Abgabe
+## Abgabe
 Die Abgabe soll per pushci (**siehe PDF**) erfolgen. Hierbei handelt es sich um einen Dienst, welcher aus dem Intranet und dem Internet erreichbar ist.
-Dieser Dienst übernimmt Ihre Datei, packt diese aus, überprüft einige formale Kriterien, compiliert die Sourcen und führt alle Tests aus. Eine Datei kann nur abgegeben werden, wenn alle Testfälle ”grün“ sind.
-Wer bereits mit einem Continuous-Integration-System gearbeitet hat, ist mit diesem Vorgehen sicher vertraut. Für Studierende, die noch nicht mit einem CI-System gearbei- tet haben, ist das möglicherweise ungewohnt. Es ist daher dringend angeraten, sich mit
-5
 
-diesem Dienst frühzeitig vertraut zu machen. Es wäre sehr ungeschickt, erst am Tag der Abgabe um 23:55 das erste mal zu versuchen, eine Datei ”hochzuladen“.
-Sie können beliebig oft eine Datei ”hochladen“ und überprüfen lassen. Der Dienst ist
- ̈
-während des ganzen Semesters verfügbar. Wenn diese Uberprüfung erfolgreich war,
-kann die Datei abgegeben werden, Sie können die Abgabe jedoch auch bei erfolgreicher
-Prüfung einfach abbrechen. Bitte geben Sie nur einmal eine finale Lösung ab, indem Sie
- ̈
-nach der Uberprüfung die Matrikelnummern der Gruppenmitglieder angeben. Nur im
-Ausnahmefall sollte eine Abgabe mehrfach erfolgen, wobei nur die zuletzt abgegebene Variante bewertet wird.
-Bewertungskriterien
+Dieser Dienst übernimmt Ihre Datei, packt diese aus, überprüft einige formale Kriterien, compiliert die Sourcen und führt alle Tests aus. Eine Datei kann nur abgegeben werden, wenn alle Testfälle ”grün“ sind.
+
+Wer bereits mit einem Continuous-Integration-System gearbeitet hat, ist mit diesem Vorgehen sicher vertraut. Für Studierende, die noch nicht mit einem CI-System gearbei- tet haben, ist das möglicherweise ungewohnt. Es ist daher dringend angeraten, sich mit diesem Dienst frühzeitig vertraut zu machen. Es wäre sehr ungeschickt, erst am Tag der Abgabe um 23:55 das erste mal zu versuchen, eine Datei ”hochzuladen“.
+
+Sie können beliebig oft eine Datei ”hochladen“ und überprüfen lassen. Der Dienst ist während des ganzen Semesters verfügbar. Wenn diese Überprüfung erfolgreich war, kann die Datei abgegeben werden, Sie können die Abgabe jedoch auch bei erfolgreicher Prüfung einfach abbrechen. Bitte geben Sie nur einmal eine finale Lösung ab, indem Sie nach der Überprüfung die Matrikelnummern der Gruppenmitglieder angeben. Nur im Ausnahmefall sollte eine Abgabe mehrfach erfolgen, wobei nur die zuletzt abgegebene Variante bewertet wird.
+
+## Bewertungskriterien
 Ihr Programmentwurf wird nach folgenden Kriterien bewertet:
 1. Abbildung der Anforderungen (s.o.)
 2. Strukturierung und Konsistenz des Quellcodes
-3. Ausreichende Testabdeckung des implementierten Codes. (gemessen mit go test -cover)
+3. Ausreichende Testabdeckung des implementierten Codes. (gemessen mit `go test -cover`)
 4. Sinnhaftigkeit der Tests (Sonderfälle, Grenzfälle, Orthogonalität usw.)
 5. Qualität von Kommentaren und Dokumentation
 6. Benutzerfreundlichkeit der Schnittstellen (APIs)

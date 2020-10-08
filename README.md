@@ -1,6 +1,9 @@
 # Photo-Server
 
-- 
+- [Organisatorisches](#organisatorisches)
+- [Aufgabenstellung](#aufgabenstellung)
+   - [Anforderungen](#anforderungen)
+   - [Optionale Anforderungen](#optionale-anforderungen)
 
 ## Organisatorisches
 - Die Abgabe des Programmentwurfs erfolgt spätestens am Sonntag, den **10.01.2021** als gepackte Quellen im ZIP-Format per pushci.

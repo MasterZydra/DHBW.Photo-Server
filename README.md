@@ -4,6 +4,7 @@
 - [Aufgabenstellung](#aufgabenstellung)
    - [Anforderungen](#anforderungen)
    - [Optionale Anforderungen](#optionale-anforderungen)
+- [WEB-Server in Go](#web-server-in-go)
 
 ## Organisatorisches
 - Die Abgabe des Programmentwurfs erfolgt spätestens am Sonntag, den **10.01.2021** als gepackte Quellen im ZIP-Format per pushci.
@@ -93,14 +94,15 @@ werden.
     2. Die Kommentare sollen durchsucht werden können.
 
 12. Photogruppen
-12.1) Photos sollen zu Gruppen zusammengefasst werden können.
-12.2) Es soll möglich sein, alle Photos dieser Gruppe anzuzeigen.
-12.3) Eine solche Gruppe soll als Bestellliste übernommen werden können. 12.4) Es soll eine ”Dia-Show“ einer Gruppe möglich sein.
-WEB-Server in Go
+    1. Photos sollen zu Gruppen zusammengefasst werden können.
+    2. Es soll möglich sein, alle Photos dieser Gruppe anzuzeigen.
+    3. Eine solche Gruppe soll als Bestellliste übernommen werden können.
+    4. Es soll eine ”Dia-Show“ einer Gruppe möglich sein.
+
+## WEB-Server in Go
 Es gibt einige interessante Techniken, welche die Implementierung von WEB-Servern in Go unterstützen.
 Der folgende sehr gelungene Vortrag sei empfohlen:
 Mat Ryer: ”Building APIs“ Golang UK Conference 2015 https://youtu.be/tIm8UkSf6RA
-4
 
 Eine weitere Quelle für Best-Practices findet sich in diesem Vortrag: Peter Bourgon: ”Best Practices in Production Environments“
 QCon London 2016 https://peter.bourgon.org/go-best-practices-2016/

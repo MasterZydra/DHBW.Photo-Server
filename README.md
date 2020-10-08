@@ -5,6 +5,7 @@
    - [Anforderungen](#anforderungen)
    - [Optionale Anforderungen](#optionale-anforderungen)
 - [WEB-Server in Go](#web-server-in-go)
+- [Abgabeumfang](#abgabeumfang)
 
 ## Organisatorisches
 - Die Abgabe des Programmentwurfs erfolgt spätestens am Sonntag, den **10.01.2021** als gepackte Quellen im ZIP-Format per pushci.
@@ -100,27 +101,29 @@ werden.
     4. Es soll eine ”Dia-Show“ einer Gruppe möglich sein.
 
 ## WEB-Server in Go
-Es gibt einige interessante Techniken, welche die Implementierung von WEB-Servern in Go unterstützen.
-Der folgende sehr gelungene Vortrag sei empfohlen:
-Mat Ryer: ”Building APIs“ Golang UK Conference 2015 https://youtu.be/tIm8UkSf6RA
+Es gibt einige interessante Techniken, welche die Implementierung von WEB-Servern in Go unterstützen.  
+Der folgende sehr gelungene Vortrag sei empfohlen:  
+Mat Ryer: ”Building APIs“  
+Golang UK Conference 2015  
+https://youtu.be/tIm8UkSf6RA
 
-Eine weitere Quelle für Best-Practices findet sich in diesem Vortrag: Peter Bourgon: ”Best Practices in Production Environments“
-QCon London 2016 https://peter.bourgon.org/go-best-practices-2016/
-Abgabeumfang
-• Der komplette Source-Code incl. der Testfälle.
-• Dokumentation des Source-Codes
-Die Dokumentation setzt sich aus zwei Bestandteilen zusammen: Zum einen aus der Dokumentation des Sourcecodes. Diese erfolgt am geeignetsten im Sourcecode selbst. Zum anderen aus der Dokumentation der Architektur. Diese soll geeignet
- ̈
-sein, einem Außenstehenden einen Uberblick über das Gesamtprojekt zu verschaf-
-fen, indem Fragen beantwortet werden wie: ”Aus welchen Komponenten besteht das System?“ oder ”Wie arbeiten die Komponenten zusammen?“. Bei Objektori- entierten Projekten bietet sich z.B. ein Klassendiagramm an, um die Beziehungen zwischen den Klassen darzustellen, ist allein aber nicht ausreichend.
-• Die Abgabe soll eine PDF-Datei beinhalten, welche mindestens die folgenden Ka- pitel hat:
-– Architekturdokumentation
-– Anwenderdokumentation
-– Dokumentation des Betriebs.
-– Jedes Gruppenmitglied ergänzt eine kurze Beschreibung des eigenen Beitrags zur Projektumsetzung ab (eine Seite reicht).
-• Für die Bewertung werden nur die Sourcen und die eine PDF-Datei herangezogen.
-• Alle Source-Dateien und die PDF-Datei müssen die Matrikelnummern aller Grup-
-penmitglieder enthalten.
+Eine weitere Quelle für Best-Practices findet sich in diesem Vortrag:  
+Peter Bourgon: ”Best Practices in Production Environments“  
+QCon London 2016  
+https://peter.bourgon.org/go-best-practices-2016/
+
+## Abgabeumfang
+- Der komplette Source-Code incl. der Testfälle.
+- Dokumentation des Source-Codes  
+Die Dokumentation setzt sich aus zwei Bestandteilen zusammen: Zum einen aus der Dokumentation des Sourcecodes. Diese erfolgt am geeignetsten im Sourcecode selbst. Zum anderen aus der Dokumentation der Architektur. Diese soll geeignet sein, einem Außenstehenden einen Überblick über das Gesamtprojekt zu verschaffen, indem Fragen beantwortet werden wie: ”Aus welchen Komponenten besteht das System?“ oder ”Wie arbeiten die Komponenten zusammen?“. Bei Objektorientierten Projekten bietet sich z.B. ein Klassendiagramm an, um die Beziehungen zwischen den Klassen darzustellen, ist allein aber nicht ausreichend.
+- Die Abgabe soll eine PDF-Datei beinhalten, welche mindestens die folgenden Kapitel hat:
+   - Architekturdokumentation
+   - Anwenderdokumentation
+   - Dokumentation des Betriebs.
+   - Jedes Gruppenmitglied ergänzt eine kurze Beschreibung des eigenen Beitrags zur Projektumsetzung ab (eine Seite reicht).
+- Für die Bewertung werden nur die Sourcen und die eine PDF-Datei herangezogen.
+- Alle Source-Dateien und die PDF-Datei müssen die Matrikelnummern aller Gruppenmitglieder enthalten.
+
 Abgabe
 Die Abgabe soll per pushci (**siehe PDF**) erfolgen. Hierbei handelt es sich um einen Dienst, welcher aus dem Intranet und dem Internet erreichbar ist.
 Dieser Dienst übernimmt Ihre Datei, packt diese aus, überprüft einige formale Kriterien, compiliert die Sourcen und führt alle Tests aus. Eine Datei kann nur abgegeben werden, wenn alle Testfälle ”grün“ sind.

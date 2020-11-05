@@ -23,6 +23,18 @@ werden.
 ## Aufgabenstellung
 Es soll ein System zur Verwaltung von Photos implementiert werden.
 
+### Eigene Anmerkungen
+3 Komponenten:  
+- Konsolen-Tool
+- Webseite
+- Backend (REST-API)
+
+Soll die Liste dauerhaft gespeichert werden? Oder ist es ein temporärer "Warenkorb"?
+
+Sollen diese Bestellungen gespeichert/verarbeitet werden?
+
+
+
 ### Anforderungen
 1. Nicht funktional
    1. Die Implementierung hat in der Programmiersprache Go zu erfolgen.
@@ -46,15 +58,15 @@ Es soll ein System zur Verwaltung von Photos implementiert werden.
    1. Es müssen nur JPEG Dateien unterstützt werden.
    2. Dem Anwender soll eine chronologisch sortierte Liste der Photos angezeigt werden.
    3. Es soll eine Übersicht bestehend aus verkleinerten Vorschaubildern angezeigt
-werden.
-   4. Es soll möglich sein, ein Photo auch in Originalauflösung anzusehen.
-   5. Das System soll in der Lage sein, mit tausenden von Photos umzugehen, das Anzeigen einer lange Liste aller Photos ist also nicht geeignet.
+werden. (_Bei Upload verkleinerte Version speichern_)
+   4. Es soll möglich sein, ein Photo auch in Originalauflösung anzusehen. (_Click Event -> Popup?_)
+   5. Das System soll in der Lage sein, mit tausenden von Photos umzugehen, das Anzeigen einer lange Liste aller Photos ist also nicht geeignet. (_Paging, Dropdown mit verschiedenen Zahlen_)
 
 5. Photo-Upload
    1. Es müssen nur JPEG Dateien unterstützt werden.
    2. Photos sollen über eine WEB-Seite hochgeladen werden können.
-   3. Das Datum des Photos soll aus dem Exif-Header der JPEG-Datei entnommen werden.
-   4. Der mehrfache Upload eines Fotos soll verhindert werden.
+   3. Das Datum des Photos soll aus dem Exif-Header der JPEG-Datei entnommen werden. (_Exif-Parser_)
+   4. Der mehrfache Upload eines Fotos soll verhindert werden. (_Bei Upload Hash über Pixel erstellen?_)
 
 6. Batch-Upload
    1. Es soll ein Kommandozeilen-Tool zum Upload aller Photos eines Ordners geben.
@@ -68,18 +80,18 @@ werden.
    5. Auch hier soll das Datum des Photos aus dem Exif-Header der JPEG-Datei entnommen werden.
 
 7. Bestellung von Photos
-   1. Aus der Menge aller Photos soll eine Liste mit einer Auswahl an Photos erstellt werden können.
+   1. Aus der Menge aller Photos soll eine Liste mit einer Auswahl an Photos erstellt werden können. (_Auswahlmöglichkeit_)
    2. Jedes Photo dieser Liste soll mit Meta-Informationen versehen werden können, die eine Bestellung von Abzügen ermöglichen.
-   3. Dazu gehören mindestens die Anzahl der Abzüge und das Format der Abzüge.
+   3. Dazu gehören mindestens die Anzahl der Abzüge und das Format der Abzüge. (_Standardformate wie 9er ..._)
    4. Es soll möglich sein, einzelne Photos aus dieser Liste zu löschen.
    5. Es soll möglich sein, diese Liste komplett zu löschen.
    6. Es soll möglich sein, die Photos dieser Liste in Originalauflösung zusammen mit den Meta-Informationen als eine ZIP-Datei herunterzuladen.
 
 8. Storage
-   1. Alle Informationen sollen zusammen mit den Photos im Dateisystem gespeichert werden.
+   1. Alle Informationen sollen zusammen mit den Photos im Dateisystem gespeichert werden. (_Keine DB_)
    2. Es sollen nicht alle Informationen in einer gemeinsamen Datei gespeichert werden.
    3. Es soll ein geeignetes Caching implementiert werden, d.h. es sollen **nicht** bei jedem Request alle Dateien aus dem Dateisystem neu eingelesen werden.
-   4. Es soll verhindert werden, dass der Cache über alle Grenzen wächst, wenn sehr viele Fotos verwaltet werden. Gehen Sie davon aus, dass nicht alle Photos in Originalauflösung im Speicher gehalten werden können.
+   4. Es soll verhindert werden, dass der Cache über alle Grenzen wächst, wenn sehr viele Fotos verwaltet werden. Gehen Sie davon aus, dass nicht alle Photos in Originalauflösung im Speicher gehalten werden können. (_Server- oder clientseitig?_)
 
 9. Konfiguration
    1. Die Konfiguration soll komplett über Startparameter erfolgen. (Siehe Package `flag`)
@@ -88,8 +100,8 @@ werden.
 
 10. Betrieb
     1. Wird die Anwendung ohne Argumente gestartet, soll ein sinnvoller ”default“ gewählt werden.
-    2. Nicht vorhandene aber benötigte Order sollen ggfls. angelegt werden.
-    3.Die Anwendung soll zwar HTTPS und die entsprechenden erforderlichen Zertifikate unterstützen, es kann jedoch davon ausgegangen werden, dass geeignete Zertifikate gestellt werden. Für Ihre Tests können Sie ein ”self signed“ Zertifikat verwenden. Es ist nicht erforderlich zur Laufzeit Zertifikate zu erstellen o.ä.. Ebenso ist keine Let’s Encrypt Anbindung erforderlich.
+    2. Nicht vorhandene aber benötigte Order sollen ggfls. angelegt werden. (_Prüfung und Ordner erstellen beim Start_)
+    3. Die Anwendung soll zwar HTTPS und die entsprechenden erforderlichen Zertifikate unterstützen, es kann jedoch davon ausgegangen werden, dass geeignete Zertifikate gestellt werden. Für Ihre Tests können Sie ein ”self signed“ Zertifikat verwenden. Es ist nicht erforderlich zur Laufzeit Zertifikate zu erstellen o.ä.. Ebenso ist keine Let’s Encrypt Anbindung erforderlich.
 
 ### Optionale Anforderungen
 11. Kommentierung eines Photos
@@ -98,7 +110,7 @@ werden.
 
 12. Photogruppen
     1. Photos sollen zu Gruppen zusammengefasst werden können.
-    2. Es soll möglich sein, alle Photos dieser Gruppe anzuzeigen.
+    2. Es soll möglich sein, alle Photos dieser Gruppe anzuzeigen. (_Gruppe muss gespeichert werden_)
     3. Eine solche Gruppe soll als Bestellliste übernommen werden können.
     4. Es soll eine ”Dia-Show“ einer Gruppe möglich sein.
 

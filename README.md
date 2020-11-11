@@ -27,13 +27,41 @@ Es soll ein System zur Verwaltung von Photos implementiert werden.
 3 Komponenten:  
 - Konsolen-Tool
 - Webseite
+   - Caching
+   - BasicAuth
 - Backend (REST-API)
+   - Jede Anfrage muss im Header Benutzername und Passwort enthalten
 
-Soll die Liste dauerhaft gespeichert werden? Oder ist es ein temporärer "Warenkorb"?
+**Speichern der Bilder**  
+`Content.csv`enthält pro Bild:  
+Zeitstempel | Name | Hashwert (md5)
 
-Sollen diese Bestellungen gespeichert/verarbeitet werden?
+Für jedes Bild:  
+- Bild1.jpeg (Original)
+- Previews/Bild1.jpeg (Thumbnail)
+- Bild1.json (Hash, Exif, ggf. Kommentare)  
+   Bei Kommentaren muss nur der Text ggf. mit Zeitstempel gespeichert werden.
 
+**Benutzerdaten**  
+`users.csv`  
+Benutzername und Passwort ("salting")  
+Benutzername darf keine Sonderzeichen enthalten
+Benutzername | Passwort
 
+**Bestellen**  
+Die Bilder im Warenkorb werden mit den Metainfos (Auszugformate, Menge) als Zip heruntergeladen.  
+Danach kann der Warenkorb gelöscht werden.  
+JSON-Datei: Bild mit zugehörigen (Format, Anzal)-Einträgen.
+
+**REST-API**  
+- `POST` - Upload eines Fotos:  
+  1. Ein Bild pro Aufruf (als Base64)
+  2. Bild als Base64 -> Mehrere Bilder, da nur von A-Z, "/" und "+"
+  
+**Aufgabenverteilung**  
+- Benutzerauthentifizierung (Jones)
+- Bilder (David)
+- Konsole (Patricia)
 
 ### Anforderungen
 1. Nicht funktional

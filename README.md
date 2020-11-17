@@ -1,3 +1,4 @@
+![Go](https://github.com/MasterZydra/DHBW.Photo-Server/workflows/Go/badge.svg)
 # Photo-Server
 
 - [Organisatorisches](#organisatorisches)

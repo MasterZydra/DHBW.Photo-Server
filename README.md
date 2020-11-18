@@ -25,6 +25,8 @@ werden.
 Es soll ein System zur Verwaltung von Photos implementiert werden.
 
 ### Eigene Anmerkungen
+- Konsole - Für was Datum aus EXIF?
+
 3 Komponenten:  
 - Konsolen-Tool
 - Webseite

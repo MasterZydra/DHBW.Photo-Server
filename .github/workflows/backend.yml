@@ -32,10 +32,10 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v cmd/backend/.
+      run: go build -v ./cmd/backend
 
     - name: Test
-      run: go test -v cmd/backend/.
+      run: go test -v ./cmd/backend
     
     - name: Test coverage
-      run: go test -cover cmd/backend/.
+      run: go test -cover ./cmd/backend

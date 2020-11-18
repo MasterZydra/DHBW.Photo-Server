@@ -35,6 +35,23 @@ Es soll ein System zur Verwaltung von Photos implementiert werden.
 - Backend (REST-API)
    - Jede Anfrage muss im Header Benutzername und Passwort enthalten
 
+**Projektstruktur**  
+```
+/docs       PDF, UML
+/cmd
+  /backend
+  /website
+  /terminal
+    main.go
+/internal
+  # EXIF-Parser
+  # Helper
+  # ImageManager
+  # ...
+/web
+/test
+```
+
 **Speichern der Bilder**  
 `Content.csv`enthält pro Bild:  
 Zeitstempel | Name | Hashwert (md5)

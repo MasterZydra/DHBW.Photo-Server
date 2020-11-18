@@ -45,9 +45,11 @@ Für jedes Bild:
 
 **Benutzerdaten**  
 `users.csv`  
-Benutzername und Passwort ("salting")  
+Benutzername und Passwort (["salting"](https://play.golang.org/p/tAZtO7L6pm))  
 Benutzername darf keine Sonderzeichen enthalten
 Benutzername | Passwort
+
+Registieren von Benutzern ergänzen
 
 **Bestellen**  
 Die Bilder im Warenkorb werden mit den Metainfos (Auszugformate, Menge) als Zip heruntergeladen.  

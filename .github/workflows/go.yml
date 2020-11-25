@@ -48,3 +48,12 @@ jobs:
     
     - name: Test terminal coverage
       run: go test -cover ./cmd/terminal
+
+    - name: Build internal/cryptography
+      run: go build -v ./internal/cryptography
+
+    - name: Test internal/cryptography
+      run: go test -v ./internal/cryptography
+    
+    - name: Test internal/cryptography coverage
+      run: go test -cover ./internal/cryptography

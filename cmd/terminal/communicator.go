@@ -3,8 +3,11 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
+	"net/url"
 	"os"
 	"strings"
+	"unicode"
 )
 
 func Greet() {
@@ -26,12 +29,23 @@ func Greet() {
 func WaitForUserInput() UserInput {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Please enter parameters: ")
+
 	fmt.Print("Username: ")
 	uname, _ := reader.ReadString('\n')
+	uname = strings.TrimSuffix(uname, "\n")
+	//check that the username contains only numbers and letters
+	validateUsername(uname)
+
 	fmt.Print("Password: ")
 	pswd, _ := reader.ReadString('\n')
+	pswd = strings.TrimSuffix(pswd, "\n")
+
 	fmt.Print("Host of the server: ")
 	host, _ := reader.ReadString('\n')
+	host = strings.TrimSuffix(host, "\n")
+	// check if host is valid
+	validateHost(host)
+
 	fmt.Print("Path of the folder with the photos: ")
 	path, _ := reader.ReadString('\n')
 	path = strings.TrimSuffix(path, "\n")
@@ -40,8 +54,23 @@ func WaitForUserInput() UserInput {
 	userInput.Password = pswd
 	userInput.Host = host
 	userInput.Path = path
-	// TODO: validate Input (so everyone can enter anything he wants -> not good)
+	
 	return userInput
+}
+
+func validateUsername(uname string) {
+	for _, c := range uname {
+		if !unicode.IsDigit(c) && !unicode.IsLetter(c) {
+			log.Fatal("The username must only contain letters and numbers.")
+		}
+	}
+}
+
+func validateHost(host string) {
+	_, err := url.ParseRequestURI(host)
+	if err != nil {
+		log.Fatal("Invalid Host" + err.Error())
+	}
 }
 
 func WriteMessage(msg string) {

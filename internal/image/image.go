@@ -1,6 +1,6 @@
 package image
 
-//import "../cryptography"
+import "../cryptography"
 
 type Image struct {
 	Name string
@@ -14,8 +14,8 @@ type UploadImage struct {
 }
 
 func NewUploadImage(name string, raw []byte) UploadImage {
-	return UploadImage{Image: Image{Name: name, Hash: ""}}
-	//  string(cryptography.HashImage(raw))
+	hash := cryptography.HashToString(cryptography.HashImage(&raw))
+	return UploadImage{Image: Image{Name: name, Hash: hash}, Raw: raw}
 }
 
 func NewImage(name string, date string) *Image {

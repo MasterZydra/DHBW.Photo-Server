@@ -1,11 +1,21 @@
 package image
 
-// import "../cryptography"
+//import "../cryptography"
 
 type Image struct {
 	Name string
 	Date string
 	Hash string
+}
+
+type UploadImage struct {
+	Image
+	Raw []byte
+}
+
+func NewUploadImage(name string, raw []byte) UploadImage {
+	return UploadImage{Image: Image{Name: name, Hash: ""}}
+	//  string(cryptography.HashImage(raw))
 }
 
 func NewImage(name string, date string) *Image {

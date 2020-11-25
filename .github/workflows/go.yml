@@ -31,20 +31,8 @@ jobs:
             dep ensure
         fi
 
-    - name: Build backend
-      run: go build -v ./cmd/backend
+    - name: Building
+      run: go build -v ./cmd/backend ./cmd/terminal ./internal/cryptography
 
-    - name: Test backend
-      run: go test -cover ./cmd/backend
-
-    - name: Build terminal
-      run: go build -v ./cmd/terminal
-
-    - name: Test terminal
-      run: go test -cover ./cmd/terminal
-
-    - name: Build internal/cryptography
-      run: go build -v ./internal/cryptography
-
-    - name: Test internal/cryptography
-      run: go test -cover ./internal/cryptography
+    - name: Testing
+      run: go test -cover ./cmd/backend ./cmd/terminal ./internal/cryptography

@@ -35,25 +35,16 @@ jobs:
       run: go build -v ./cmd/backend
 
     - name: Test backend
-      run: go test -v ./cmd/backend
-    
-    - name: Test backend coverage
       run: go test -cover ./cmd/backend
 
     - name: Build terminal
       run: go build -v ./cmd/terminal
 
     - name: Test terminal
-      run: go test -v ./cmd/terminal
-    
-    - name: Test terminal coverage
       run: go test -cover ./cmd/terminal
 
     - name: Build internal/cryptography
       run: go build -v ./internal/cryptography
 
     - name: Test internal/cryptography
-      run: go test -v ./internal/cryptography
-    
-    - name: Test internal/cryptography coverage
       run: go test -cover ./internal/cryptography

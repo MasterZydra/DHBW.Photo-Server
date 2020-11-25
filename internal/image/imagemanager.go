@@ -6,9 +6,9 @@ type ImageManager struct {
 	images []*Image
 }
 
-func (im *ImageManager) Contains(image *Image) bool {
+func (im *ImageManager) Contains(image *UploadImage) bool {
 	for _, i := range im.images {
-		if i.Hash == image.Hash {
+		if strings.Compare(i.Hash, image.Hash) == 0 {
 			return true
 		}
 	}

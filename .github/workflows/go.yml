@@ -32,7 +32,7 @@ jobs:
         fi
 
     - name: Building
-      run: go build -v ./cmd/backend ./cmd/terminal ./internal/cryptography
+      run: go build -v ./cmd/backend ./cmd/terminal ./internal/cryptography ./internal/image
 
     - name: Testing
-      run: go test -cover ./cmd/backend ./cmd/terminal ./internal/cryptography
+      run: go test -cover ./cmd/backend ./cmd/terminal ./internal/cryptography ./internal/image

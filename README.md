@@ -25,8 +25,6 @@ werden.
 Es soll ein System zur Verwaltung von Photos implementiert werden.
 
 ### Eigene Anmerkungen
-- Konsole - Für was Datum aus EXIF?
-
 3 Komponenten:  
 - Konsolen-Tool
 - Webseite
@@ -127,7 +125,7 @@ werden. (_Bei Upload verkleinerte Version speichern_)
       - Passwort
    3. Der Server soll eine geeignete REST-API implementieren, welche vom Kommandozeilen-Tool genutzt werden kann.
    4. Der mehrfache Upload eines Fotos soll verhindert werden.
-   5. Auch hier soll das Datum des Photos aus dem Exif-Header der JPEG-Datei entnommen werden.
+   5. Auch hier (_beim Batch-Upload_) soll das Datum des Photos aus dem Exif-Header der JPEG-Datei entnommen werden. (_Muss nicht im Client sein. Gedanke von Neemann: Prüfen, ob Datum in EXIF, ansonsten Datum aus Datei-Metadaten._)
 
 7. Bestellung von Photos
    1. Aus der Menge aller Photos soll eine Liste mit einer Auswahl an Photos erstellt werden können. (_Auswahlmöglichkeit_)

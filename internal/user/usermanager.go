@@ -2,9 +2,10 @@ package user
 
 import (
 	"encoding/csv"
+	"errors"
 	"io"
-	"log"
 	"os"
+	"strings"
 )
 
 type UsersManager struct {
@@ -23,15 +24,16 @@ func NewUsersManager(args ...string) UsersManager {
 }
 
 func (um *UsersManager) AddUser(user *User) {
+	// TODO: passwort verschlüsseln
 	um.Users = append(um.Users, user)
 }
 
-func (um *UsersManager) LoadUsers() {
+func (um *UsersManager) LoadUsers() error {
 	// load Users from Users file into Users array
 
 	csvFile, err := os.Open(um.UsersFile)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	csvReader := csv.NewReader(csvFile)
@@ -42,7 +44,7 @@ func (um *UsersManager) LoadUsers() {
 			break
 		}
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		newUser := User{
 			Name:     res[0],
@@ -53,16 +55,17 @@ func (um *UsersManager) LoadUsers() {
 
 	err = csvFile.Close()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
-func (um *UsersManager) StoreUsers() {
+func (um *UsersManager) StoreUsers() error {
 	// save Users array into usersfile
 
 	csvFile, err := os.Create(um.UsersFile)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	csvWriter := csv.NewWriter(csvFile)
@@ -73,16 +76,45 @@ func (um *UsersManager) StoreUsers() {
 
 	err = csvWriter.WriteAll(users)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	csvWriter.Flush()
 	err = csvFile.Close()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
-func (um *UsersManager) Register(name string, password string) {
-	// ???
+func (um *UsersManager) Register(name string, password string) error {
+	// check if user already exists, and yes: error; if not add it to usersfile
+	// TODO: create user folder?
+	err := um.LoadUsers()
+	if err != nil {
+		return err
+	}
+
+	for _, user := range um.Users {
+		if strings.ToLower(name) == strings.ToLower(user.Name) {
+			return errors.New("user " + name + " already exists")
+		}
+	}
+
+	newUser := User{
+		Name:     name,
+		Password: password,
+	}
+	um.AddUser(&newUser)
+
+	err = um.StoreUsers()
+	if err != nil {
+		return err
+	}
+	err = um.LoadUsers()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

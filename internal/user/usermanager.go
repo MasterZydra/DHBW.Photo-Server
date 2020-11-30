@@ -24,7 +24,6 @@ func NewUsersManager(args ...string) UsersManager {
 }
 
 func (um *UsersManager) AddUser(user *User) {
-	// TODO: passwort verschlüsseln
 	um.Users = append(um.Users, user)
 }
 
@@ -46,6 +45,7 @@ func (um *UsersManager) LoadUsers() error {
 		if err != nil {
 			return err
 		}
+
 		newUser := User{
 			Name:     res[0],
 			Password: res[1],
@@ -88,8 +88,8 @@ func (um *UsersManager) StoreUsers() error {
 }
 
 func (um *UsersManager) Register(name string, password string) error {
-	// check if user already exists, and yes: error; if not add it to usersfile
-	// TODO: create user folder?
+	// check if User already exists, and yes: error; if not add it to usersfile
+	// TODO: create User folder?
 	err := um.LoadUsers()
 	if err != nil {
 		return err
@@ -97,14 +97,11 @@ func (um *UsersManager) Register(name string, password string) error {
 
 	for _, user := range um.Users {
 		if strings.ToLower(name) == strings.ToLower(user.Name) {
-			return errors.New("user " + name + " already exists")
+			return errors.New("User " + name + " already exists")
 		}
 	}
 
-	newUser := User{
-		Name:     name,
-		Password: password,
-	}
+	newUser := NewUser(name, password)
 	um.AddUser(&newUser)
 
 	err = um.StoreUsers()

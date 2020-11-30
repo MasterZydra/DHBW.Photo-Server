@@ -10,6 +10,12 @@ import (
 const testUserFile = "usersFile_test.csv"
 const prodUserFile = "usersFile.csv"
 
+//pw: test123
+const pw1Hash = "6dfbf8730f569dba965ead781f536f7b5ccc2f6b9824f0e49e6878b349a94bc9186c7d7145df80e841def14f3dd70791"
+
+//pw: 123test
+const pw2Hash = "e9fa8567977ba0db64bc5d5f18118d377032a4820c38ed404400b52bdb6751b9e27c0beb37e35f2bf75608c634a28990"
+
 func TestMain(m *testing.M) {
 	setup()
 	code := m.Run()
@@ -23,8 +29,8 @@ func setup() {
 	}
 	csvWriter := csv.NewWriter(csvFile)
 	var data = [][]string{
-		{"Max", "1234"},
-		{"Ana", "5678"},
+		{"Max", pw1Hash},
+		{"Ana", pw2Hash},
 	}
 	err = csvWriter.WriteAll(data)
 	if err != nil {
@@ -46,7 +52,7 @@ func TestAddUserCount(t *testing.T) {
 	usersCountBefore := len(um.Users)
 	newUser := User{
 		Name:     "testuser",
-		Password: "1234",
+		Password: pw1Hash,
 	}
 	um.AddUser(&newUser)
 	if usersCountBefore == len(um.Users) {
@@ -55,14 +61,11 @@ func TestAddUserCount(t *testing.T) {
 }
 func TestAddUserContent(t *testing.T) {
 	um := NewUsersManager(testUserFile)
-	newUser := User{
-		Name:     "testuser",
-		Password: "1234",
-	}
+	newUser := NewUser("manuela", "testPW")
 	um.AddUser(&newUser)
 	lastUser := um.Users[len(um.Users)-1]
 	if lastUser.Name != newUser.Name || lastUser.Password != newUser.Password {
-		t.Error("Last user isn't the one added before")
+		t.Error("Last User isn't the one added before")
 	}
 }
 
@@ -80,8 +83,8 @@ func TestLoadUsersContent(t *testing.T) {
 	_ = um.LoadUsers()
 	max := um.Users[0]
 	ana := um.Users[1]
-	if max.Name != "Max" || max.Password != "1234" || ana.Name != "Ana" || ana.Password != "5678" {
-		t.Error("At least one user wasn't loaded correctly from the usersfile")
+	if max.Name != "Max" || max.Password != pw1Hash || ana.Name != "Ana" || ana.Password != pw2Hash {
+		t.Error("At least one User wasn't loaded correctly from the usersfile")
 	}
 }
 
@@ -107,15 +110,12 @@ func TestStoreUsers(t *testing.T) {
 	um := NewUsersManager(testUserFile)
 	_ = um.LoadUsers()
 	usersCountBefore := len(um.Users)
-	newUser := User{
-		Name:     "manuela",
-		Password: "1234",
-	}
+	newUser := NewUser("manuela", "1234")
 	um.AddUser(&newUser)
 	_ = um.StoreUsers()
 	_ = um.LoadUsers()
 	if usersCountBefore == len(um.Users) {
-		t.Error("Storing the new user has not worked")
+		t.Error("Storing the new User has not worked")
 	}
 }
 
@@ -131,6 +131,6 @@ func TestRegisterExistingUser(t *testing.T) {
 	um := NewUsersManager(testUserFile)
 	err := um.Register("max", "0987")
 	if err == nil {
-		t.Errorf("You shouldn't be able to add the user max, since it already exists")
+		t.Errorf("You shouldn't be able to add the User max, since it already exists")
 	}
 }

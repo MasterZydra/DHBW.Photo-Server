@@ -19,8 +19,6 @@ func (u *User) ToCsv() []string {
 	return []string{u.Name, u.password}
 }
 
-//func (u *User) ComparePassword(hexHash string) {
-//	cryptography.ComparePassword(hexHash, u.password)
-//	// TODO
-//
-//}
+func (u *User) ComparePassword(clearPassword string) (bool, error) {
+	return cryptography.ComparePassword(u.password, clearPassword)
+}

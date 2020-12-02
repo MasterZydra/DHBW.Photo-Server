@@ -80,8 +80,13 @@ JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
   
 **Aufgabenverteilung**  
 - Benutzerauthentifizierung (Jones)
+    - Webserver-Teil mit Auth-Wrapper für Handler
+- Webseite:
+  - Template-Engine
 - Bilder (David)
-- Konsole (Patricia)
+  - Einlesen/Schreiben der Bildliste
+- Konsolen-Tests (Patricia)
+- Exif-Parser (Patricia)
 
 ### Anforderungen
 1. Nicht funktional

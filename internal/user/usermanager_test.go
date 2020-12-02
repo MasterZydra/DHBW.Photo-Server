@@ -52,7 +52,7 @@ func TestAddUserCount(t *testing.T) {
 	usersCountBefore := len(um.Users)
 	newUser := User{
 		Name:     "testuser",
-		Password: pw1Hash,
+		password: pw1Hash,
 	}
 	um.AddUser(&newUser)
 	if usersCountBefore == len(um.Users) {
@@ -64,7 +64,7 @@ func TestAddUserContent(t *testing.T) {
 	newUser := NewUser("manuela", "testPW")
 	um.AddUser(&newUser)
 	lastUser := um.Users[len(um.Users)-1]
-	if lastUser.Name != newUser.Name || lastUser.Password != newUser.Password {
+	if lastUser.Name != newUser.Name || lastUser.password != newUser.password {
 		t.Error("Last User isn't the one added before")
 	}
 }
@@ -83,7 +83,7 @@ func TestLoadUsersContent(t *testing.T) {
 	_ = um.LoadUsers()
 	max := um.Users[0]
 	ana := um.Users[1]
-	if max.Name != "Max" || max.Password != pw1Hash || ana.Name != "Ana" || ana.Password != pw2Hash {
+	if max.Name != "Max" || max.password != pw1Hash || ana.Name != "Ana" || ana.password != pw2Hash {
 		t.Error("At least one User wasn't loaded correctly from the usersfile")
 	}
 }

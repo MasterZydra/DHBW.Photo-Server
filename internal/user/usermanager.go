@@ -48,7 +48,7 @@ func (um *UsersManager) LoadUsers() error {
 
 		newUser := User{
 			Name:     res[0],
-			Password: res[1],
+			password: res[1],
 		}
 		um.AddUser(&newUser)
 	}

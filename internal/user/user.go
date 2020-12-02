@@ -2,20 +2,25 @@ package user
 
 import "DHBW.Photo-Server/internal/cryptography"
 
-// TODO: besprechen: Password private machen? Damit mans nicht editieren kann
 type User struct {
 	Name     string
-	Password string
+	password string
 }
 
 func NewUser(name string, password string) User {
 	pw, _ := cryptography.CreatePassword(password)
 	return User{
 		Name:     name,
-		Password: pw,
+		password: pw,
 	}
 }
 
 func (u *User) ToCsv() []string {
-	return []string{u.Name, u.Password}
+	return []string{u.Name, u.password}
 }
+
+//func (u *User) ComparePassword(hexHash string) {
+//	cryptography.ComparePassword(hexHash, u.password)
+//	// TODO
+//
+//}

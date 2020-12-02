@@ -1,6 +1,6 @@
 package image
 
-import "../cryptography"
+import "DHBW.Photo-Server/internal/cryptography"
 
 type Image struct {
 	Name string
@@ -20,7 +20,7 @@ func NewUploadImage(name string, raw []byte) UploadImage {
 
 func NewImage(name string, date string) *Image {
 	// ToDo - Implement
-	return &Image{}//Name: name, Date: date} //, Hash: cryptography.HashImage()}
+	return &Image{} //Name: name, Date: date} //, Hash: cryptography.HashImage()}
 }
 
 func (i *Image) GetThumb() *[]byte {

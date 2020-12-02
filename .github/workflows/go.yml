@@ -23,16 +23,8 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
-
     - name: Building
-      run: go build -v ./cmd/backend ./cmd/terminal ./internal/cryptography ./internal/image ./internal/user
+      run: go build -v ./...
 
     - name: Testing
-      run: go test -cover ./cmd/backend ./cmd/terminal ./internal/cryptography ./internal/image ./internal/user
+      run: go test -cover ./...

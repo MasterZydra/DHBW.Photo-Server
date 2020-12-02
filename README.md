@@ -71,7 +71,7 @@ Registieren von Benutzern ergänzen
 **Bestellen**  
 Die Bilder im Warenkorb werden mit den Metainfos (Auszugformate, Menge) als Zip heruntergeladen.  
 Danach kann der Warenkorb gelöscht werden.  
-JSON-Datei: Bild mit zugehörigen (Format, Anzal)-Einträgen.
+JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
 
 **REST-API**  
 - `POST` - Upload eines Fotos:  

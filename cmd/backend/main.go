@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/", mainHandler)
+	http.HandleFunc("/", AuthWrapper(mainHandler))
 	log.Fatalln(http.ListenAndServeTLS(":4443", "cert.pem", "key.pem", nil))
 }
 

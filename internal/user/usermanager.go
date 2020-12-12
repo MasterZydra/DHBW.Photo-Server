@@ -115,3 +115,16 @@ func (um *UsersManager) Register(name string, password string) error {
 
 	return nil
 }
+
+func (um *UsersManager) Authenticate(user string, pw string) bool {
+	_ = um.LoadUsers()
+	for _, userObj := range um.Users {
+		if userObj.Name == user {
+			ok, _ := userObj.ComparePassword(pw)
+			if ok {
+				return true
+			}
+		}
+	}
+	return false
+}

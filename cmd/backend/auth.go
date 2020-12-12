@@ -1,14 +1,23 @@
 package main
 
 import (
-	user2 "DHBW.Photo-Server/internal/user"
 	"net/http"
 )
 
-func AuthWrapper(handler http.HandlerFunc) http.HandlerFunc {
+type Authenticator interface {
+	Authenticate(user, password string) bool
+}
+
+type AuthenticatorFunc func(user, password string) bool
+
+func (af AuthenticatorFunc) Authenticate(user, password string) bool {
+	return af(user, password)
+}
+
+func AuthWrapper(authenticator Authenticator, handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		usr, pw, ok := r.BasicAuth()
-		if ok && authenticate(usr, pw) {
+		if ok && authenticator.Authenticate(usr, pw) {
 			handler(w, r)
 		} else {
 			w.Header().Set("WWW-Authenticate",
@@ -18,18 +27,4 @@ func AuthWrapper(handler http.HandlerFunc) http.HandlerFunc {
 				http.StatusUnauthorized)
 		}
 	}
-}
-
-func authenticate(user string, pw string) bool {
-	um := user2.NewUsersManager()
-	_ = um.LoadUsers()
-	for _, userObj := range um.Users {
-		if userObj.Name == user {
-			ok, err := userObj.ComparePassword(pw)
-			if ok && err != nil {
-				return true
-			}
-		}
-	}
-	return false
 }

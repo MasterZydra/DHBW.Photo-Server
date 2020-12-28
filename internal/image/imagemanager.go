@@ -7,8 +7,7 @@ type ImageManager struct {
 }
 
 func NewImageManager(userName string) *ImageManager {
-	// ToDo Implement
-	return &ImageManager{}
+	return ReadContent(userName)
 }
 
 func (im *ImageManager) Contains(image *UploadImage) bool {

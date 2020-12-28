@@ -57,7 +57,7 @@ func TestAddUserContent(t *testing.T) {
 	um.AddUser(&newUser)
 	lastUser := um.Users[len(um.Users)-1]
 	if lastUser.Name != newUser.Name || lastUser.password != newUser.password {
-		t.Error("Last User isn't the one added before")
+		t.Error("Last Username isn't the one added before")
 	}
 }
 
@@ -76,7 +76,7 @@ func TestLoadUsersContent(t *testing.T) {
 	max := um.Users[0]
 	ana := um.Users[1]
 	if max.Name != DHBW_Photo_Server.User1Name || max.password != DHBW_Photo_Server.Pw1Hash || ana.Name != DHBW_Photo_Server.User2Name || ana.password != DHBW_Photo_Server.Pw2Hash {
-		t.Error("At least one User wasn't loaded correctly from the usersfile")
+		t.Error("At least one Username wasn't loaded correctly from the usersfile")
 	}
 }
 
@@ -107,7 +107,7 @@ func TestStoreUsers(t *testing.T) {
 	_ = um.StoreUsers()
 	_ = um.LoadUsers()
 	if usersCountBefore == len(um.Users) {
-		t.Error("Storing the new User has not worked")
+		t.Error("Storing the new Username has not worked")
 	}
 }
 
@@ -123,7 +123,7 @@ func TestRegisterExistingUser(t *testing.T) {
 	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
 	err := um.Register(DHBW_Photo_Server.User1Name, "0987")
 	if err == nil {
-		t.Errorf("You shouldn't be able to add the User %v, since it already exists", DHBW_Photo_Server.User1Name)
+		t.Errorf("You shouldn't be able to add the Username %v, since it already exists", DHBW_Photo_Server.User1Name)
 	}
 }
 

@@ -88,8 +88,8 @@ func (um *UsersManager) StoreUsers() error {
 }
 
 func (um *UsersManager) Register(name string, password string) error {
-	// check if User already exists, and yes: error; if not add it to usersfile
-	// TODO: create User folder?
+	// check if Username already exists, and yes: error; if not add it to usersfile
+	// TODO: create Username folder?
 	err := um.LoadUsers()
 	if err != nil {
 		return err
@@ -97,7 +97,7 @@ func (um *UsersManager) Register(name string, password string) error {
 
 	for _, user := range um.Users {
 		if strings.ToLower(name) == strings.ToLower(user.Name) {
-			return errors.New("User " + name + " already exists")
+			return errors.New("Username '" + name + "' already exists")
 		}
 	}
 

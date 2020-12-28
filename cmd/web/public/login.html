@@ -1,7 +1,7 @@
 {{define "title"}}Login Photo-Server{{end}}
 
 {{define "body"}}
-<form method="{{.BackendHost}}login">
+<form action="{{.BackendHost}}login" method="post">
     <table>
         <tr>
             <td>
@@ -16,7 +16,7 @@
                 <label for="password">Passwort:</label>
             </td>
             <td>
-                <input type="text" name="password" id="password">
+                <input type="password" name="password" id="password">
             </td>
         </tr>
         <tr>

@@ -1,8 +1,10 @@
 package image
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
+	"path"
 	"testing"
 )
 
@@ -107,7 +109,17 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 		t.Errorf("Image in ImageManager does not match with UploadImage")
 	}
 
-	// ToDo Load Image and check if raw data matches too
+	// Read saved image to check if raw data is equal
+	readRawImage, err := ioutil.ReadFile(path.Join("../../test/output", fileName))
+	if err != nil {
+		t.Errorf("Error reading saved image: %v", err)
+		return
+	}
+	if bytes.Compare(raw, readRawImage) != 0 {
+		t.Errorf("Writen and read image raw data is not equal")
+	}
+
+	// ToDo Test if image is in content file
 }
 
 // ToDo Test AddImage

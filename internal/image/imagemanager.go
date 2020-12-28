@@ -33,12 +33,17 @@ func (im *ImageManager) AddImageUpload(image *UploadImage) {
 	}
 	// Add file to image array
 	im.AddImage(&image.Image)
+	// Sort and store content file
+	im.Sort()
+	err = WriteContent(im.user, im)
+	if err != nil {
+		fmt.Errorf("error saving content file: %v", err)
+	}
 }
 
 func (im *ImageManager) AddImage(image *Image) {
+	// Add image
 	im.images = append(im.images, image)
-	// ToDo Sort Images
-	// ToDo Write contentFile
 }
 
 func (im *ImageManager) Sort() {

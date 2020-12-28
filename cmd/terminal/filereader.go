@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bufio"
-	"encoding/base64"
 	"io/ioutil"
 	"log"
 	"os"
@@ -38,28 +36,6 @@ func ReadJPEGsFromPath(path string) []*os.File {
 	WriteMessage("Successfully read " + strconv.Itoa(len(result)) + " files")
 
 	return result
-}
-
-func EncodeFilesToBase64(files []*os.File) []string {
-	var encodedStrings []string
-
-	for _, file := range files {
-		// encode each file and add it to slice
-		encodedStrings = append(encodedStrings, encodeSingleFile(file))
-	}
-
-	return encodedStrings
-}
-
-func encodeSingleFile(file *os.File) string {
-	//first read content of the file:
-	content, _ := ioutil.ReadAll(bufio.NewReader(file))
-
-	// then encode
-	encoded := base64.StdEncoding.EncodeToString(content)
-
-	// return encoded string
-	return encoded
 }
 
 func isJPG(filename string) bool {

@@ -22,6 +22,6 @@ func UploadPhoto(input UserInput, img *os.File) {
 	fmt.Println(resp.Status)
 }
 
-func UploadPhotos(input UserInput, imgs []string) {
+func UploadPhotos(input UserInput, imgs []*os.File) {
 	// TODO: implement
 }

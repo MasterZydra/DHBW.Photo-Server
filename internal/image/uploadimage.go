@@ -33,3 +33,8 @@ func (i *UploadImage) SaveImageToDisk() error {
 	}
 	return nil
 }
+
+func NewUploadImage(name string, creationDate string, raw []byte) UploadImage {
+	hash := cryptography.HashToString(cryptography.HashImage(&raw))
+	return UploadImage{Image: Image{Name: name, Hash: hash}, Raw: raw}
+}

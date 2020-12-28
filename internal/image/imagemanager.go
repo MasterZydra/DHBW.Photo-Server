@@ -37,10 +37,12 @@ func (im *ImageManager) AddImageUpload(image *UploadImage) {
 
 func (im *ImageManager) AddImage(image *Image) {
 	im.images = append(im.images, image)
+	// ToDo Sort Images
+	// ToDo Write contentFile
 }
 
 func (im *ImageManager) Sort() {
-	// Do something
+	// ToDo Implement
 }
 
 func (im *ImageManager) GetPhoto(name string) *[]byte {

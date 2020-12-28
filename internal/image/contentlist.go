@@ -31,7 +31,7 @@ func ReadContent(user string) *ImageManager {
 	}
 
 	// Store all data in ImageManager struct
-	imageManager := &ImageManager{}
+	imageManager := &ImageManager{user: user}
 	for _, img := range images {
 		image := Image{Name: img[0], Date: img[1], Hash: img[2]}
 		imageManager.AddImage(&image)

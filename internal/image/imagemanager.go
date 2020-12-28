@@ -4,6 +4,7 @@ import "strings"
 
 type ImageManager struct {
 	images []*Image
+	user string
 }
 
 func NewImageManager(userName string) *ImageManager {

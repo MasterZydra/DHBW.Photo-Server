@@ -3,7 +3,8 @@ package image
 import "testing"
 
 func TestNewImageManager(t *testing.T) {
-	// Test images
+	// Test data
+	user := "../../test"
 	image1 := Image{Name: "img1", Date: "20.11.2020", Hash: "d41d8cd98f00b204e9800998ecf8427e"}
 	image2 := Image{Name: "img2", Date: "21.11.2020", Hash: "d41d8cdb8f0db204a9800498ecf8427e"}
 
@@ -11,11 +12,16 @@ func TestNewImageManager(t *testing.T) {
 	usercontent = "contentNewImageManagerTest.csv"
 
 	// Init ImageManager for given user path
-	imgMan := NewImageManager("../../test")
+	imgMan := NewImageManager(user)
 
 	if imgMan == nil {
 		t.Errorf("Something went wrong creating a ImageManager from user path")
 		return
+	}
+
+	// Check if given parameter is stored in object
+	if imgMan.user != user {
+		t.Errorf("Property user is not filled correctly")
 	}
 
 	// Check if read content is correct

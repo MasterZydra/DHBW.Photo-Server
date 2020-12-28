@@ -109,3 +109,8 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 
 	// ToDo Load Image and check if raw data matches too
 }
+
+// ToDo Test AddImage
+// ToDo Test Sort
+// ToDo Test GetPhoto
+// ToDo Test GetThumbnail

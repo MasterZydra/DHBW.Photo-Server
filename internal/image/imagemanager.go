@@ -6,6 +6,11 @@ type ImageManager struct {
 	images []*Image
 }
 
+func NewImageManager(userName string) *ImageManager {
+	// ToDo Implement
+	return &ImageManager{}
+}
+
 func (im *ImageManager) Contains(image *UploadImage) bool {
 	for _, i := range im.images {
 		if strings.Compare(i.Hash, image.Hash) == 0 {

@@ -29,4 +29,6 @@ func main() {
 	// send https request
 	// use encoded as body
 	// TODO: add restconsumer
+
+	UploadPhotos(input, encoded)
 }

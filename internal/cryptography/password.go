@@ -28,7 +28,8 @@ func ComparePassword(hexHash string, password string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return bytes.Equal(hashBytes, hashPassword([]byte(password), hashBytes[:saltSize])), nil
+	compareHashBytes := hashPassword([]byte(password), hashBytes[:saltSize])
+	return bytes.Equal(hashBytes, compareHashBytes), nil
 }
 
 func createSalt(n int) ([]byte, error) {

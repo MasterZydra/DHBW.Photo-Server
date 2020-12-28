@@ -1,0 +1,41 @@
+{{define "title"}}Register Photo-Server{{end}}
+
+{{define "body"}}
+<form action="{{.BackendHost}}register">
+    <table>
+        <tr>
+            <td>
+                <label for="user">Benutzername:</label>
+            </td>
+            <td>
+                <input type="text" name="user" id="user">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="password">Passwort:</label>
+            </td>
+            <td>
+                <input type="text" name="password" id="password">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="password-confirmation">Passwort bestätigen:</label>
+            </td>
+            <td>
+                <input type="text" name="password-confirmation" id="password-confirmation">
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>
+                <button type="submit">Registrieren</button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<p>Du hast bereits einen Account? <a href="/login.html">Hier einloggen</a></p>
+
+{{end}}

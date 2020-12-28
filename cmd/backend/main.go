@@ -6,8 +6,11 @@ import (
 )
 
 func main() {
+	port := "3000"
+
 	http.HandleFunc("/", mainHandler)
-	log.Fatalln(http.ListenAndServeTLS(":4443", "cert.pem", "key.pem", nil))
+	log.Println("backend listening on " + port)
+	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
 }
 
 func mainHandler(w http.ResponseWriter, r *http.Request) {

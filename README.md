@@ -11,7 +11,7 @@
 - [Bewertungskriterien](#bewertungskriterien)
 
 ## Organisatorisches
-- Die Abgabe des Programmentwurfs erfolgt spätestens am Sonntag, den **10.01.2021** als gepackte Quellen im ZIP-Format per pushci.
+- Die Abgabe des Programmentwurfs erfolgt spätestens am Sonntag, den **10.01.2021** als gepackte Quellen im ZIP-Format per [pushci](https://infprogs2.dhbw-mosbach.de/).
 - Die Bearbeitung der Aufgabe erfolgt in Gruppen von maximal drei Studierenden.
 - Es muss eine Aufstellung der Beiträge der einzelnen Gruppenmitglieder abgegeben
 werden.

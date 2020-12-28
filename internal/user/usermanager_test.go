@@ -1,20 +1,12 @@
 package user
 
 import (
+	DHBW_Photo_Server "DHBW.Photo-Server"
 	"encoding/csv"
 	"log"
 	"os"
 	"testing"
 )
-
-const testUserFile = "usersFile_test.csv"
-const prodUserFile = "usersFile.csv"
-
-//pw: test123
-const pw1Hash = "6dfbf8730f569dba965ead781f536f7b5ccc2f6b9824f0e49e6878b349a94bc9186c7d7145df80e841def14f3dd70791"
-
-//pw: 123test
-const pw2Hash = "e9fa8567977ba0db64bc5d5f18118d377032a4820c38ed404400b52bdb6751b9e27c0beb37e35f2bf75608c634a28990"
 
 func TestMain(m *testing.M) {
 	setup()
@@ -23,14 +15,14 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
-	csvFile, err := os.Create(testUserFile)
+	csvFile, err := os.Create(DHBW_Photo_Server.TestUserFile)
 	if err != nil {
 		log.Fatal(err)
 	}
 	csvWriter := csv.NewWriter(csvFile)
 	var data = [][]string{
-		{"Max", pw1Hash},
-		{"Ana", pw2Hash},
+		{DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw1Hash},
+		{DHBW_Photo_Server.User2Name, DHBW_Photo_Server.Pw2Hash},
 	}
 	err = csvWriter.WriteAll(data)
 	if err != nil {
@@ -40,19 +32,19 @@ func setup() {
 
 func TestNewUsersManager(t *testing.T) {
 	um1 := NewUsersManager()
-	um2 := NewUsersManager(testUserFile)
+	um2 := NewUsersManager(DHBW_Photo_Server.TestUserFile)
 	um3 := NewUsersManager("")
-	if um1.UsersFile != prodUserFile || um2.UsersFile != testUserFile || um3.UsersFile != prodUserFile {
+	if um1.UsersFile != DHBW_Photo_Server.ProdUserFile || um2.UsersFile != DHBW_Photo_Server.TestUserFile || um3.UsersFile != DHBW_Photo_Server.ProdUserFile {
 		t.Error("At least one users file is not correct in the usermanager")
 	}
 }
 
 func TestAddUserCount(t *testing.T) {
-	um := NewUsersManager(testUserFile)
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
 	usersCountBefore := len(um.Users)
 	newUser := User{
 		Name:     "testuser",
-		password: pw1Hash,
+		password: DHBW_Photo_Server.Pw1Hash,
 	}
 	um.AddUser(&newUser)
 	if usersCountBefore == len(um.Users) {
@@ -60,7 +52,7 @@ func TestAddUserCount(t *testing.T) {
 	}
 }
 func TestAddUserContent(t *testing.T) {
-	um := NewUsersManager(testUserFile)
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
 	newUser := NewUser("manuela", "testPW")
 	um.AddUser(&newUser)
 	lastUser := um.Users[len(um.Users)-1]
@@ -70,7 +62,7 @@ func TestAddUserContent(t *testing.T) {
 }
 
 func TestLoadUsersCount(t *testing.T) {
-	um := NewUsersManager(testUserFile)
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
 	usersCountBefore := len(um.Users)
 	_ = um.LoadUsers()
 	if usersCountBefore == len(um.Users) {
@@ -79,11 +71,11 @@ func TestLoadUsersCount(t *testing.T) {
 }
 
 func TestLoadUsersContent(t *testing.T) {
-	um := NewUsersManager(testUserFile)
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
 	_ = um.LoadUsers()
 	max := um.Users[0]
 	ana := um.Users[1]
-	if max.Name != "Max" || max.password != pw1Hash || ana.Name != "Ana" || ana.password != pw2Hash {
+	if max.Name != DHBW_Photo_Server.User1Name || max.password != DHBW_Photo_Server.Pw1Hash || ana.Name != DHBW_Photo_Server.User2Name || ana.password != DHBW_Photo_Server.Pw2Hash {
 		t.Error("At least one User wasn't loaded correctly from the usersfile")
 	}
 }
@@ -97,7 +89,7 @@ func TestLoadUsersWrongFile(t *testing.T) {
 }
 
 func TestLoadUsersMultiple(t *testing.T) {
-	um := NewUsersManager(testUserFile)
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
 	_ = um.LoadUsers()
 	usersCountBetween := len(um.Users)
 	_ = um.LoadUsers()
@@ -107,7 +99,7 @@ func TestLoadUsersMultiple(t *testing.T) {
 }
 
 func TestStoreUsers(t *testing.T) {
-	um := NewUsersManager(testUserFile)
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
 	_ = um.LoadUsers()
 	usersCountBefore := len(um.Users)
 	newUser := NewUser("manuela", "1234")
@@ -120,7 +112,7 @@ func TestStoreUsers(t *testing.T) {
 }
 
 func TestRegister(t *testing.T) {
-	um := NewUsersManager(testUserFile)
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
 	err := um.Register("robert", "1234")
 	if err != nil {
 		t.Errorf("There was an error during registration: %v", err)
@@ -128,9 +120,33 @@ func TestRegister(t *testing.T) {
 }
 
 func TestRegisterExistingUser(t *testing.T) {
-	um := NewUsersManager(testUserFile)
-	err := um.Register("max", "0987")
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
+	err := um.Register(DHBW_Photo_Server.User1Name, "0987")
 	if err == nil {
-		t.Errorf("You shouldn't be able to add the User max, since it already exists")
+		t.Errorf("You shouldn't be able to add the User %v, since it already exists", DHBW_Photo_Server.User1Name)
+	}
+}
+
+func TestUsersManager_AuthenticateCorrect(t *testing.T) {
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
+	ok := um.Authenticate(DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw1Clear)
+	if !ok {
+		t.Errorf("Authentication should be valid, but it isn't")
+	}
+}
+
+func TestUsersManager_AuthenticateWrongUser(t *testing.T) {
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
+	ok := um.Authenticate("wrongUserName", DHBW_Photo_Server.Pw1Clear)
+	if ok {
+		t.Errorf("username should be wrong, but it seems to be correct")
+	}
+}
+
+func TestUsersManager_AuthenticateWrongPW(t *testing.T) {
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
+	ok := um.Authenticate(DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw2Clear)
+	if ok {
+		t.Errorf("password should be wrong, but it seems to be correct")
 	}
 }

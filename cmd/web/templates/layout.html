@@ -1,0 +1,14 @@
+{{define "layout"}}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>{{template "title"}}</title>
+</head>
+<body>
+    {{.BackendHost}}
+    <h1>Photo-Server</h1>
+    {{template "body" .}}
+</body>
+</html>
+{{end}}

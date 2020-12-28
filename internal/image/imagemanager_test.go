@@ -1,6 +1,10 @@
 package image
 
-import "testing"
+import (
+	"io/ioutil"
+	"os"
+	"testing"
+)
 
 func TestNewImageManager(t *testing.T) {
 	// Test data
@@ -46,4 +50,62 @@ func TestImageManager_Contains(t *testing.T) {
 	if imgMan.Contains(&image2) {
 		t.Errorf("Wrongly detects image2 as alread contained")
 	}
+}
+
+func TestImageManager_AddImageUpload(t *testing.T) {
+	// Test data
+	fileName := "MyImg.jpg"
+	// Read bytes of example image
+	raw, err := ioutil.ReadFile("../../test/example_imgs/img1.jpg")
+	if err != nil {
+		t.Errorf("Error reading image: %v", err)
+	}
+	// Init upload image
+	upimg := UploadImage{
+		Raw: raw,
+		Image: Image{
+			Name: fileName,
+			Date: "01.01.2020",
+			Hash: "d41d8cd98f00b204e9800998ecf8427e"}}
+
+	// Add image to ImageManager
+	imgMan := ImageManager{user: "../../test/output"}
+	imgMan.AddImageUpload(&upimg)
+
+	// Check if image is stored to directory
+	dir, err := os.Open("../../test/output")
+	if err != nil {
+		t.Errorf("Failed to open output folder: %v", err)
+		return
+	}
+	// List all files and folders in output folder
+	fileInfo, err := dir.Readdir(0)
+	if err != nil {
+		t.Errorf("Failed to read folder content: %v", err)
+		return
+	}
+	// Search in array if image is contained
+	found := false
+	for _, info := range fileInfo {
+		if info.Name() == fileName {
+			found = true
+			break
+		}
+	}
+	// Check if image was found
+	if !found {
+		t.Errorf("File %v not found in output folder", fileName)
+	}
+
+	// Check if image is in image array in ImageManager
+	if len(imgMan.images) != 1 {
+		t.Errorf("Too much images in ImageManager")
+		return
+	}
+	if img := imgMan.images[0];
+	img.Name != upimg.Name || img.Date != upimg.Date || img.Hash != upimg.Hash {
+		t.Errorf("Image in ImageManager does not match with UploadImage")
+	}
+
+	// ToDo Load Image and check if raw data matches too
 }

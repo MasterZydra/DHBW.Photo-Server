@@ -1,6 +1,9 @@
 package image
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type ImageManager struct {
 	images []*Image
@@ -18,6 +21,18 @@ func (im *ImageManager) Contains(image *UploadImage) bool {
 		}
 	}
 	return false
+}
+
+func (im *ImageManager) AddImageUpload(image *UploadImage) {
+	// Set path to user directory
+	image.SetUserPath(im.user)
+	// Store file to disk
+	err := image.SaveImageToDisk()
+	if err != nil {
+		fmt.Errorf("error saving image to disk: %v", err)
+	}
+	// Add file to image array
+	im.AddImage(&image.Image)
 }
 
 func (im *ImageManager) AddImage(image *Image) {

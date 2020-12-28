@@ -1,7 +1,7 @@
-{{define "title"}}Login Photo-Server{{end}}
+{{define "title"}}Register Photo-Server{{end}}
 
 {{define "body"}}
-<form method="{{.BackendHost}}login">
+<form action="{{.BackendHost}}register">
     <table>
         <tr>
             <td>
@@ -20,14 +20,22 @@
             </td>
         </tr>
         <tr>
+            <td>
+                <label for="password-confirmation">Passwort bestätigen:</label>
+            </td>
+            <td>
+                <input type="text" name="password-confirmation" id="password-confirmation">
+            </td>
+        </tr>
+        <tr>
             <td></td>
             <td>
-                <button type="submit">Einloggen</button>
+                <button type="submit">Registrieren</button>
             </td>
         </tr>
     </table>
-
 </form>
 
-<p>Noch kein Account? <a href="/register.html">Hier Registrieren</a></p>
+<p>Du hast bereits einen Account? <a href="/login.html">Hier einloggen</a></p>
+
 {{end}}

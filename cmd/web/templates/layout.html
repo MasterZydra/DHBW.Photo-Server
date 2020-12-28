@@ -6,7 +6,9 @@
     <title>{{template "title"}}</title>
 </head>
 <body>
-    {{template "body"}}
+    {{.BackendHost}}
+    <h1>Photo-Server</h1>
+    {{template "body" .}}
 </body>
 </html>
 {{end}}

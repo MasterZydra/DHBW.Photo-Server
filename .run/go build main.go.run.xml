@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go build main.go" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+    <module name="DHBW.Photo-Server" />
+    <working_directory value="$PROJECT_DIR$/cmd/web" />
+    <kind value="FILE" />
+    <filePath value="$PROJECT_DIR$/cmd/web/main.go" />
+    <package value="DHBW.Photo-Server" />
+    <directory value="$PROJECT_DIR$" />
+    <output_directory value="$PROJECT_DIR$/cmd/web" />
+    <input_file value="$PROJECT_DIR$/cmd/web/go_build_main_go.exe" />
+    <method v="2" />
+  </configuration>
+</component>

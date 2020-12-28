@@ -19,14 +19,16 @@ func NewUploadImage(name string, raw []byte) UploadImage {
 }
 
 func NewImage(name string, date string) *Image {
-	// ToDo - Implement
+	// ToDo Implement
 	return &Image{} //Name: name, Date: date} //, Hash: cryptography.HashImage()}
 }
 
 func (i *Image) GetThumb() *[]byte {
+	// ToDo Implement
 	return &[]byte{}
 }
 
 func (i *Image) GetOriginal() *[]byte {
+	// ToDo Implement
 	return &[]byte{}
 }

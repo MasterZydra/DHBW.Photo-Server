@@ -12,6 +12,10 @@ type UploadImage struct {
 	userPath string
 }
 
+func (i *UploadImage) SetUserPath(path string) {
+	i.userPath = path
+}
+
 func (i *UploadImage) SaveImageToDisk() error {
 	// Open new file
 	imgFile, err := os.Create(path.Join(i.userPath, i.Name))

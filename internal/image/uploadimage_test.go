@@ -32,3 +32,12 @@ func TestUploadImage_SaveImageToDisk(t *testing.T) {
 		t.Errorf("Read data is not equal to the written data")
 	}
 }
+
+func TestUploadImage_SetUserPath(t *testing.T) {
+	newPath := "NewPath"
+	img := UploadImage{userPath: ""}
+	img.SetUserPath(newPath)
+	if img.userPath != newPath {
+		t.Errorf("Path %v expected but received %v", newPath, img.userPath)
+	}
+}

@@ -1,16 +1,18 @@
 package image
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
+	"path"
 	"testing"
 )
 
 func TestNewImageManager(t *testing.T) {
 	// Test data
 	user := "../../test"
-	image1 := Image{Name: "img1", Date: "20.11.2020", Hash: "d41d8cd98f00b204e9800998ecf8427e"}
-	image2 := Image{Name: "img2", Date: "21.11.2020", Hash: "d41d8cdb8f0db204a9800498ecf8427e"}
+	image1 := NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Overwrite output file name
 	usercontent = "contentNewImageManagerTest.csv"
@@ -38,12 +40,42 @@ func TestNewImageManager(t *testing.T) {
 
 func TestImageManager_Contains(t *testing.T) {
 	// Test images
-	image1 := UploadImage{Image: Image{Name: "img1", Date: "20.11.2020", Hash: "d41d8cd98f00b204e9800998ecf8427e"}}
-	image2 := UploadImage{Image: Image{Name: "img2", Date: "21.11.2020", Hash: "d41d8cdb8f0db204a9800498ecf8427e"}}
+	image1 := UploadImage{Image: *NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")}
+	image2 := UploadImage{Image: *NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")}
 
+	// Init ImageManager
 	imgMan := ImageManager{}
 	imgMan.AddImage(&(image1.Image))
 
+	// Execute tests
+	if !imgMan.Contains(&image1) {
+		t.Errorf("Existing image1 not detected")
+	}
+	if imgMan.Contains(&image2) {
+		t.Errorf("Wrongly detects image2 as alread contained")
+	}
+}
+
+func TestImageManager_Contains_WithExampleImages(t *testing.T) {
+	// Test images
+	// Read bytes of example image 1
+	raw1, err := ioutil.ReadFile("../../test/example_imgs/img1.jpg")
+	if err != nil {
+		t.Errorf("Error reading image: %v", err)
+	}
+	// Read bytes of example image 2
+	raw2, err := ioutil.ReadFile("../../test/example_imgs/img2.jpg")
+	if err != nil {
+		t.Errorf("Error reading image: %v", err)
+	}
+	image1 := NewUploadImage("img1", "2020-11-20", raw1)
+	image2 := NewUploadImage("img2", "2020-11-21", raw2)
+
+	// Init ImageManager
+	imgMan := ImageManager{}
+	imgMan.AddImage(&(image1.Image))
+
+	// Execute tests
 	if !imgMan.Contains(&image1) {
 		t.Errorf("Existing image1 not detected")
 	}
@@ -61,12 +93,7 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 		t.Errorf("Error reading image: %v", err)
 	}
 	// Init upload image
-	upimg := UploadImage{
-		Raw: raw,
-		Image: Image{
-			Name: fileName,
-			Date: "01.01.2020",
-			Hash: "d41d8cd98f00b204e9800998ecf8427e"}}
+	upimg := NewUploadImage(fileName, "2020-01-01", raw)
 
 	// Add image to ImageManager
 	imgMan := ImageManager{user: "../../test/output"}
@@ -107,10 +134,72 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 		t.Errorf("Image in ImageManager does not match with UploadImage")
 	}
 
-	// ToDo Load Image and check if raw data matches too
+	// Read saved image to check if raw data is equal
+	readRawImage, err := ioutil.ReadFile(path.Join("../../test/output", fileName))
+	if err != nil {
+		t.Errorf("Error reading saved image: %v", err)
+		return
+	}
+	if bytes.Compare(raw, readRawImage) != 0 {
+		t.Errorf("Writen and read image raw data is not equal")
+	}
+
+	// ToDo Test if image is in content file
 }
 
-// ToDo Test AddImage
-// ToDo Test Sort
+func TestImageManager_AddImage(t *testing.T) {
+	// Test images
+	image1 := NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")
+
+	// Init ImageManager
+	imgMan := ImageManager{}
+
+	// Add first image
+	imgMan.AddImage(image1)
+	// Check if image is in image array in ImageManager
+	if len(imgMan.images) != 1 {
+		t.Errorf("Too much images in ImageManager")
+		return
+	}
+	if img := imgMan.images[0];
+		img.Name != image1.Name || img.Date != image1.Date || img.Hash != image1.Hash {
+		t.Errorf("Image in ImageManager does not match with UploadImage")
+		return
+	}
+
+	// Add second image
+	imgMan.AddImage(image2)
+	// Check if image is in image array in ImageManager
+	if len(imgMan.images) != 2 {
+		t.Errorf("Too much images in ImageManager")
+		return
+	}
+	if img := imgMan.images[1];
+		img.Name != image2.Name || img.Date != image2.Date || img.Hash != image2.Hash {
+		t.Errorf("Image in ImageManager does not match with UploadImage")
+	}
+}
+
+func TestImageManager_Sort(t *testing.T) {
+	// Test images
+	image1 := NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")
+	image0 := NewImage("img0", "2020-01-21", "d41d8cdb8f0db204a9800498ecf8427e")
+	image2 := NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")
+
+	// Init ImageManager
+	imgMan := ImageManager{}
+	imgMan.AddImage(image1)
+	imgMan.AddImage(image0)
+	imgMan.AddImage(image2)
+
+	// Sort and check order
+	imgMan.Sort()
+	if img := imgMan.images;
+		img[0].Name != "img2" || img[1].Name != "img1" || img[2].Name != "img0" {
+			t.Errorf("Images are in the wrong order")
+	}
+}
+
 // ToDo Test GetPhoto
 // ToDo Test GetThumbnail

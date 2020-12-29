@@ -33,8 +33,7 @@ func ReadContent(user string) *ImageManager {
 	// Store all data in ImageManager struct
 	imageManager := &ImageManager{user: user}
 	for _, img := range images {
-		image := Image{Name: img[0], Date: img[1], Hash: img[2]}
-		imageManager.AddImage(&image)
+		imageManager.AddImage(NewImage(img[0], img[1], img[2]))
 	}
 
 	return imageManager
@@ -55,7 +54,7 @@ func WriteContent(user string, imgs *ImageManager) error {
 	// Build array that will be stored in CSV format
 	var imgArray [][]string
 	for _, img := range imgs.images {
-		imgArray = append(imgArray, []string{img.Name, img.Date, img.Hash})
+		imgArray = append(imgArray, []string{img.Name, img.Date.Format("2006-01-02"), img.Hash})
 	}
 
 	// Write file

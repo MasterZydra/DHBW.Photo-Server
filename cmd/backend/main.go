@@ -39,10 +39,6 @@ func encode(w http.ResponseWriter, v interface{}) error {
 	return nil
 }
 
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-
-}
-
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.RegisterRes
 
@@ -71,8 +67,35 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 
 	// encode data
 	// TODO: in Wrapper packen?
-	err = encode(w, &res)
+	_ = encode(w, &res)
+}
+
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	var res api.LoginRes
+
+	// decode data
+	var data api.LoginReq
+	err := decode(r, &data)
 	if err != nil {
 		res.Error = err.Error()
 	}
+
+	um := user.NewUsersManager()
+	ok, err := um.Authenticate(data.Username, data.Password)
+	if err != nil {
+		res.Error = err.Error()
+	} else if !ok {
+		res.Error = "Wrong username or password"
+	}
+
+	if ok {
+		// generate Cookie and store it in ResponseWriter
+		userObj := um.GetUser(data.Username)
+		userObj.AddCookie()
+		_ = um.StoreUsers()
+		res.Cookie = userObj.Cookie
+	}
+
+	// encode data
+	_ = encode(w, &res)
 }

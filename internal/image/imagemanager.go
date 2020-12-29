@@ -2,6 +2,7 @@ package image
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -47,7 +48,9 @@ func (im *ImageManager) AddImage(image *Image) {
 }
 
 func (im *ImageManager) Sort() {
-	// ToDo Implement
+	sort.Slice(im.images, func(i, j int) bool {
+		return im.images[i].Date.After(im.images[j].Date)
+	})
 }
 
 func (im *ImageManager) GetPhoto(name string) *[]byte {

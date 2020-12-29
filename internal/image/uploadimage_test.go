@@ -6,6 +6,26 @@ import (
 	"testing"
 )
 
+func TestNewUploadImage(t *testing.T) {
+	// Read bytes of example image
+	raw, err := ioutil.ReadFile("../../test/example_imgs/img2.jpg")
+	if err != nil {
+		t.Errorf("Error reading image: %v", err)
+	}
+
+	// Create image
+	img := NewUploadImage("myImage.jpg", "2020-12-12", raw)
+
+	// Check struct content
+	if img.Name != "myImage.jpg" ||
+		img.Hash != "fe430f8f373ec2abd6880bfdaebcd9ae" ||
+		// ToDo Add check for correct date + Example with image without exif creation date
+		//img.Date.Format("2006-01-02") != "2020-12-12" ||
+		bytes.Compare(img.Raw, raw) != 0 {
+		t.Errorf("UploadImage content does not match with given data")
+	}
+}
+
 func TestUploadImage_SaveImageToDisk(t *testing.T) {
 	// Test data
 	rawdata := []byte{84,69,83,84}

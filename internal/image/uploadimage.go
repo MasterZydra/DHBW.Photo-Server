@@ -12,6 +12,13 @@ type UploadImage struct {
 	userPath string
 }
 
+func NewUploadImage(name string, creationDate string, raw []byte) UploadImage {
+	hash := cryptography.HashToString(cryptography.HashImage(&raw))
+	// ToDo Read Exif -> if no date use given creationdate
+	img := NewImage(name, creationDate, hash)
+	return UploadImage{Image: *img, Raw: raw}
+}
+
 func (i *UploadImage) SetUserPath(path string) {
 	i.userPath = path
 }
@@ -32,9 +39,4 @@ func (i *UploadImage) SaveImageToDisk() error {
 		return err
 	}
 	return nil
-}
-
-func NewUploadImage(name string, creationDate string, raw []byte) UploadImage {
-	hash := cryptography.HashToString(cryptography.HashImage(&raw))
-	return UploadImage{Image: Image{Name: name, Hash: hash}, Raw: raw}
 }

@@ -147,7 +147,39 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 	// ToDo Test if image is in content file
 }
 
-// ToDo Test AddImage
+func TestImageManager_AddImage(t *testing.T) {
+	// Test images
+	image1 := NewImage("img1", "20.11.2020", "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("img2", "21.11.2020", "d41d8cdb8f0db204a9800498ecf8427e")
+
+	// Init ImageManager
+	imgMan := ImageManager{}
+
+	// Add first image
+	imgMan.AddImage(image1)
+	// Check if image is in image array in ImageManager
+	if len(imgMan.images) != 1 {
+		t.Errorf("Too much images in ImageManager")
+		return
+	}
+	if img := imgMan.images[0];
+		img.Name != image1.Name || img.Date != image1.Date || img.Hash != image1.Hash {
+		t.Errorf("Image in ImageManager does not match with UploadImage")
+		return
+	}
+
+	imgMan.AddImage(image2)
+	// Check if image is in image array in ImageManager
+	if len(imgMan.images) != 2 {
+		t.Errorf("Too much images in ImageManager")
+		return
+	}
+	if img := imgMan.images[1];
+		img.Name != image2.Name || img.Date != image2.Date || img.Hash != image2.Hash {
+		t.Errorf("Image in ImageManager does not match with UploadImage")
+	}
+}
+
 // ToDo Test Sort
 // ToDo Test GetPhoto
 // ToDo Test GetThumbnail

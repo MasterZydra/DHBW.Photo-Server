@@ -63,12 +63,7 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 		t.Errorf("Error reading image: %v", err)
 	}
 	// Init upload image
-	upimg := UploadImage{
-		Raw: raw,
-		Image: Image{
-			Name: fileName,
-			Date: "01.01.2020",
-			Hash: "d41d8cd98f00b204e9800998ecf8427e"}}
+	upimg := NewUploadImage(fileName, "01.01.2020", raw)
 
 	// Add image to ImageManager
 	imgMan := ImageManager{user: "../../test/output"}

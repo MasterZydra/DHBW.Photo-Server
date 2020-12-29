@@ -33,7 +33,7 @@ func TestUploadImage_SaveImageToDisk(t *testing.T) {
 	// Initialize and save new image
 	upimg := UploadImage{
 		Raw: rawdata,
-		Image: *NewImage("imageWriteTest.txt", "01.01.2020", "d41d8cd98f00b204e9800998ecf8427e"),
+		Image: *NewImage("imageWriteTest.txt", "2020-01-01", "d41d8cd98f00b204e9800998ecf8427e"),
 		userPath: "../../test/output"}
 	upimg.SaveImageToDisk()
 

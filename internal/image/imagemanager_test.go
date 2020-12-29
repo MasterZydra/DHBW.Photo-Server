@@ -11,8 +11,8 @@ import (
 func TestNewImageManager(t *testing.T) {
 	// Test data
 	user := "../../test"
-	image1 := NewImage("img1", "20.11.2020", "d41d8cd98f00b204e9800998ecf8427e")
-	image2 := NewImage("img2", "21.11.2020", "d41d8cdb8f0db204a9800498ecf8427e")
+	image1 := NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Overwrite output file name
 	usercontent = "contentNewImageManagerTest.csv"
@@ -40,8 +40,8 @@ func TestNewImageManager(t *testing.T) {
 
 func TestImageManager_Contains(t *testing.T) {
 	// Test images
-	image1 := UploadImage{Image: *NewImage("img1", "20.11.2020", "d41d8cd98f00b204e9800998ecf8427e")}
-	image2 := UploadImage{Image: *NewImage("img2", "21.11.2020", "d41d8cdb8f0db204a9800498ecf8427e")}
+	image1 := UploadImage{Image: *NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")}
+	image2 := UploadImage{Image: *NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")}
 
 	// Init ImageManager
 	imgMan := ImageManager{}
@@ -68,8 +68,8 @@ func TestImageManager_Contains_WithExampleImages(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error reading image: %v", err)
 	}
-	image1 := NewUploadImage("img1", "20.11.2020", raw1)
-	image2 := NewUploadImage("img2", "21.11.2020", raw2)
+	image1 := NewUploadImage("img1", "2020-11-20", raw1)
+	image2 := NewUploadImage("img2", "2020-11-21", raw2)
 
 	// Init ImageManager
 	imgMan := ImageManager{}
@@ -93,7 +93,7 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 		t.Errorf("Error reading image: %v", err)
 	}
 	// Init upload image
-	upimg := NewUploadImage(fileName, "01.01.2020", raw)
+	upimg := NewUploadImage(fileName, "2020-01-01", raw)
 
 	// Add image to ImageManager
 	imgMan := ImageManager{user: "../../test/output"}
@@ -149,8 +149,8 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 
 func TestImageManager_AddImage(t *testing.T) {
 	// Test images
-	image1 := NewImage("img1", "20.11.2020", "d41d8cd98f00b204e9800998ecf8427e")
-	image2 := NewImage("img2", "21.11.2020", "d41d8cdb8f0db204a9800498ecf8427e")
+	image1 := NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Init ImageManager
 	imgMan := ImageManager{}
@@ -168,6 +168,7 @@ func TestImageManager_AddImage(t *testing.T) {
 		return
 	}
 
+	// Add second image
 	imgMan.AddImage(image2)
 	// Check if image is in image array in ImageManager
 	if len(imgMan.images) != 2 {
@@ -180,6 +181,25 @@ func TestImageManager_AddImage(t *testing.T) {
 	}
 }
 
-// ToDo Test Sort
+func TestImageManager_Sort(t *testing.T) {
+	// Test images
+	image1 := NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")
+	image0 := NewImage("img0", "2020-01-21", "d41d8cdb8f0db204a9800498ecf8427e")
+	image2 := NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")
+
+	// Init ImageManager
+	imgMan := ImageManager{}
+	imgMan.AddImage(image1)
+	imgMan.AddImage(image0)
+	imgMan.AddImage(image2)
+
+	// Sort and check order
+	imgMan.Sort()
+	if img := imgMan.images;
+		img[0].Name != "img2" || img[1].Name != "img1" || img[2].Name != "img0" {
+			t.Errorf("Images are in the wrong order")
+	}
+}
+
 // ToDo Test GetPhoto
 // ToDo Test GetThumbnail

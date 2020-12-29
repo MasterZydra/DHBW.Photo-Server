@@ -6,8 +6,8 @@ import (
 
 func TestReadContent(t *testing.T) {
 	// Test images
-	image1 := NewImage("img1", "20.11.2020", "d41d8cd98f00b204e9800998ecf8427e")
-	image2 := NewImage("img2", "21.11.2020", "d41d8cdb8f0db204a9800498ecf8427e")
+	image1 := NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Overwrite output file name
 	usercontent = "contentReadTest.csv"
@@ -29,8 +29,8 @@ func TestReadContent(t *testing.T) {
 
 func TestWriteContent(t *testing.T) {
 	// Test images
-	image1 := NewImage("Image 1", "02.01.2020", "d41d8cd98f00b204e9800998ecf8427e")
-	image2 := NewImage("Image 2", "01.01.2020", "d41d8cd98f10b214e5803998ecf8427e")
+	image1 := NewImage("Image 1", "2020-01-02", "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("Image 2", "2020-01-01", "d41d8cd98f10b214e5803998ecf8427e")
 
 	// Overwrite output file name
 	usercontent = "contentWriteTest.csv"

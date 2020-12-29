@@ -11,8 +11,8 @@ import (
 func TestNewImageManager(t *testing.T) {
 	// Test data
 	user := "../../test"
-	image1 := Image{Name: "img1", Date: "20.11.2020", Hash: "d41d8cd98f00b204e9800998ecf8427e"}
-	image2 := Image{Name: "img2", Date: "21.11.2020", Hash: "d41d8cdb8f0db204a9800498ecf8427e"}
+	image1 := NewImage("img1", "20.11.2020", "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("img2", "21.11.2020", "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Overwrite output file name
 	usercontent = "contentNewImageManagerTest.csv"
@@ -40,8 +40,8 @@ func TestNewImageManager(t *testing.T) {
 
 func TestImageManager_Contains(t *testing.T) {
 	// Test images
-	image1 := UploadImage{Image: Image{Name: "img1", Date: "20.11.2020", Hash: "d41d8cd98f00b204e9800998ecf8427e"}}
-	image2 := UploadImage{Image: Image{Name: "img2", Date: "21.11.2020", Hash: "d41d8cdb8f0db204a9800498ecf8427e"}}
+	image1 := UploadImage{Image: *NewImage("img1", "20.11.2020", "d41d8cd98f00b204e9800998ecf8427e")}
+	image2 := UploadImage{Image: *NewImage("img2", "21.11.2020", "d41d8cdb8f0db204a9800498ecf8427e")}
 
 	imgMan := ImageManager{}
 	imgMan.AddImage(&(image1.Image))

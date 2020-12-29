@@ -6,8 +6,8 @@ import (
 
 func TestReadContent(t *testing.T) {
 	// Test images
-	image1 := Image{Name: "img1", Date: "20.11.2020", Hash: "d41d8cd98f00b204e9800998ecf8427e"}
-	image2 := Image{Name: "img2", Date: "21.11.2020", Hash: "d41d8cdb8f0db204a9800498ecf8427e"}
+	image1 := NewImage("img1", "20.11.2020", "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("img2", "21.11.2020", "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Overwrite output file name
 	usercontent = "contentReadTest.csv"
@@ -29,16 +29,16 @@ func TestReadContent(t *testing.T) {
 
 func TestWriteContent(t *testing.T) {
 	// Test images
-	image1 := Image{Name: "Image 1", Date: "02.01.2020", Hash: "d41d8cd98f00b204e9800998ecf8427e"}
-	image2 := Image{Name: "Image 2", Date: "01.01.2020", Hash: "d41d8cd98f10b214e5803998ecf8427e"}
+	image1 := NewImage("Image 1", "02.01.2020", "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("Image 2", "01.01.2020", "d41d8cd98f10b214e5803998ecf8427e")
 
 	// Overwrite output file name
 	usercontent = "contentWriteTest.csv"
 
 	// Creat new image manager, fill it with images and write that data
 	imgman := ImageManager{}
-	imgman.AddImage(&image1)
-	imgman.AddImage(&image2)
+	imgman.AddImage(image1)
+	imgman.AddImage(image2)
 	WriteContent("../../test/output", &imgman)
 
 	// Read file again

@@ -43,9 +43,39 @@ func TestImageManager_Contains(t *testing.T) {
 	image1 := UploadImage{Image: *NewImage("img1", "20.11.2020", "d41d8cd98f00b204e9800998ecf8427e")}
 	image2 := UploadImage{Image: *NewImage("img2", "21.11.2020", "d41d8cdb8f0db204a9800498ecf8427e")}
 
+	// Init ImageManager
 	imgMan := ImageManager{}
 	imgMan.AddImage(&(image1.Image))
 
+	// Execute tests
+	if !imgMan.Contains(&image1) {
+		t.Errorf("Existing image1 not detected")
+	}
+	if imgMan.Contains(&image2) {
+		t.Errorf("Wrongly detects image2 as alread contained")
+	}
+}
+
+func TestImageManager_Contains_WithExampleImages(t *testing.T) {
+	// Test images
+	// Read bytes of example image 1
+	raw1, err := ioutil.ReadFile("../../test/example_imgs/img1.jpg")
+	if err != nil {
+		t.Errorf("Error reading image: %v", err)
+	}
+	// Read bytes of example image 2
+	raw2, err := ioutil.ReadFile("../../test/example_imgs/img2.jpg")
+	if err != nil {
+		t.Errorf("Error reading image: %v", err)
+	}
+	image1 := NewUploadImage("img1", "20.11.2020", raw1)
+	image2 := NewUploadImage("img2", "21.11.2020", raw2)
+
+	// Init ImageManager
+	imgMan := ImageManager{}
+	imgMan.AddImage(&(image1.Image))
+
+	// Execute tests
 	if !imgMan.Contains(&image1) {
 		t.Errorf("Existing image1 not detected")
 	}

@@ -24,8 +24,9 @@ func TestUsernameValidation (t *testing.T) {
 }
 
 func TestHostValidation (t *testing.T) {
-	allowedHosts := [6]string{"TestUser", "User123", "Max", "Ana", "manuela", "robert"}
-	forbiddenHosts := [6]string{"%TestUser%", "_User123_", "#Max", "(Ana)", "<manuela>", "!robert!"}
+	// TODO: implement
+	allowedHosts := [3]string{"localhost:8080", "https://localhost:4443", "http://192.168.2.162:8888/"}
+	forbiddenHosts := [3]string{"localhost", "1234", "192.168.2.162"}
 
 	for _, host := range allowedHosts {
 		err := validateHost(host)

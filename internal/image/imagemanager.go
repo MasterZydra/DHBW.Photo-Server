@@ -35,7 +35,8 @@ func (im *ImageManager) AddImageUpload(image *UploadImage) {
 	// Add file to image array
 	im.AddImage(&image.Image)
 	// Sort and store content file
-	im.Sort()
+	im.sort()
+	// ToDo In own func
 	err = WriteContent(im.user, im)
 	if err != nil {
 		fmt.Errorf("error saving content file: %v", err)
@@ -47,7 +48,7 @@ func (im *ImageManager) AddImage(image *Image) {
 	im.images = append(im.images, image)
 }
 
-func (im *ImageManager) Sort() {
+func (im *ImageManager) sort() {
 	sort.Slice(im.images, func(i, j int) bool {
 		return im.images[i].Date.After(im.images[j].Date)
 	})

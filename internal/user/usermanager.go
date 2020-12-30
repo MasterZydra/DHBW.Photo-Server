@@ -1,10 +1,12 @@
 package user
 
 import (
+	DHBW_Photo_Server "DHBW.Photo-Server"
 	"encoding/csv"
 	"errors"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -14,6 +16,7 @@ type UsersManager struct {
 }
 
 func NewUsersManager(args ...string) UsersManager {
+	// TODO: LoadUsers direkt beim NewUsersManager ausführen -> refactoring
 	usersFile := "usersFile.csv"
 	if args != nil && args[0] != "" {
 		usersFile = args[0]
@@ -46,16 +49,22 @@ func (um *UsersManager) LoadUsers() error {
 			return err
 		}
 
-		newUser := User{
-			Name:     res[0],
-			password: res[1],
-		}
+		newUser := FromCsv(res)
 		um.AddUser(&newUser)
 	}
 
 	err = csvFile.Close()
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (um *UsersManager) GetUser(username string) *User {
+	for _, userObj := range um.Users {
+		if strings.ToLower(userObj.Name) == strings.ToLower(username) {
+			return userObj
+		}
 	}
 	return nil
 }
@@ -88,17 +97,19 @@ func (um *UsersManager) StoreUsers() error {
 }
 
 func (um *UsersManager) Register(name string, password string) error {
+	// check if user has not allowed characters in it (allowed are: a-z,A-Z,0-9,-,_ and .
+	matched, err := regexp.MatchString(DHBW_Photo_Server.UsernameRegexBlacklist, name)
+	if matched {
+		return errors.New("Username can only contain a-z,A-Z,0-9,-,_ and .")
+	}
+
 	// check if Username already exists, and yes: error; if not add it to usersfile
-	// TODO: create Username folder?
-	err := um.LoadUsers()
+	exists, err := um.UserExists(name)
 	if err != nil {
 		return err
 	}
-
-	for _, user := range um.Users {
-		if strings.ToLower(name) == strings.ToLower(user.Name) {
-			return errors.New("Username '" + name + "' already exists")
-		}
+	if exists {
+		return errors.New("Username '" + name + "' already exists")
 	}
 
 	newUser := NewUser(name, password)
@@ -116,15 +127,38 @@ func (um *UsersManager) Register(name string, password string) error {
 	return nil
 }
 
-func (um *UsersManager) Authenticate(user string, pw string) bool {
-	_ = um.LoadUsers()
-	for _, userObj := range um.Users {
-		if userObj.Name == user {
-			ok, _ := userObj.ComparePassword(pw)
-			if ok {
-				return true
-			}
+func (um *UsersManager) UserExists(name string) (bool, error) {
+	err := um.LoadUsers()
+	if err != nil {
+		return false, err
+	}
+	user := um.GetUser(name)
+	if user != nil {
+		return true, nil
+	}
+	return false, nil
+}
+
+func (um *UsersManager) Authenticate(user string, pw string) (bool, error) {
+	err := um.LoadUsers()
+	if err != nil {
+		return false, err
+	}
+	userObj := um.GetUser(user)
+	if userObj != nil {
+		ok, _ := userObj.ComparePassword(pw)
+		if ok {
+			return true, nil
 		}
+	}
+	return false, nil
+}
+
+// TODO: test
+func (um *UsersManager) AuthenticateHashedPassword(username string, hashedPw string) bool {
+	userObj := um.GetUser(username)
+	if userObj != nil {
+		return userObj.password == hashedPw
 	}
 	return false
 }

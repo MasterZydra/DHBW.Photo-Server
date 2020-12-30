@@ -1,7 +1,7 @@
 package user
 
 import (
-	DHBW_Photo_Server "DHBW.Photo-Server"
+	"DHBW.Photo-Server"
 	"encoding/csv"
 	"log"
 	"os"
@@ -98,6 +98,25 @@ func TestLoadUsersMultiple(t *testing.T) {
 	}
 }
 
+func TestUsersManager_GetUserSuccess(t *testing.T) {
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
+	_ = um.LoadUsers()
+	max := um.GetUser(DHBW_Photo_Server.User1Name)
+	if max.Name != DHBW_Photo_Server.User1Name || max.password != DHBW_Photo_Server.Pw1Hash {
+		t.Errorf("Something went wrong while getting user %v", DHBW_Photo_Server.User1Name)
+	}
+}
+
+func TestUsersManager_GetUserFail(t *testing.T) {
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
+	_ = um.LoadUsers()
+	username := "unknownUser"
+	unknown := um.GetUser(username)
+	if unknown != nil {
+		t.Errorf("Shouldn't get user %v", username)
+	}
+}
+
 func TestStoreUsers(t *testing.T) {
 	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
 	_ = um.LoadUsers()
@@ -111,6 +130,23 @@ func TestStoreUsers(t *testing.T) {
 	}
 }
 
+func TestUsersManager_UserExistsTrue(t *testing.T) {
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
+	exists, _ := um.UserExists(DHBW_Photo_Server.User1Name)
+	if !exists {
+		t.Errorf("user '%v' should exist", DHBW_Photo_Server.User1Name)
+	}
+}
+
+func TestUsersManager_UserExistsFalse(t *testing.T) {
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
+	username := "userThatDoesntExist"
+	exists, _ := um.UserExists(username)
+	if exists {
+		t.Errorf("user '%v' should exist", username)
+	}
+}
+
 func TestRegister(t *testing.T) {
 	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
 	err := um.Register("robert", "1234")
@@ -119,7 +155,15 @@ func TestRegister(t *testing.T) {
 	}
 }
 
-func TestRegisterExistingUser(t *testing.T) {
+func TestUsersManager_RegisterWrongUsername(t *testing.T) {
+	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
+	err := um.Register("robert*", "1234")
+	if err == nil {
+		t.Errorf("There should be an error stating that the username is invalid")
+	}
+}
+
+func TestUsersManager_RegisterExistingUser(t *testing.T) {
 	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
 	err := um.Register(DHBW_Photo_Server.User1Name, "0987")
 	if err == nil {
@@ -129,7 +173,7 @@ func TestRegisterExistingUser(t *testing.T) {
 
 func TestUsersManager_AuthenticateCorrect(t *testing.T) {
 	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
-	ok := um.Authenticate(DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw1Clear)
+	ok, _ := um.Authenticate(DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw1Clear)
 	if !ok {
 		t.Errorf("Authentication should be valid, but it isn't")
 	}
@@ -137,7 +181,7 @@ func TestUsersManager_AuthenticateCorrect(t *testing.T) {
 
 func TestUsersManager_AuthenticateWrongUser(t *testing.T) {
 	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
-	ok := um.Authenticate("wrongUserName", DHBW_Photo_Server.Pw1Clear)
+	ok, _ := um.Authenticate("wrongUserName", DHBW_Photo_Server.Pw1Clear)
 	if ok {
 		t.Errorf("username should be wrong, but it seems to be correct")
 	}
@@ -145,7 +189,7 @@ func TestUsersManager_AuthenticateWrongUser(t *testing.T) {
 
 func TestUsersManager_AuthenticateWrongPW(t *testing.T) {
 	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
-	ok := um.Authenticate(DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw2Clear)
+	ok, _ := um.Authenticate(DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw2Clear)
 	if ok {
 		t.Errorf("password should be wrong, but it seems to be correct")
 	}

@@ -21,17 +21,6 @@ func TestNewUserPwError(t *testing.T) {
 	}
 }
 
-func TestUser_ToCsv(t *testing.T) {
-	user := User{
-		Name:     "test",
-		password: "mostcomplexpasswordever",
-	}
-	userCsvRow := user.ToCsv()
-	if len(userCsvRow) != 2 || userCsvRow[0] != user.Name || userCsvRow[1] != user.password {
-		t.Error("Error while converting user object to csv")
-	}
-}
-
 func TestUser_ComparePassword(t *testing.T) {
 	pw := "harryPotter4eva"
 	user := NewUser("ron", pw)

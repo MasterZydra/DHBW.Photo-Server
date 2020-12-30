@@ -1,6 +1,8 @@
 package user
 
-import "DHBW.Photo-Server/internal/cryptography"
+import (
+	"DHBW.Photo-Server/internal/cryptography"
+)
 
 type User struct {
 	Name     string
@@ -12,6 +14,13 @@ func NewUser(name string, password string) User {
 	return User{
 		Name:     name,
 		password: pw,
+	}
+}
+
+func FromCsv(csvLine []string) User {
+	return User{
+		Name:     csvLine[0],
+		password: csvLine[1],
 	}
 }
 

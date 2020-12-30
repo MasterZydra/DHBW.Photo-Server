@@ -10,3 +10,11 @@ type RegisterRes struct {
 	Username string
 	Error    string
 }
+
+type ImageReq struct {
+	Data string
+}
+
+type ImageRes struct {
+	Data string
+}

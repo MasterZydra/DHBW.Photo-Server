@@ -2,13 +2,13 @@
 
 {{define "body"}}
 <p>
-    <a href="home.html">
-        {{if .LoggedIn}}
+    <a href="/home">
+        {{if .Global.LoggedIn}}
             Home
         {{else}}
             Einloggen
         {{end}}
     </a>
 </p>
-<p><a href="register.html">Registrieren</a></p>
+<p><a href="/register">Registrieren</a></p>
 {{end}}

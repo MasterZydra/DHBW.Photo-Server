@@ -13,17 +13,11 @@ func main() {
 	port := "3000"
 
 	// TODO: mustParams-Wrapper einbauen? https://medium.com/@matryer/the-http-handler-wrapper-technique-in-golang-updated-bc7fbcffa702
-	http.HandleFunc("/", mainHandler)
 	http.HandleFunc("/register", registerHandler)
-	http.HandleFunc("/images", auth.Wrapper(auth.Authenticate(), imagesHandler, []string{}))
+	http.HandleFunc("/images", auth.Wrapper(auth.Authenticate(), imagesHandler))
 
 	log.Println("backend listening on https://localhost:" + port)
 	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
-}
-
-func mainHandler(w http.ResponseWriter, r *http.Request) {
-	responseString := "<html><body>Hallo</body></html>"
-	w.Write([]byte(responseString))
 }
 
 func decode(r *http.Request, v interface{}) error {
@@ -72,6 +66,8 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func imagesHandler(w http.ResponseWriter, r *http.Request) {
-	responseString := "<html><body>Erfolreich Basic Auth bezwungen</body></html>"
-	w.Write([]byte(responseString))
+	var res api.ImageRes
+	res.Data = "test"
+	// TODO: images zurückgeben
+	_ = encode(w, &res)
 }

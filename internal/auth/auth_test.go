@@ -13,9 +13,7 @@ func createServer(auth AuthenticatorFunc) *httptest.Server {
 		Wrapper(auth,
 			func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, "string from server")
-			},
-			[]string{},
-		))
+			}))
 }
 
 func TestWithoutPassword(t *testing.T) {

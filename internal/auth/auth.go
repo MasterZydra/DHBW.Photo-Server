@@ -2,7 +2,6 @@ package auth
 
 import (
 	"DHBW.Photo-Server/internal/user"
-	"DHBW.Photo-Server/internal/util"
 	"net/http"
 )
 
@@ -16,10 +15,10 @@ func (af AuthenticatorFunc) Authenticate(user, password string) bool {
 	return af(user, password)
 }
 
-func Wrapper(authenticator Authenticator, handler http.HandlerFunc, whitelist []string) http.HandlerFunc {
+func Wrapper(authenticator Authenticator, handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		usr, pw, ok := r.BasicAuth()
-		if util.ContainsString(whitelist, r.URL.Path) || ok && authenticator.Authenticate(usr, pw) {
+		if ok && authenticator.Authenticate(usr, pw) {
 			handler(w, r)
 		} else {
 			w.Header().Set("WWW-Authenticate",

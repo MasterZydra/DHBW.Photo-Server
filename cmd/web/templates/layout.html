@@ -13,8 +13,8 @@
     <br>
     <br>
     <p>
-    {{if .LoggedIn }}
-        Eingeloggt als {{.Username}}. Zum Abmelden Browser schließen.
+    {{if .Global.LoggedIn }}
+        Eingeloggt als {{.Global.Username}}. Zum Abmelden Browser schließen.
     {{else}}
         Nicht eingeloggt.
     {{end}}

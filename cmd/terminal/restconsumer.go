@@ -10,7 +10,7 @@ import (
 func UploadPhoto(input UserInput, img *os.File) {
 	client := &http.Client{}
 
-	req, err := http.NewRequest("POST", input.Host + "/img", img)
+	req, err := http.NewRequest("POST", input.Host + "/uploadImage", img)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -23,5 +23,8 @@ func UploadPhoto(input UserInput, img *os.File) {
 }
 
 func UploadPhotos(input UserInput, imgs []*os.File) {
-	// TODO: implement
+	// TODO: test
+	for _, img := range imgs {
+		go UploadPhoto(input, img)
+	}
 }

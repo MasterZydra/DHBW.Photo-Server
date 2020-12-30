@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
 	"errors"
 	"io"
-	"net/http"
 	"os"
 	"regexp"
 	"strings"
@@ -17,6 +16,7 @@ type UsersManager struct {
 }
 
 func NewUsersManager(args ...string) UsersManager {
+	// TODO: LoadUsers direkt beim NewUsersManager ausführen -> refactoring
 	usersFile := "usersFile.csv"
 	if args != nil && args[0] != "" {
 		usersFile = args[0]
@@ -67,15 +67,6 @@ func (um *UsersManager) GetUser(username string) *User {
 		}
 	}
 	return nil
-}
-
-func (um *UsersManager) GetUserByCookie(cookie *http.Cookie) *User {
-	re := regexp.MustCompile(DHBW_Photo_Server.UsernameRegexWhitelist)
-	username := re.FindString(cookie.Value)
-	if username == "" {
-		return nil
-	}
-	return um.GetUser(username)
 }
 
 func (um *UsersManager) StoreUsers() error {
@@ -153,13 +144,21 @@ func (um *UsersManager) Authenticate(user string, pw string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	for _, userObj := range um.Users {
-		if userObj.Name == user {
-			ok, _ := userObj.ComparePassword(pw)
-			if ok {
-				return true, nil
-			}
+	userObj := um.GetUser(user)
+	if userObj != nil {
+		ok, _ := userObj.ComparePassword(pw)
+		if ok {
+			return true, nil
 		}
 	}
 	return false, nil
+}
+
+// TODO: test
+func (um *UsersManager) AuthenticateHashedPassword(username string, hashedPw string) bool {
+	userObj := um.GetUser(username)
+	if userObj != nil {
+		return userObj.password == hashedPw
+	}
+	return false
 }

@@ -4,7 +4,6 @@ import (
 	"DHBW.Photo-Server"
 	"encoding/csv"
 	"log"
-	"net/http"
 	"os"
 	"testing"
 )
@@ -22,8 +21,8 @@ func setup() {
 	}
 	csvWriter := csv.NewWriter(csvFile)
 	var data = [][]string{
-		{DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw1Hash, DHBW_Photo_Server.CookieValue1},
-		{DHBW_Photo_Server.User2Name, DHBW_Photo_Server.Pw2Hash, DHBW_Photo_Server.CookieValue2},
+		{DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw1Hash},
+		{DHBW_Photo_Server.User2Name, DHBW_Photo_Server.Pw2Hash},
 	}
 	err = csvWriter.WriteAll(data)
 	if err != nil {
@@ -115,42 +114,6 @@ func TestUsersManager_GetUserFail(t *testing.T) {
 	unknown := um.GetUser(username)
 	if unknown != nil {
 		t.Errorf("Shouldn't get user %v", username)
-	}
-}
-
-func TestUsersManager_GetUserByCookieSuccess(t *testing.T) {
-	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
-	_ = um.LoadUsers()
-	cookie := http.Cookie{
-		Value: DHBW_Photo_Server.User1Name + DHBW_Photo_Server.CookieValueSeparator + "TEa8eQ_-ZVoeZaz6z5XaUM1NOQI=",
-	}
-	userObj := um.GetUserByCookie(&cookie)
-	if userObj == nil || userObj.Name != DHBW_Photo_Server.User1Name {
-		t.Error("User object shouldn't be nil. It should get the user by the provided cookie")
-	}
-}
-
-func TestUsersManager_GetUserByCookieUnknownUser(t *testing.T) {
-	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
-	_ = um.LoadUsers()
-	cookie := http.Cookie{
-		Value: "unknownUser" + DHBW_Photo_Server.CookieValueSeparator + "TEa8eQ_-ZVoeZaz6z5XaUM1NOQI=",
-	}
-	userObj := um.GetUserByCookie(&cookie)
-	if userObj != nil {
-		t.Error("User object shouldn't be nil. It should get the user by the provided cookie")
-	}
-}
-
-func TestUsersManager_GetUserByCookieNoUser(t *testing.T) {
-	um := NewUsersManager(DHBW_Photo_Server.TestUserFile)
-	_ = um.LoadUsers()
-	cookie := http.Cookie{
-		Value: "TEa8eQ_-ZVoeZaz6z5XaUM1NOQI=",
-	}
-	userObj := um.GetUserByCookie(&cookie)
-	if userObj != nil {
-		t.Error("User object shouldn't be nil. It should get the user by the provided cookie")
 	}
 }
 

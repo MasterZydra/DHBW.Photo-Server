@@ -1,4 +1,4 @@
-package main
+package auth
 
 import (
 	"fmt"
@@ -10,10 +10,12 @@ import (
 
 func createServer(auth AuthenticatorFunc) *httptest.Server {
 	return httptest.NewServer(
-		AuthWrapper(auth,
+		Wrapper(auth,
 			func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, "string from server")
-			}))
+			},
+			[]string{},
+		))
 }
 
 func TestWithoutPassword(t *testing.T) {

@@ -9,5 +9,16 @@
     <h1>Photo-Server</h1>
     {{template "body" .}}
 </body>
+<footer>
+    <br>
+    <br>
+    <p>
+    {{if .LoggedIn }}
+        Eingeloggt als {{.Username}}. Zum Abmelden Browser schließen.
+    {{else}}
+        Nicht eingeloggt.
+    {{end}}
+    </p>
+</footer>
 </html>
 {{end}}

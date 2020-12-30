@@ -1,0 +1,14 @@
+{{define "title"}}Photo-Server{{end}}
+
+{{define "body"}}
+<p>
+    <a href="home.html">
+        {{if .LoggedIn}}
+            Home
+        {{else}}
+            Einloggen
+        {{end}}
+    </a>
+</p>
+<p><a href="register.html">Registrieren</a></p>
+{{end}}

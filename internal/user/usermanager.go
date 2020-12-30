@@ -10,27 +10,27 @@ import (
 	"strings"
 )
 
-type UsersManager struct {
+type UserManager struct {
 	Users     []*User
 	UsersFile string
 }
 
-func NewUsersManager(args ...string) UsersManager {
-	// TODO: LoadUsers direkt beim NewUsersManager ausführen -> refactoring
+func NewUserManager(args ...string) UserManager {
+	// TODO: LoadUsers direkt beim NewUserManager ausführen -> refactoring
 	usersFile := "usersFile.csv"
 	if args != nil && args[0] != "" {
 		usersFile = args[0]
 	}
-	return UsersManager{
+	return UserManager{
 		UsersFile: usersFile,
 	}
 }
 
-func (um *UsersManager) AddUser(user *User) {
+func (um *UserManager) AddUser(user *User) {
 	um.Users = append(um.Users, user)
 }
 
-func (um *UsersManager) LoadUsers() error {
+func (um *UserManager) LoadUsers() error {
 	// load Users from Users file into Users array
 
 	csvFile, err := os.Open(um.UsersFile)
@@ -60,7 +60,7 @@ func (um *UsersManager) LoadUsers() error {
 	return nil
 }
 
-func (um *UsersManager) GetUser(username string) *User {
+func (um *UserManager) GetUser(username string) *User {
 	for _, userObj := range um.Users {
 		if strings.ToLower(userObj.Name) == strings.ToLower(username) {
 			return userObj
@@ -69,7 +69,7 @@ func (um *UsersManager) GetUser(username string) *User {
 	return nil
 }
 
-func (um *UsersManager) StoreUsers() error {
+func (um *UserManager) StoreUsers() error {
 	// save Users array into usersfile
 
 	csvFile, err := os.Create(um.UsersFile)
@@ -96,7 +96,7 @@ func (um *UsersManager) StoreUsers() error {
 	return nil
 }
 
-func (um *UsersManager) Register(name string, password string) error {
+func (um *UserManager) Register(name string, password string) error {
 	// check if user has not allowed characters in it (allowed are: a-z,A-Z,0-9,-,_ and .
 	matched, err := regexp.MatchString(DHBW_Photo_Server.UsernameRegexBlacklist, name)
 	if matched {
@@ -127,7 +127,7 @@ func (um *UsersManager) Register(name string, password string) error {
 	return nil
 }
 
-func (um *UsersManager) UserExists(name string) (bool, error) {
+func (um *UserManager) UserExists(name string) (bool, error) {
 	err := um.LoadUsers()
 	if err != nil {
 		return false, err
@@ -139,7 +139,7 @@ func (um *UsersManager) UserExists(name string) (bool, error) {
 	return false, nil
 }
 
-func (um *UsersManager) Authenticate(user string, pw string) (bool, error) {
+func (um *UserManager) Authenticate(user string, pw string) (bool, error) {
 	err := um.LoadUsers()
 	if err != nil {
 		return false, err
@@ -155,7 +155,7 @@ func (um *UsersManager) Authenticate(user string, pw string) (bool, error) {
 }
 
 // TODO: test
-func (um *UsersManager) AuthenticateHashedPassword(username string, hashedPw string) bool {
+func (um *UserManager) AuthenticateHashedPassword(username string, hashedPw string) bool {
 	userObj := um.GetUser(username)
 	if userObj != nil {
 		return userObj.password == hashedPw

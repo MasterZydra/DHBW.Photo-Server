@@ -31,9 +31,8 @@ func TestNewImageManager(t *testing.T) {
 	}
 
 	// Check if read content is correct
-	if img := imgMan.images;
-		img[0].Name != image1.Name || img[0].Date != image1.Date || img[0].Hash != image1.Hash ||
-			img[1].Name != image2.Name || img[1].Date != image2.Date || img[1].Hash != image2.Hash {
+	if img := imgMan.images; img[0].Name != image1.Name || img[0].Date != image1.Date || img[0].Hash != image1.Hash ||
+		img[1].Name != image2.Name || img[1].Date != image2.Date || img[1].Hash != image2.Hash {
 		t.Errorf("Read content is not correct")
 	}
 }
@@ -129,8 +128,7 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 		t.Errorf("Too much images in ImageManager")
 		return
 	}
-	if img := imgMan.images[0];
-	img.Name != upimg.Name || img.Date != upimg.Date || img.Hash != upimg.Hash {
+	if img := imgMan.images[0]; img.Name != upimg.Name || img.Date != upimg.Date || img.Hash != upimg.Hash {
 		t.Errorf("Image in ImageManager does not match with UploadImage")
 	}
 
@@ -162,8 +160,7 @@ func TestImageManager_AddImage(t *testing.T) {
 		t.Errorf("Too much images in ImageManager")
 		return
 	}
-	if img := imgMan.images[0];
-		img.Name != image1.Name || img.Date != image1.Date || img.Hash != image1.Hash {
+	if img := imgMan.images[0]; img.Name != image1.Name || img.Date != image1.Date || img.Hash != image1.Hash {
 		t.Errorf("Image in ImageManager does not match with UploadImage")
 		return
 	}
@@ -175,8 +172,7 @@ func TestImageManager_AddImage(t *testing.T) {
 		t.Errorf("Too much images in ImageManager")
 		return
 	}
-	if img := imgMan.images[1];
-		img.Name != image2.Name || img.Date != image2.Date || img.Hash != image2.Hash {
+	if img := imgMan.images[1]; img.Name != image2.Name || img.Date != image2.Date || img.Hash != image2.Hash {
 		t.Errorf("Image in ImageManager does not match with UploadImage")
 	}
 }
@@ -195,11 +191,10 @@ func TestImageManager_Sort(t *testing.T) {
 
 	// Sort and check order
 	imgMan.Sort()
-	if img := imgMan.images;
-		img[0].Name != "img2" || img[1].Name != "img1" || img[2].Name != "img0" {
-			t.Errorf("Images are in the wrong order")
+	if img := imgMan.images; img[0].Name != "img2" || img[1].Name != "img1" || img[2].Name != "img0" {
+		t.Errorf("images are in the wrong order")
 	}
 }
 
-// ToDo Test GetPhoto
+// ToDo Test GetImage
 // ToDo Test GetThumbnail

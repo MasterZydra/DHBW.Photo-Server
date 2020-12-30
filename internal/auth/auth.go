@@ -33,7 +33,7 @@ func Wrapper(authenticator Authenticator, handler http.HandlerFunc) http.Handler
 // TODO: tests schreiben?
 func Authenticate() AuthenticatorFunc {
 	return func(username, password string) bool {
-		um := user.NewUsersManager()
+		um := user.NewUserManager()
 		ok, _ := um.Authenticate(username, password)
 		return ok
 	}

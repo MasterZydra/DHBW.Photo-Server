@@ -8,7 +8,7 @@ import (
 
 type ImageManager struct {
 	images []*Image
-	user string
+	user   string
 }
 
 func NewImageManager(userName string) *ImageManager {
@@ -53,7 +53,7 @@ func (im *ImageManager) Sort() {
 	})
 }
 
-func (im *ImageManager) GetPhoto(name string) *[]byte {
+func (im *ImageManager) GetImage(name string) *[]byte {
 	for _, i := range im.images {
 		if strings.Compare(i.Name, name) == 0 {
 			return &[]byte{}

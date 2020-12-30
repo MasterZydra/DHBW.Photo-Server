@@ -19,4 +19,6 @@ const (
 
 	UsernameRegexBlacklist = `[^a-z^A-Z^0-9\^_\^.\^-]`
 	UsernameRegexWhitelist = `[a-zA-Z0-9\_\.\-]+`
+
+	BackendHost = "https://localhost:3000/"
 )

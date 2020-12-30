@@ -1,11 +1,13 @@
 package main
 
 import (
+	"DHBW.Photo-Server"
 	"DHBW.Photo-Server/internal/api"
 	"DHBW.Photo-Server/internal/auth"
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -15,9 +17,6 @@ import (
 )
 
 const port = "4443"
-const BackendHost = "https://localhost:3000/"
-
-var whitelistPaths = []string{"/", "/index.html", "/register.html"}
 
 type TemplateVariables struct {
 	Global GlobalVariables
@@ -36,9 +35,53 @@ func main() {
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/home", auth.Wrapper(auth.Authenticate(), homeHandler))
+	// TODO: Jones: Frontend-Struktur überlegen und ApiCalls fürs Backend vorbereiten
 
 	log.Println("web listening on https://localhost:" + port)
 	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
+}
+
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	defer layout(w, r, nil)
+	r.URL.Path = "index"
+}
+
+func registerHandler(w http.ResponseWriter, r *http.Request) {
+	defer layout(w, r, nil)
+
+	if r.Method == http.MethodPost {
+		data := api.RegisterReq{
+			Username:             r.FormValue("user"),
+			Password:             r.FormValue("password"),
+			PasswordConfirmation: r.FormValue("passwordConfirmation"),
+		}
+		var res api.RegisterRes
+		err := callApi(r, "register", data, &res)
+		if err != nil {
+			badRequest(w, err)
+			return
+		}
+
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+}
+
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	var res api.ThumbnailsRes
+	defer layout(w, r, res)
+
+	data := api.ThumbnailsReq{
+		Index:  1,
+		Length: 25,
+	}
+	err := callApi(r, "thumbnails", data, &res)
+	if err != nil {
+		badRequest(w, err)
+		return
+	}
+
+	// TODO: Thumbnails zurückgeben
 }
 
 func layout(w http.ResponseWriter, r *http.Request, data interface{}) {
@@ -84,53 +127,20 @@ func layout(w http.ResponseWriter, r *http.Request, data interface{}) {
 	}
 }
 
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	r.URL.Path = "index"
-	layout(w, r, nil)
+func internalServerError(w http.ResponseWriter, err error) {
+	http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 }
 
-func registerHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		data := api.RegisterReq{
-			Username:             r.FormValue("user"),
-			Password:             r.FormValue("password"),
-			PasswordConfirmation: r.FormValue("passwordConfirmation"),
-		}
-		var res api.RegisterRes
-		err := callApi(r, "register", data, &res)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		if res.Error != "" {
-			http.Error(w, res.Error, http.StatusBadRequest)
-			return
-		}
-
-		//logout(w, r)
-		http.Redirect(w, r, "/index.html", http.StatusTemporaryRedirect)
-		return
-	}
-	layout(w, r, nil)
+func badRequest(w http.ResponseWriter, err error) {
+	http.Error(w, err.Error(), http.StatusBadRequest)
 }
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	var res api.ImageRes
-	_ = callApi(r, "images", nil, &res)
-
-	layout(w, r, res)
-}
-
-func internalServerError(w http.ResponseWriter, error error) {
-	http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+error.Error(), http.StatusInternalServerError)
-}
-
-func callApi(r *http.Request, url string, data interface{}, res interface{}) error {
-	// encode data to json
+func callApi(r *http.Request, url string, data interface{}, res api.BaseRes) error {
+	// encode data to jsonUtil
 	jsonBytes, err := json.Marshal(data)
 
 	// prepare request
-	req, err := http.NewRequest(http.MethodPost, BackendHost+url, bytes.NewBuffer(jsonBytes))
+	req, err := http.NewRequest(http.MethodPost, DHBW_Photo_Server.BackendHost+url, bytes.NewBuffer(jsonBytes))
 	if err != nil {
 		return err
 	}
@@ -159,10 +169,17 @@ func callApi(r *http.Request, url string, data interface{}, res interface{}) err
 		return err
 	}
 
-	// decode data from json into result struct
+	// decode data from jsonUtil into result struct
 	err = json.Unmarshal(jsonBytes, &res)
 	if err != nil {
 		return err
 	}
+
+	// check for error from backend in res
+	errorString := res.GetError()
+	if errorString != "" {
+		return errors.New(errorString)
+	}
+
 	return nil
 }

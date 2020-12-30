@@ -16,7 +16,7 @@ func ReadJPEGsFromPath(path string) []*os.File {
 		log.Fatal(err)
 	}
 
-	WriteMessage("Folder successfully read in.")
+	WriteMessage("Folder successfully read in")
 
 	var result []*os.File
 	var fileSeparator string = string(os.PathSeparator)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"DHBW.Photo-Server/internal/api"
+	"DHBW.Photo-Server/internal/auth"
 	"DHBW.Photo-Server/internal/user"
 	"encoding/json"
 	"log"
@@ -12,17 +13,11 @@ func main() {
 	port := "3000"
 
 	// TODO: mustParams-Wrapper einbauen? https://medium.com/@matryer/the-http-handler-wrapper-technique-in-golang-updated-bc7fbcffa702
-	http.HandleFunc("/", mainHandler)
-	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
+	http.HandleFunc("/images", auth.Wrapper(auth.Authenticate(), imagesHandler))
 
 	log.Println("backend listening on https://localhost:" + port)
 	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
-}
-
-func mainHandler(w http.ResponseWriter, r *http.Request) {
-	responseString := "<html><body>Hallo</body></html>"
-	w.Write([]byte(responseString))
 }
 
 func decode(r *http.Request, v interface{}) error {
@@ -70,32 +65,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	_ = encode(w, &res)
 }
 
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	var res api.LoginRes
-
-	// decode data
-	var data api.LoginReq
-	err := decode(r, &data)
-	if err != nil {
-		res.Error = err.Error()
-	}
-
-	um := user.NewUsersManager()
-	ok, err := um.Authenticate(data.Username, data.Password)
-	if err != nil {
-		res.Error = err.Error()
-	} else if !ok {
-		res.Error = "Wrong username or password"
-	}
-
-	if ok {
-		// generate Cookie and store it in ResponseWriter
-		userObj := um.GetUser(data.Username)
-		userObj.AddCookie()
-		_ = um.StoreUsers()
-		res.Cookie = userObj.Cookie
-	}
-
-	// encode data
+func imagesHandler(w http.ResponseWriter, r *http.Request) {
+	var res api.ImageRes
+	res.Data = "test"
+	// TODO: images zurückgeben
 	_ = encode(w, &res)
 }

@@ -1,7 +1,5 @@
 package api
 
-import "net/http"
-
 type RegisterReq struct {
 	Username             string
 	Password             string
@@ -13,12 +11,10 @@ type RegisterRes struct {
 	Error    string
 }
 
-type LoginReq struct {
-	Username string
-	Password string
+type ImageReq struct {
+	Data string
 }
 
-type LoginRes struct {
-	Cookie http.Cookie
-	Error  string
+type ImageRes struct {
+	Data string
 }

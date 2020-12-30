@@ -190,9 +190,10 @@ func TestImageManager_Sort(t *testing.T) {
 	imgMan.AddImage(image2)
 
 	// Sort and check order
-	imgMan.Sort()
-	if img := imgMan.images; img[0].Name != "img2" || img[1].Name != "img1" || img[2].Name != "img0" {
-		t.Errorf("images are in the wrong order")
+	imgMan.sort()
+	if img := imgMan.images;
+		img[0].Name != "img2" || img[1].Name != "img1" || img[2].Name != "img0" {
+			t.Errorf("Images are in the wrong order")
 	}
 }
 

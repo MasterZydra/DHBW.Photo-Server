@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"net/url"
@@ -34,7 +35,11 @@ func WaitForUserInput() UserInput {
 	uname, _ := reader.ReadString('\n')
 	uname = strings.TrimSuffix(uname, "\n")
 	//check that the username contains only numbers and letters
-	validateUsername(uname)
+	err := validateUsername(uname)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Print("Password: ")
 	pswd, _ := reader.ReadString('\n')
@@ -44,7 +49,11 @@ func WaitForUserInput() UserInput {
 	host, _ := reader.ReadString('\n')
 	host = strings.TrimSuffix(host, "\n")
 	// check if host is valid
-	validateHost(host)
+	err = validateHost(host)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Print("Path of the folder with the photos: ")
 	path, _ := reader.ReadString('\n')
@@ -58,19 +67,23 @@ func WaitForUserInput() UserInput {
 	return userInput
 }
 
-func validateUsername(uname string) {
+func validateUsername(uname string) error {
 	for _, c := range uname {
 		if !unicode.IsDigit(c) && !unicode.IsLetter(c) {
-			log.Fatal("The username must only contain letters and numbers.")
+			return errors.New("The username must only contain letters and numbers")
+			//log.Fatal("The username must only contain letters and numbers.")
 		}
 	}
+	return nil
 }
 
-func validateHost(host string) {
+func validateHost(host string) error {
 	_, err := url.ParseRequestURI(host)
 	if err != nil {
-		log.Fatal("Invalid Host" + err.Error())
+		return errors.New("Invalid Host" + err.Error())
+		//log.Fatal("Invalid Host" + err.Error())
 	}
+	return nil
 }
 
 func WriteMessage(msg string) {

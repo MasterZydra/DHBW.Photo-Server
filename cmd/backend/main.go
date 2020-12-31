@@ -87,7 +87,7 @@ func thumbnailsHander(w http.ResponseWriter, r *http.Request) {
 }
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	var res api.ThumbnailsRes
+	var res api.ImageUploadRes
 	defer jsonUtil.EncodeResponse(w, &res)
 
 	username, _, ok := r.BasicAuth()

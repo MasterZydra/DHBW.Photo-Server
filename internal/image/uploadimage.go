@@ -2,6 +2,7 @@ package image
 
 import (
 	"DHBW.Photo-Server/internal/cryptography"
+	"DHBW.Photo-Server/internal/util"
 	"os"
 	"path"
 )
@@ -24,6 +25,10 @@ func (i *UploadImage) SetUserPath(path string) {
 }
 
 func (i *UploadImage) SaveImageToDisk() error {
+	err := util.CheckExistAndCreateFolder(path.Join(imagedir, i.userPath))
+	if err != nil {
+		return err
+	}
 	// Open new file
 	imgFile, err := os.Create(path.Join(imagedir, i.userPath, i.Name))
 	if err != nil {

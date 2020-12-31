@@ -15,6 +15,7 @@ func TestNewImageManager(t *testing.T) {
 	image2 := NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Overwrite output file name
+	imagedir = ""
 	usercontent = "contentNewImageManagerTest.csv"
 
 	// Init ImageManager for given user path
@@ -37,7 +38,7 @@ func TestNewImageManager(t *testing.T) {
 	}
 }
 
-func TestImageManager_Contains(t *testing.T) {
+func TestImageManager_Contains_Hash(t *testing.T) {
 	// Test images
 	image1 := UploadImage{Image: *NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")}
 	image2 := UploadImage{Image: *NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")}
@@ -83,11 +84,13 @@ func TestImageManager_Contains_WithExampleImages(t *testing.T) {
 	raw1, err := ioutil.ReadFile("../../test/example_imgs/img1.jpg")
 	if err != nil {
 		t.Errorf("Error reading image: %v", err)
+		return
 	}
 	// Read bytes of example image 2
 	raw2, err := ioutil.ReadFile("../../test/example_imgs/img2.jpg")
 	if err != nil {
 		t.Errorf("Error reading image: %v", err)
+		return
 	}
 	image1 := NewUploadImage("img1", "2020-11-20", raw1)
 	image2 := NewUploadImage("img2", "2020-11-21", raw2)
@@ -112,6 +115,7 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 	raw, err := ioutil.ReadFile("../../test/example_imgs/img1.jpg")
 	if err != nil {
 		t.Errorf("Error reading image: %v", err)
+		return
 	}
 	// Init upload image
 	upimg := NewUploadImage(fileName, "2020-01-01", raw)

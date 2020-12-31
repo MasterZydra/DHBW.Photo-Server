@@ -21,6 +21,13 @@ func (a RegisterRes) GetError() string {
 	return a.Error
 }
 
+type ImageUploadRes struct {
+	Error string
+}
+func (a ImageUploadRes) GetError() string {
+	return a.Error
+}
+
 type ImageReq struct {
 }
 type ImageRes struct {

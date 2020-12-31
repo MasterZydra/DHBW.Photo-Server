@@ -28,6 +28,19 @@ func TestReadContent(t *testing.T) {
 	}
 }
 
+func TestReadContent_UserFolderNotExist(t *testing.T) {
+	user := "../../test/someNoneExistingUser"
+	// Overwrite output file name
+	imagedir = ""
+
+	// Read content file
+	readImages := ReadContent(user)
+	if readImages == nil || len(readImages.images) != 0 || readImages.user != user {
+		t.Errorf("File was not read correctly")
+		return
+	}
+}
+
 func TestReadContent_FileNotExist(t *testing.T) {
 	user := "../../test"
 	// Overwrite output file name

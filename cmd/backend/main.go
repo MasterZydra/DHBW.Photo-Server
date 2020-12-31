@@ -1,18 +1,25 @@
 package main
 
 import (
+	DHBW_Photo_Server "DHBW.Photo-Server"
 	"DHBW.Photo-Server/cmd/backend/jsonUtil"
 	"DHBW.Photo-Server/internal/api"
 	"DHBW.Photo-Server/internal/auth"
 	"DHBW.Photo-Server/internal/user"
+	"DHBW.Photo-Server/internal/util"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
 func main() {
-	port := "3000"
+	// Setup
+	err := util.CheckExistAndCreateFolder(DHBW_Photo_Server.ImageDir)
+	if err != nil {
+		log.Fatalf("Error creating image folder: %v", err)
+	}
 
+	port := "3000"
 	// TODO: mustParams-Wrapper einbauen? https://medium.com/@matryer/the-http-handler-wrapper-technique-in-golang-updated-bc7fbcffa702
 	// ermöglicht Registrierung
 	http.HandleFunc("/register", registerHandler)

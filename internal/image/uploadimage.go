@@ -25,7 +25,7 @@ func (i *UploadImage) SetUserPath(path string) {
 
 func (i *UploadImage) SaveImageToDisk() error {
 	// Open new file
-	imgFile, err := os.Create(path.Join(i.userPath, i.Name))
+	imgFile, err := os.Create(path.Join(imagedir, i.userPath, i.Name))
 	if err != nil {
 		return err
 	}

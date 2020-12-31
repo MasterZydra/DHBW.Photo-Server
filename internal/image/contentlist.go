@@ -1,13 +1,16 @@
 package image
 
 import (
+	DHBW_Photo_Server "DHBW.Photo-Server"
 	"encoding/csv"
 	"os"
 	"path"
 )
 import "fmt"
 
-var usercontent = "content.csv"
+var imagedir 	= DHBW_Photo_Server.ImageDir
+var thumbdir 	= DHBW_Photo_Server.ThumbDir
+var usercontent = DHBW_Photo_Server.UserContent
 
 // Read "content.csv" for given user. The user has to be equal to the folder name.
 // It returns an initialized ImageManager struct.

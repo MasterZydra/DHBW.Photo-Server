@@ -1,5 +1,11 @@
 package image
 
+/*
+ * This file contains functions to read and write the content file.
+ * The content file contains the list of all images in the user folder.
+ * It contains the name, creation date and hash.
+ */
+
 import (
 	DHBW_Photo_Server "DHBW.Photo-Server"
 	"DHBW.Photo-Server/internal/util"
@@ -13,7 +19,7 @@ var imagedir 	= DHBW_Photo_Server.ImageDir
 var thumbdir 	= DHBW_Photo_Server.ThumbDir
 var usercontent = DHBW_Photo_Server.UserContent
 
-// Read "content.csv" for given user. The user has to be equal to the folder name.
+// Read content file for given user. The user has to be equal to the folder name.
 // It returns an initialized ImageManager struct.
 func ReadContent(user string) *ImageManager {
 	// Open file
@@ -46,7 +52,7 @@ func ReadContent(user string) *ImageManager {
 	return imageManager
 }
 
-// Write "content.csv" for given user. The user has to be equal to the folder name.
+// Write content file for given user. The user has to be equal to the folder name.
 func WriteContent(user string, imgs *ImageManager) error {
 	err := util.CheckExistAndCreateFolder(path.Join(imagedir, user))
 	if err != nil {

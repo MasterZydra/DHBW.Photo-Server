@@ -1,7 +1,9 @@
 package image
 
 import (
+	"DHBW.Photo-Server/internal/util"
 	"fmt"
+	"path"
 	"sort"
 	"strings"
 )
@@ -55,20 +57,35 @@ func (im *ImageManager) sort() {
 	})
 }
 
-func (im *ImageManager) GetImage(name string) *[]byte {
+// Get raw data of given image name for current user.
+// Returns pointer to the byte slice.
+// Returns nil if file was not found.
+func (im *ImageManager) GetImage(name string) *LoadedImage {
+	return im.getRawImage(path.Join(imagedir,im.user), name)
+}
+
+// Get raw data of thumbnail of given image name for current user.
+// Returns pointer to the byte slice.
+// Returns nil if file was not found.
+func (im *ImageManager) GetThumbnail(name string) *LoadedImage {
+	return im.getRawImage(path.Join(imagedir,im.user,thumbdir), name)
+}
+
+// Get raw data of given image name in given directory.
+// Returns pointer to the byte slice.
+// Returns nil if file was not found.
+func (im *ImageManager) getRawImage(imgPath, name string) *LoadedImage {
 	for _, i := range im.images {
 		if strings.Compare(i.Name, name) == 0 {
-			return &[]byte{}
+			raw, err := util.ReadRawImage(path.Join(imgPath,name))
+			if err != nil {
+				fmt.Printf("error reading file: %v\n",err)
+				return nil
+			}
+			loadedImage := NewLoadedImage(i, &raw)
+			return &loadedImage
 		}
 	}
 	return nil
 }
 
-func (im *ImageManager) GetThumbnail(name string) *[]byte {
-	for _, i := range im.images {
-		if strings.Compare(i.Name, name) == 0 {
-			return &[]byte{}
-		}
-	}
-	return nil
-}

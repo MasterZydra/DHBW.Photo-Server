@@ -11,6 +11,7 @@ func TestNewUploadImage(t *testing.T) {
 	raw, err := ioutil.ReadFile("../../test/example_imgs/img2.jpg")
 	if err != nil {
 		t.Errorf("Error reading image: %v", err)
+		return
 	}
 
 	// Create image

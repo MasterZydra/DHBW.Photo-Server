@@ -2,6 +2,7 @@ package image
 
 import (
 	DHBW_Photo_Server "DHBW.Photo-Server"
+	"DHBW.Photo-Server/internal/util"
 	"encoding/csv"
 	"os"
 	"path"
@@ -47,6 +48,11 @@ func ReadContent(user string) *ImageManager {
 
 // Write "content.csv" for given user. The user has to be equal to the folder name.
 func WriteContent(user string, imgs *ImageManager) error {
+	err := util.CheckExistAndCreateFolder(path.Join(imagedir, user))
+	if err != nil {
+		return err
+	}
+
 	// Create new file
 	f, err := os.Create(path.Join(imagedir, user, usercontent))
 	if err != nil {

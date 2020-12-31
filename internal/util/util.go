@@ -2,6 +2,7 @@ package util
 
 import (
 	"io/ioutil"
+	"os"
 )
 
 // TODO: Tests schreiben
@@ -21,4 +22,17 @@ func ReadRawImage(path string) ([]byte, error){
 		return []byte{}, err
 	}
 	return readRawImage, nil
+}
+
+// Check if given path exists.
+// If false, then not create the necessary folders.
+func CheckExistAndCreateFolder(path string) error {
+	file, err := os.Stat(path)
+	if os.IsNotExist(err) || !file.Mode().IsDir() {
+		err := os.MkdirAll(path, 0755)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

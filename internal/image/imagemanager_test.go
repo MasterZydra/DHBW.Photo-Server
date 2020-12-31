@@ -1,6 +1,7 @@
 package image
 
 import (
+	"DHBW.Photo-Server/internal/util"
 	"bytes"
 	"io/ioutil"
 	"os"
@@ -220,6 +221,39 @@ func TestImageManager_Sort(t *testing.T) {
 	if img := imgMan.images;
 		img[0].Name != "img2" || img[1].Name != "img1" || img[2].Name != "img0" {
 			t.Errorf("Images are in the wrong order")
+	}
+}
+
+func TestImageManager_GetImage(t *testing.T) {
+	// Test data
+	user := "../../test/output"
+	// Read test image
+	raw, err := util.ReadRawImage("../../test/example_imgs/img1.jpg")
+	if err != nil {
+		t.Errorf("Could not read example image: %v", err)
+		return
+	}
+	upimg := NewUploadImage("img1.jpg", "2020-12-31", raw)
+
+	// Overwrite output file name
+	imagedir = ""
+	usercontent = "contentGetImageTest.csv"
+
+	// Init ImageManager
+	imgMan := NewImageManager(user)
+	imgMan.AddImageUpload(&upimg)
+
+	// Get image and compare raw data
+	imgManRead := NewImageManager(user)
+	readimg := imgManRead.GetImage("img1.jpg")
+	if readimg.Name != "img1.jpg" || bytes.Compare(readimg.Raw, raw) != 0 {
+		t.Errorf("Image from GetImage is not equal to stored image")
+	}
+
+	// Test with invalid file
+	readInvalid := imgManRead.GetImage("invalidImage.jpg")
+	if readInvalid != nil {
+		t.Errorf("Wrong result for invalid image name")
 	}
 }
 

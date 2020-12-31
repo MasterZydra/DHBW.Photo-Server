@@ -5,6 +5,7 @@ import (
 	"DHBW.Photo-Server/internal/api"
 	"DHBW.Photo-Server/internal/auth"
 	"DHBW.Photo-Server/internal/user"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -79,7 +80,34 @@ func thumbnailsHander(w http.ResponseWriter, r *http.Request) {
 }
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: David: implementieren
+	var res api.ThumbnailsRes
+	defer jsonUtil.EncodeResponse(w, &res)
+
+	username, _, ok := r.BasicAuth()
+	if !ok {
+		res.Error = "Could not get username"
+		return
+	}
+
+	imgname := r.Header.Get("imagename")
+	imgcreation := r.Header.Get("imagecreationdate")
+
+	// Read body
+	var body []byte
+	if r.Body != nil {
+		var err error
+		body, err = ioutil.ReadAll(r.Body)
+		if err != nil {
+			// ToDo Error treatment
+		}
+	}
+
+	errorString := UploadImage(username, imgname, imgcreation, body)
+	if errorString != "" {
+		res.Error = errorString
+		w.WriteHeader(500)
+	}
+	w.WriteHeader(200)
 }
 
 func imageHandler(w http.ResponseWriter, r *http.Request) {

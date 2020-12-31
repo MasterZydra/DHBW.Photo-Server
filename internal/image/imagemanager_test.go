@@ -55,6 +55,28 @@ func TestImageManager_Contains(t *testing.T) {
 	}
 }
 
+func TestImageManager_Contains_Filename(t *testing.T) {
+	// Test images
+	image1 := UploadImage{Image: *NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")}
+	image2 := UploadImage{Image: *NewImage("img1", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")}
+	image3 := UploadImage{Image: *NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")}
+
+	// Init ImageManager
+	imgMan := ImageManager{}
+	imgMan.AddImage(&(image1.Image))
+
+	// Execute tests
+	if !imgMan.Contains(&image1) {
+		t.Errorf("Existing image1 not detected")
+	}
+	if !imgMan.Contains(&image2) {
+		t.Errorf("Existing image1 not detected")
+	}
+	if imgMan.Contains(&image3) {
+		t.Errorf("Wrongly detects image3 as alread contained")
+	}
+}
+
 func TestImageManager_Contains_WithExampleImages(t *testing.T) {
 	// Test images
 	// Read bytes of example image 1

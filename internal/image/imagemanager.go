@@ -17,7 +17,8 @@ func NewImageManager(userName string) *ImageManager {
 
 func (im *ImageManager) Contains(image *UploadImage) bool {
 	for _, i := range im.images {
-		if strings.Compare(i.Hash, image.Hash) == 0 {
+		if strings.Compare(i.Hash, image.Hash) == 0 ||
+			strings.ToLower(i.Name) == strings.ToLower(image.Name){
 			return true
 		}
 	}

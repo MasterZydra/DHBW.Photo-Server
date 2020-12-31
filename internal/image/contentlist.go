@@ -16,7 +16,10 @@ var usercontent = DHBW_Photo_Server.UserContent
 // It returns an initialized ImageManager struct.
 func ReadContent(user string) *ImageManager {
 	// Open file
-	csvFile, err := os.Open(path.Join(user, usercontent))
+	csvFile, err := os.Open(path.Join(imagedir, user, usercontent))
+	if os.IsNotExist(err) {
+		return &ImageManager{user: user}
+	}
 	if err != nil {
 		// Error stuff
 		fmt.Println(err)
@@ -45,7 +48,7 @@ func ReadContent(user string) *ImageManager {
 // Write "content.csv" for given user. The user has to be equal to the folder name.
 func WriteContent(user string, imgs *ImageManager) error {
 	// Create new file
-	f, err := os.Create(path.Join(user, usercontent))
+	f, err := os.Create(path.Join(imagedir, user, usercontent))
 	if err != nil {
 		return err
 	}

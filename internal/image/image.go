@@ -22,12 +22,3 @@ func NewImage(name string, date string, hash string) *Image {
 		Hash: hash}
 }
 
-func (i *Image) GetThumb() *[]byte {
-	// ToDo Implement
-	return &[]byte{}
-}
-
-func (i *Image) GetOriginal() *[]byte {
-	// ToDo Implement
-	return &[]byte{}
-}

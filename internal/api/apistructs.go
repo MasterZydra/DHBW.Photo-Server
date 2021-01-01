@@ -4,6 +4,8 @@ import (
 	"DHBW.Photo-Server/internal/image"
 )
 
+// TODO: Jones Documentation
+
 type BaseRes interface {
 	GetError() string
 }
@@ -24,6 +26,7 @@ func (a RegisterRes) GetError() string {
 type ImageUploadRes struct {
 	Error string
 }
+
 func (a ImageUploadRes) GetError() string {
 	return a.Error
 }
@@ -44,8 +47,8 @@ type ThumbnailsReq struct {
 	Length int
 }
 type ThumbnailsRes struct {
-	Error	string
-	Images	[]*image.LoadedImage
+	Error  string
+	Images []*image.LoadedImage
 }
 
 func (a ThumbnailsRes) GetError() string {

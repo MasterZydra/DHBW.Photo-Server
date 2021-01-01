@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+// TODO: Jones Documentation
+
 type Authenticator interface {
 	Authenticate(user, password string, r *http.Request) bool
 }
@@ -39,7 +41,7 @@ func FileServerWrapper(authenticator Authenticator, h http.Handler) http.Handler
 	})
 }
 
-// TODO: tests schreiben?
+// TODO: Jones tests schreiben?
 func AuthenticateHandler() AuthenticatorFunc {
 	return authenticate
 }

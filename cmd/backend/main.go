@@ -12,6 +12,8 @@ import (
 	"net/http"
 )
 
+// TODO: Jones Documentation
+
 func main() {
 	// Setup
 	err := util.CheckExistAndCreateFolder(DHBW_Photo_Server.ImageDir)
@@ -25,7 +27,7 @@ func main() {
 	http.HandleFunc("/register", registerHandler)
 
 	// gibt Thumbnails mit den Infos dazu von index bis length zurück
-	http.HandleFunc("/thumbnails", auth.HandlerWrapper(auth.AuthenticateHandler(), thumbnailsHander))
+	http.HandleFunc("/thumbnails", auth.HandlerWrapper(auth.AuthenticateHandler(), thumbnailsHandler))
 
 	// lädt Image hoch
 	http.HandleFunc("/upload", auth.HandlerWrapper(auth.AuthenticateHandler(), uploadHandler))
@@ -64,7 +66,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func thumbnailsHander(w http.ResponseWriter, r *http.Request) {
+func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ThumbnailsRes
 	defer jsonUtil.EncodeResponse(w, &res)
 

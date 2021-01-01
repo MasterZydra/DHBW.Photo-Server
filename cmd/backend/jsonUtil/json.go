@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+// TODO: Jones Documentation
+
 // TODO: Jones: tests schreiben
 func DecodeBody(r *http.Request, data interface{}) error {
 	if err := json.NewDecoder(r.Body).Decode(data); err != nil {

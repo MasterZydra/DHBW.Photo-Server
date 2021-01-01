@@ -25,14 +25,13 @@ func main() {
 	http.HandleFunc("/register", registerHandler)
 
 	// gibt Thumbnails mit den Infos dazu von index bis length zurück
-	http.HandleFunc("/thumbnails", auth.Wrapper(auth.Authenticate(), thumbnailsHander))
+	http.HandleFunc("/thumbnails", auth.HandlerWrapper(auth.AuthenticateHandler(), thumbnailsHander))
 
 	// lädt Image hoch
-	http.HandleFunc("/upload", auth.Wrapper(auth.Authenticate(), uploadHandler))
+	http.HandleFunc("/upload", auth.HandlerWrapper(auth.AuthenticateHandler(), uploadHandler))
 
-	// TODO: Jones: klären, ob nur Pfad oder das Bild an sich -> andere sollen nicht Link erraten können (gilt auch für Thumbnails)
 	// Gibt Bild + Infos zurück
-	http.HandleFunc("/image", auth.Wrapper(auth.Authenticate(), imageHandler))
+	http.HandleFunc("/image", auth.HandlerWrapper(auth.AuthenticateHandler(), imageHandler))
 
 	log.Println("backend listening on https://localhost:" + port)
 	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))

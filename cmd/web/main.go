@@ -29,12 +29,16 @@ type GlobalVariables struct {
 }
 
 func main() {
-	fs := http.FileServer(http.Dir("./public"))
-	http.Handle("/public/", http.StripPrefix("/public/", fs))
+	// serve images directory
+	fs := http.FileServer(http.Dir("./images"))
+	http.Handle("/images/", auth.FileServerWrapper(
+		auth.AuthenticateFileServer(),
+		http.StripPrefix("/images", fs),
+	))
 
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/register", registerHandler)
-	http.HandleFunc("/home", auth.Wrapper(auth.Authenticate(), homeHandler))
+	http.HandleFunc("/home", auth.HandlerWrapper(auth.AuthenticateHandler(), homeHandler))
 	// TODO: Jones: Frontend-Struktur überlegen und ApiCalls fürs Backend vorbereiten
 
 	log.Println("web listening on https://localhost:" + port)

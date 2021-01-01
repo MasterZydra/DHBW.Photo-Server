@@ -10,7 +10,7 @@ import (
 
 func createServer(auth AuthenticatorFunc) *httptest.Server {
 	return httptest.NewServer(
-		Wrapper(auth,
+		HandlerWrapper(auth,
 			func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, "string from server")
 			}))

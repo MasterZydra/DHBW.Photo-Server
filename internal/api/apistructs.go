@@ -10,6 +10,19 @@ type BaseRes interface {
 	GetError() string
 }
 
+type TestReq struct {
+	SomeString  string
+	SomeInteger int
+}
+type TestRes struct {
+	Error      string
+	SomeResult string
+}
+
+func (a TestRes) GetError() string {
+	return a.Error
+}
+
 type RegisterReq struct {
 	Username             string
 	Password             string

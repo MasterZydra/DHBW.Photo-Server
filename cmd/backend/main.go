@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -165,7 +164,7 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	defer jsonUtil.EncodeResponse(w, &res)
 
 	imgname := r.URL.Query().Get("name")
-	fmt.Print("Imagename: %v", imgname)
+	//fmt.Print("Imagename: %v", imgname)
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"

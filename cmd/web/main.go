@@ -3,7 +3,7 @@ package main
 import (
 	"DHBW.Photo-Server"
 	"DHBW.Photo-Server/internal/api"
-	"DHBW.Photo-Server/internal/auth"
+	"DHBW.Photo-Server/internal/user"
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
@@ -18,6 +18,7 @@ import (
 
 // TODO: Jones Documentation
 
+// TODO: Port über go flag konfigurierbar machen können
 const port = "4443"
 
 type TemplateVariables struct {
@@ -33,14 +34,14 @@ type GlobalVariables struct {
 func main() {
 	// serve images directory
 	fs := http.FileServer(http.Dir("./images"))
-	http.Handle("/images/", auth.FileServerWrapper(
-		auth.AuthenticateFileServer(),
+	http.Handle("/images/", user.FileServerWrapper(
+		user.AuthenticateFileServer(),
 		http.StripPrefix("/images", fs),
 	))
 
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/register", registerHandler)
-	http.HandleFunc("/home", auth.HandlerWrapper(auth.AuthenticateHandler(), homeHandler))
+	http.HandleFunc("/home", user.HandlerWrapper(user.AuthenticateHandler(), homeHandler))
 	// TODO: jones: uploadHandler implementieren
 	//http.HandleFunc("/upload", auth.HandlerWrapper(auth.AuthenticateHandler(), uploadHandler))
 	// TODO: Jones: Frontend-Struktur überlegen und ApiCalls fürs Backend vorbereiten

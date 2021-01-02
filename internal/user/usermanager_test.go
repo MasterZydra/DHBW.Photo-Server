@@ -11,6 +11,7 @@ import (
 func TestMain(m *testing.M) {
 	setup()
 	code := m.Run()
+	setup() // call setup again to cleanup after tests ran
 	os.Exit(code)
 }
 

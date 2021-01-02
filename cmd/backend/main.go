@@ -1,6 +1,7 @@
 package main
 
 import (
+	"DHBW.Photo-Server/internal/user"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -8,8 +9,6 @@ import (
 	DHBW_Photo_Server "DHBW.Photo-Server"
 	"DHBW.Photo-Server/cmd/backend/jsonUtil"
 	"DHBW.Photo-Server/internal/api"
-	"DHBW.Photo-Server/internal/auth"
-	"DHBW.Photo-Server/internal/user"
 	"DHBW.Photo-Server/internal/util"
 )
 
@@ -28,13 +27,13 @@ func main() {
 	http.HandleFunc("/register", registerHandler)
 
 	// gibt Thumbnails mit den Infos dazu von index bis length zurück
-	http.HandleFunc("/thumbnails", auth.HandlerWrapper(auth.AuthenticateHandler(), thumbnailsHandler))
+	http.HandleFunc("/thumbnails", user.HandlerWrapper(user.AuthenticateHandler(), thumbnailsHandler))
 
 	// lädt Image hoch
-	http.HandleFunc("/upload", auth.HandlerWrapper(auth.AuthenticateHandler(), uploadHandler))
+	http.HandleFunc("/upload", user.HandlerWrapper(user.AuthenticateHandler(), uploadHandler))
 
 	// Gibt Bild + Infos zurück
-	http.HandleFunc("/image", auth.HandlerWrapper(auth.AuthenticateHandler(), imageHandler))
+	http.HandleFunc("/image", user.HandlerWrapper(user.AuthenticateHandler(), imageHandler))
 
 	log.Println("backend listening on https://localhost:" + port)
 	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
@@ -65,7 +64,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// execute register function
-	um := user.NewUserManager()
+	um := user.GetImageManager()
 	err = um.Register(data.Username, data.Password)
 	if err != nil {
 		res.Error = err.Error()

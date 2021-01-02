@@ -1,7 +1,6 @@
-package auth
+package user
 
 import (
-	"DHBW.Photo-Server/internal/user"
 	"net/http"
 	"strings"
 )
@@ -24,7 +23,7 @@ func HandlerWrapper(authenticator Authenticator, handler http.HandlerFunc) http.
 		if ok && authenticator.Authenticate(usr, pw, r) {
 			handler(w, r)
 		} else {
-			w.Header().Set("WWW-Authenticate", "Basic realm=\"Please Enter Credentials\"")
+			w.Header().Set("WWW-authenticate", "Basic realm=\"Please Enter Credentials\"")
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 		}
 	}
@@ -41,7 +40,6 @@ func FileServerWrapper(authenticator Authenticator, h http.Handler) http.Handler
 	})
 }
 
-// TODO: Jones tests schreiben?
 func AuthenticateHandler() AuthenticatorFunc {
 	return authenticate
 }
@@ -56,7 +54,7 @@ func AuthenticateFileServer() AuthenticatorFunc {
 }
 
 func authenticate(username, password string, r *http.Request) bool {
-	um := user.NewUserManager()
+	um := GetImageManager()
 	ok, _ := um.Authenticate(username, password)
 	return ok
 }

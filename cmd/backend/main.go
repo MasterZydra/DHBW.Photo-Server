@@ -131,6 +131,9 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	// ToDo: David - Move default value for date in NewUploadImage
 	imgname := r.Header.Get("imagename")
 	imgcreation := r.Header.Get("imagecreationdate")
+	if imgcreation == "" {
+		imgcreation = time.Now().Format("2006-01-02")
+	}
 
 	// Read body
 	var body []byte

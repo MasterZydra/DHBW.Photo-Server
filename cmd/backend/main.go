@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 
 	dhbwphotoserver "DHBW.Photo-Server"
 	"DHBW.Photo-Server/cmd/backend/jsonUtil"
@@ -73,6 +76,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Request a range of thumbnails. The result is a JSON object.
+// The request need to be send via the GET method and contain the parameters
+// index and length. Both parameters have to be integers.
 func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -82,23 +88,31 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ThumbnailsRes
 	defer jsonUtil.EncodeResponse(w, &res)
 
-	// decode data
-	var data api.ThumbnailsReq
-	err := jsonUtil.DecodeBody(r, &data)
+	// ToDo David: Return message if not all paramters are given
+
+	index, err := strconv.Atoi(r.URL.Query().Get("index"))
 	if err != nil {
-		res.Error = err.Error()
+		res.Error = "Invalid index. Index must be an Integer"
+	}
+
+	length, err := strconv.Atoi(r.URL.Query().Get("length"))
+	if err != nil {
+		res.Error = "Invalid index. Index must be an Integer"
+	}
+
+	username, _, ok := r.BasicAuth()
+	if !ok {
+		res.Error = "Could not get username"
 		return
 	}
 
-	//username, _, ok := r.BasicAuth()
-	//if !ok {
-	//	res.Error = "Could not get username"
-	//	return
-	//}
-
-	// TODO: David: implementieren
+	res.Images = GetThumbnail(username, index, length)
+	return
 }
 
+// Upload a new image. The image has to be given in the message body.
+// In the header the image name must be given with the key "imagename".
+// If known the creation date of the image (read from file system) can be given as key "imagecreationdate".
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -114,7 +128,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: David imagecreationdate optional machen
+	// ToDo: David - Move default value for date in NewUploadImage
 	imgname := r.Header.Get("imagename")
 	imgcreation := r.Header.Get("imagecreationdate")
 
@@ -136,10 +150,26 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// Request details to an image. The result is a JSON object.
+// The request need to be send via the GET method and contain the parameter name which is the file name.
 func imageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
+
+	var res api.ImageRes
+	defer jsonUtil.EncodeResponse(w, &res)
+
+	imgname := r.URL.Query().Get("name")
+	fmt.Print("Imagename: %v", imgname)
+	username, _, ok := r.BasicAuth()
+	if !ok {
+		res.Error = "Could not get username"
+		return
+	}
+
+	res.Image = GetImage(username, imgname)
+	return
 	// TODO: David: implementieren
 }

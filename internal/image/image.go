@@ -9,7 +9,7 @@ import (
 type Image struct {
 	Name string
 	Date time.Time
-	Hash string
+	hash string
 }
 
 // Create a new Image object.
@@ -19,6 +19,6 @@ func NewImage(name string, date string, hash string) *Image {
 	if err != nil {
 		// ToDo Implement Error Handling
 	}
-	return &Image{Name: name, Date: d, Hash: hash}
+	return &Image{Name: name, Date: d, hash: hash}
 }
 

@@ -33,8 +33,8 @@ func TestNewImageManager(t *testing.T) {
 	}
 
 	// Check if read content is correct
-	if img := imgMan.images; img[0].Name != image1.Name || img[0].Date != image1.Date || img[0].Hash != image1.Hash ||
-		img[1].Name != image2.Name || img[1].Date != image2.Date || img[1].Hash != image2.Hash {
+	if img := imgMan.images; img[0].Name != image1.Name || img[0].Date != image1.Date || img[0].hash != image1.hash ||
+		img[1].Name != image2.Name || img[1].Date != image2.Date || img[1].hash != image2.hash {
 		t.Errorf("Read content is not correct")
 	}
 }
@@ -155,7 +155,7 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 		t.Errorf("Too much images in ImageManager")
 		return
 	}
-	if img := imgMan.images[0]; img.Name != upimg.Name || img.Date != upimg.Date || img.Hash != upimg.Hash {
+	if img := imgMan.images[0]; img.Name != upimg.Name || img.Date != upimg.Date || img.hash != upimg.hash {
 		t.Errorf("Image in ImageManager does not match with UploadImage")
 	}
 
@@ -187,7 +187,7 @@ func TestImageManager_AddImage(t *testing.T) {
 		t.Errorf("Too much images in ImageManager")
 		return
 	}
-	if img := imgMan.images[0]; img.Name != image1.Name || img.Date != image1.Date || img.Hash != image1.Hash {
+	if img := imgMan.images[0]; img.Name != image1.Name || img.Date != image1.Date || img.hash != image1.hash {
 		t.Errorf("Image in ImageManager does not match with UploadImage")
 		return
 	}
@@ -199,7 +199,7 @@ func TestImageManager_AddImage(t *testing.T) {
 		t.Errorf("Too much images in ImageManager")
 		return
 	}
-	if img := imgMan.images[1]; img.Name != image2.Name || img.Date != image2.Date || img.Hash != image2.Hash {
+	if img := imgMan.images[1]; img.Name != image2.Name || img.Date != image2.Date || img.hash != image2.hash {
 		t.Errorf("Image in ImageManager does not match with UploadImage")
 	}
 }
@@ -246,7 +246,7 @@ func TestImageManager_GetImage(t *testing.T) {
 	// Get image and compare raw data
 	imgManRead := NewImageManager(user)
 	readimg := imgManRead.GetImage("img1.jpg")
-	if readimg.Name != "img1.jpg" || bytes.Compare(readimg.Raw, raw) != 0 {
+	if readimg.Name != "img1.jpg" || readimg.hash != upimg.hash {
 		t.Errorf("Image from GetImage is not equal to stored image")
 	}
 

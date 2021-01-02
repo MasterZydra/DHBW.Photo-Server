@@ -1,9 +1,8 @@
 package image
 
 import (
-	"DHBW.Photo-Server/internal/util"
 	"fmt"
-	"path"
+	"math"
 	"sort"
 	"strings"
 )
@@ -29,7 +28,7 @@ func NewImageManager(userName string) *ImageManager {
 // image.
 func (im *ImageManager) Contains(image *UploadImage) bool {
 	for _, i := range im.images {
-		if strings.Compare(i.Hash, image.Hash) == 0 ||
+		if strings.Compare(i.hash, image.hash) == 0 ||
 			strings.ToLower(i.Name) == strings.ToLower(image.Name){
 			return true
 		}
@@ -75,35 +74,26 @@ func (im *ImageManager) sort() {
 	})
 }
 
-// Get raw data of given image name for current user.
-// Returns pointer to an LoadedImage object.
-// Returns nil if file was not found.
-func (im *ImageManager) GetImage(name string) *LoadedImage {
-	return im.getRawImage(path.Join(imagedir,im.user), name)
-}
-
-// Get raw data of thumbnail of given image name for current user.
-// Returns pointer to an LoadedImage object.
-// Returns nil if file was not found.
-func (im *ImageManager) GetThumbnail(name string) *LoadedImage {
-	return im.getRawImage(path.Join(imagedir,im.user,thumbdir), name)
-}
-
-// Get raw data of given image name in given directory.
-// Returns pointer to an LoadedImage object.
-// Returns nil if file was not found.
-func (im *ImageManager) getRawImage(imgPath, name string) *LoadedImage {
+// Return the pointer to Image object which has the given name.
+func (im *ImageManager) GetImage(name string) *Image {
 	for _, i := range im.images {
 		if strings.Compare(i.Name, name) == 0 {
-			raw, err := util.ReadRawImage(path.Join(imgPath,name))
-			if err != nil {
-				fmt.Printf("error reading file: %v\n",err)
-				return nil
-			}
-			loadedImage := NewLoadedImage(i, &raw)
-			return &loadedImage
+			return i
 		}
 	}
 	return nil
 }
+
+// Return a pointer to an array of Image object pointer which are in the ImageManager.
+// The result Images are defined by the given start index and length.
+func (im *ImageManager) GetThumbnails(start, length int) *[]*Image {
+	if start >= len(im.images) {
+		return nil
+	}
+
+	end := int64(math.Min(float64(start+length), float64(len(im.images))))
+	images := im.images[start:end]
+	return &images
+}
+
 

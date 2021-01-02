@@ -35,7 +35,7 @@ type ImageReq struct {
 }
 type ImageRes struct {
 	Error string
-	Image *image.LoadedImage
+	Image *image.Image
 }
 
 func (a ImageRes) GetError() string {
@@ -48,7 +48,7 @@ type ThumbnailsReq struct {
 }
 type ThumbnailsRes struct {
 	Error  string
-	Images []*image.LoadedImage
+	Images []*image.Image
 }
 
 func (a ThumbnailsRes) GetError() string {

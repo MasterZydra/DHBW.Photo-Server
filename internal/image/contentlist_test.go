@@ -22,8 +22,8 @@ func TestReadContent(t *testing.T) {
 	}
 
 	// Check if read content is correct
-	if img := readImages.images; img[0].Name != image1.Name || img[0].Date != image1.Date || img[0].Hash != image1.Hash ||
-		img[1].Name != image2.Name || img[1].Date != image2.Date || img[1].Hash != image2.Hash {
+	if img := readImages.images; img[0].Name != image1.Name || img[0].Date != image1.Date || img[0].hash != image1.hash ||
+		img[1].Name != image2.Name || img[1].Date != image2.Date || img[1].hash != image2.hash {
 		t.Errorf("Read content is not correct")
 	}
 }
@@ -78,8 +78,8 @@ func TestWriteContent(t *testing.T) {
 	}
 
 	// Check if read content is correct
-	if img := readImages.images; img[0].Name != image1.Name || img[0].Date != image1.Date || img[0].Hash != image1.Hash ||
-		img[1].Name != image2.Name || img[1].Date != image2.Date || img[1].Hash != image2.Hash {
+	if img := readImages.images; img[0].Name != image1.Name || img[0].Date != image1.Date || img[0].hash != image1.hash ||
+		img[1].Name != image2.Name || img[1].Date != image2.Date || img[1].hash != image2.hash {
 		t.Errorf("Content is not what was written")
 	}
 }

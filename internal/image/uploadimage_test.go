@@ -19,7 +19,7 @@ func TestNewUploadImage(t *testing.T) {
 
 	// Check struct content
 	if img.Name != "myImage.jpg" ||
-		img.Hash != "fe430f8f373ec2abd6880bfdaebcd9ae" ||
+		img.hash != "fe430f8f373ec2abd6880bfdaebcd9ae" ||
 		// ToDo Add check for correct date + Example with image without exif creation date
 		//img.Date.Format("2006-01-02") != "2020-12-12" ||
 		bytes.Compare(img.Raw, raw) != 0 {

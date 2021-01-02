@@ -24,30 +24,42 @@ func main() {
 	}
 
 	port := "3000"
-	// TODO: mustParams-Wrapper einbauen? https://medium.com/@matryer/the-http-handler-wrapper-technique-in-golang-updated-bc7fbcffa702
 	// ermöglicht Registrierung
-	http.HandleFunc("/register", registerHandler)
+	http.HandleFunc("/register", allowMethod(http.MethodPost, registerHandler))
 
 	// gibt Thumbnails mit den Infos dazu von index bis length zurück
-	http.HandleFunc("/thumbnails", user.HandlerWrapper(user.AuthenticateHandler(), thumbnailsHandler))
+	http.HandleFunc("/thumbnails", user.HandlerWrapper(
+		user.AuthenticateHandler(),
+		allowMethod(http.MethodGet, thumbnailsHandler),
+	))
 
 	// lädt Image hoch
-	http.HandleFunc("/upload", user.HandlerWrapper(user.AuthenticateHandler(), uploadHandler))
+	http.HandleFunc("/upload", user.HandlerWrapper(
+		user.AuthenticateHandler(),
+		allowMethod(http.MethodPost, uploadHandler),
+	))
 
 	// Gibt Bild + Infos zurück
-	http.HandleFunc("/image", user.HandlerWrapper(user.AuthenticateHandler(), imageHandler))
+	http.HandleFunc("/image", user.HandlerWrapper(
+		user.AuthenticateHandler(),
+		allowMethod(http.MethodGet, imageHandler),
+	))
 
 	log.Println("backend listening on https://localhost:" + port)
 	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
 }
 
-func registerHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: Jones Method-Prüfung in Wrapper bauen
-	if r.Method != "POST" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
+func allowMethod(method string, h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != method {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		h(w, r)
 	}
+}
 
+func registerHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.RegisterRes
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -78,11 +90,6 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 // The request need to be send via the GET method and contain the parameters
 // index and length. Both parameters have to be integers.
 func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	var res api.ThumbnailsRes
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -112,11 +119,6 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 // In the header the image name must be given with the key "imagename".
 // If known the creation date of the image (read from file system) can be given as key "imagecreationdate".
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	var res api.ImageUploadRes
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -154,11 +156,6 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 // Request details to an image. The result is a JSON object.
 // The request need to be send via the GET method and contain the parameter name which is the file name.
 func imageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	var res api.ImageRes
 	defer jsonUtil.EncodeResponse(w, &res)
 

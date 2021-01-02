@@ -41,6 +41,7 @@ func main() {
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO: Jones Method-Prüfung in Wrapper bauen
 	if r.Method != "POST" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -113,6 +114,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: David imagecreationdate optional machen
 	imgname := r.Header.Get("imagename")
 	imgcreation := r.Header.Get("imagecreationdate")
 
@@ -129,9 +131,9 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	errorString := UploadImage(username, imgname, imgcreation, body)
 	if errorString != "" {
 		res.Error = errorString
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 	}
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
 }
 
 func imageHandler(w http.ResponseWriter, r *http.Request) {

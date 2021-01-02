@@ -41,6 +41,8 @@ func main() {
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/home", auth.HandlerWrapper(auth.AuthenticateHandler(), homeHandler))
+	// TODO: jones: uploadHandler implementieren
+	//http.HandleFunc("/upload", auth.HandlerWrapper(auth.AuthenticateHandler(), uploadHandler))
 	// TODO: Jones: Frontend-Struktur überlegen und ApiCalls fürs Backend vorbereiten
 
 	log.Println("web listening on https://localhost:" + port)
@@ -52,6 +54,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	r.URL.Path = "index"
 }
 
+// TODO: jones tests schreiben
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	defer layout(w, r, nil)
 
@@ -77,15 +80,15 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ThumbnailsRes
 	defer layout(w, r, res)
 
-	data := api.ThumbnailsReq{
-		Index:  1,
-		Length: 25,
-	}
-	err := callApi(r, "thumbnails", data, &res)
-	if err != nil {
-		badRequest(w, err)
-		return
-	}
+	//data := api.ThumbnailsReq{
+	//	Index:  1,
+	//	Length: 25,
+	//}
+	//err := callApi(r, "thumbnails", data, &res)
+	//if err != nil {
+	//	badRequest(w, err)
+	//	return
+	//}
 
 	// TODO: Thumbnails zurückgeben
 }

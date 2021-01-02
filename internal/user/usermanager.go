@@ -12,12 +12,14 @@ import (
 
 // TODO: Jones Documentation
 
+// TODO: Jones um im RAM halten
 type UserManager struct {
 	Users     []*User
 	UsersFile string
 }
 
 func NewUserManager(args ...string) UserManager {
+	// TODO: jones usersfile anlegen, wenn diese nicht existiert
 	// TODO: LoadUsers direkt beim NewUserManager ausführen -> refactoring
 	usersFile := "usersFile.csv"
 	if args != nil && args[0] != "" {

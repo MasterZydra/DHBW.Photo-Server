@@ -181,15 +181,23 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ImageRes
 	defer jsonUtil.EncodeResponse(w, &res)
 
-	imgname := r.URL.Query().Get("name")
-	//fmt.Print("Imagename: %v", imgname)
+	// Get username from basic authentication
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
 		return
 	}
 
+	// Get parameter "name" from url
+	imgname := r.URL.Query().Get("name")
+	// Check if parameter "name" is given
+	if imgname == "" {
+		res.Error = "Parameter name is missing"
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
+	// Load image from associated ImageManager
 	res.Image = GetImage(username, imgname)
 	return
-	// TODO: David: implementieren
 }

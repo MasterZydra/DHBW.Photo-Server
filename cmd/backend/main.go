@@ -1,16 +1,19 @@
 package main
 
 import (
+	"io/ioutil"
+	"log"
+	"net/http"
+
 	DHBW_Photo_Server "DHBW.Photo-Server"
 	"DHBW.Photo-Server/cmd/backend/jsonUtil"
 	"DHBW.Photo-Server/internal/api"
 	"DHBW.Photo-Server/internal/auth"
 	"DHBW.Photo-Server/internal/user"
 	"DHBW.Photo-Server/internal/util"
-	"io/ioutil"
-	"log"
-	"net/http"
 )
+
+// TODO: Jones Documentation
 
 func main() {
 	// Setup
@@ -25,14 +28,13 @@ func main() {
 	http.HandleFunc("/register", registerHandler)
 
 	// gibt Thumbnails mit den Infos dazu von index bis length zurück
-	http.HandleFunc("/thumbnails", auth.Wrapper(auth.Authenticate(), thumbnailsHander))
+	http.HandleFunc("/thumbnails", auth.HandlerWrapper(auth.AuthenticateHandler(), thumbnailsHandler))
 
 	// lädt Image hoch
-	http.HandleFunc("/upload", auth.Wrapper(auth.Authenticate(), uploadHandler))
+	http.HandleFunc("/upload", auth.HandlerWrapper(auth.AuthenticateHandler(), uploadHandler))
 
-	// TODO: Jones: klären, ob nur Pfad oder das Bild an sich -> andere sollen nicht Link erraten können (gilt auch für Thumbnails)
 	// Gibt Bild + Infos zurück
-	http.HandleFunc("/image", auth.Wrapper(auth.Authenticate(), imageHandler))
+	http.HandleFunc("/image", auth.HandlerWrapper(auth.AuthenticateHandler(), imageHandler))
 
 	log.Println("backend listening on https://localhost:" + port)
 	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
@@ -70,7 +72,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func thumbnailsHander(w http.ResponseWriter, r *http.Request) {
+func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return

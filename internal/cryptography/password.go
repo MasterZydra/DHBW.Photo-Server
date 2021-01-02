@@ -9,6 +9,8 @@ import (
 	"hash"
 )
 
+// TODO: Jones Documentation
+
 const (
 	saltSize   = 16
 	iterations = 1e4

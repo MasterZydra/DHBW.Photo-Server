@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+// TODO: Jones Documentation
+
 type UserManager struct {
 	Users     []*User
 	UsersFile string

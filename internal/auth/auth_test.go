@@ -10,14 +10,14 @@ import (
 
 func createServer(auth AuthenticatorFunc) *httptest.Server {
 	return httptest.NewServer(
-		Wrapper(auth,
+		HandlerWrapper(auth,
 			func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, "string from server")
 			}))
 }
 
 func TestWithoutPassword(t *testing.T) {
-	server := createServer(func(name, pwd string) bool {
+	server := createServer(func(name, pwd string, r *http.Request) bool {
 		return true
 	})
 	defer server.Close()
@@ -41,7 +41,7 @@ func doRequestWithPassword(url string) (*http.Response, error) {
 
 func TestWithCorrectPassword(t *testing.T) {
 	var receivedName, receivedPwd string
-	server := createServer(func(name, pwd string) bool {
+	server := createServer(func(name, pwd string, r *http.Request) bool {
 		receivedName = name
 		receivedPwd = pwd
 		return true
@@ -61,7 +61,7 @@ func TestWithCorrectPassword(t *testing.T) {
 
 func TestWithWrongPassword(t *testing.T) {
 	var receivedName, receivedPwd string
-	server := createServer(func(name, pwd string) bool {
+	server := createServer(func(name, pwd string, r *http.Request) bool {
 		receivedName = name
 		receivedPwd = pwd
 		return false

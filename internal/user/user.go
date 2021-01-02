@@ -4,6 +4,8 @@ import (
 	"DHBW.Photo-Server/internal/cryptography"
 )
 
+// TODO: Jones Documentation
+
 type User struct {
 	Name     string
 	password string

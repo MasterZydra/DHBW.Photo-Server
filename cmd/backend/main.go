@@ -39,6 +39,11 @@ func main() {
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	var res api.RegisterRes
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -66,6 +71,11 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func thumbnailsHander(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	var res api.ThumbnailsRes
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -87,6 +97,11 @@ func thumbnailsHander(w http.ResponseWriter, r *http.Request) {
 }
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
 	var res api.ImageUploadRes
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -118,5 +133,9 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func imageHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
 	// TODO: David: implementieren
 }

@@ -56,3 +56,25 @@ func (i *UploadImage) SaveImageToDisk() error {
 	}
 	return nil
 }
+
+func (i *UploadImage) GenerateAndSaveThumbnailToDisk() error {
+	err := util.CheckExistAndCreateFolder(path.Join(imagedir, i.userPath, thumbdir))
+	if err != nil {
+		return err
+	}
+	// Open new file
+	imgFile, err := os.Create(path.Join(imagedir, i.userPath, thumbdir, i.Name))
+	if err != nil {
+		return err
+	}
+
+	// Write data
+	imgFile.Write(i.Raw)
+
+	// Close file
+	imgFile.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}

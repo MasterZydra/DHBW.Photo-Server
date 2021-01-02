@@ -48,6 +48,11 @@ func (im *ImageManager) AddImageUpload(image *UploadImage) {
 	if err != nil {
 		fmt.Errorf("error saving image to disk: %v", err)
 	}
+	// Store thumbnail to disk
+	err = image.GenerateAndSaveThumbnailToDisk()
+	if err != nil {
+		fmt.Errorf("error saving image to disk: %v", err)
+	}
 	// Add file to image array
 	im.AddImage(&image.Image)
 	// Sort and store content file

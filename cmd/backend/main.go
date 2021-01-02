@@ -144,20 +144,29 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ImageUploadRes
 	defer jsonUtil.EncodeResponse(w, &res)
 
+	// Get username from basic authentication
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
 		return
 	}
 
-	// ToDo: David - Move default value for date in NewUploadImage
+	// Get key "imagename" from header
 	imgname := r.Header.Get("imagename")
+	// Check if key "imagename" is given
+	if imgname == "" {
+		res.Error = "Key imagename is missing"
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
+	// ToDo: David - Move default value for date in NewUploadImage
 	imgcreation := r.Header.Get("imagecreationdate")
 	if imgcreation == "" {
 		imgcreation = time.Now().Format("2006-01-02")
 	}
 
-	// Read body
+	// Read image raw data from body
 	var body []byte
 	if r.Body != nil {
 		var err error
@@ -167,6 +176,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// Save image for associated user
 	errorString := UploadImage(username, imgname, imgcreation, body)
 	if errorString != "" {
 		res.Error = errorString

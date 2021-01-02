@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	DHBW_Photo_Server "DHBW.Photo-Server"
+	dhbwphotoserver "DHBW.Photo-Server"
 	"DHBW.Photo-Server/cmd/backend/jsonUtil"
 	"DHBW.Photo-Server/internal/api"
 	"DHBW.Photo-Server/internal/auth"
@@ -17,7 +17,7 @@ import (
 
 func main() {
 	// Setup
-	err := util.CheckExistAndCreateFolder(DHBW_Photo_Server.ImageDir)
+	err := util.CheckExistAndCreateFolder(dhbwphotoserver.ImageDir)
 	if err != nil {
 		log.Fatalf("Error creating image folder: %v", err)
 	}

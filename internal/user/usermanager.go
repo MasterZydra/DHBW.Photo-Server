@@ -18,14 +18,11 @@ type UserManager struct {
 	UsersFile string
 }
 
-func NewUserManager(args ...string) UserManager {
+var usersFile = DHBW_Photo_Server.ProdUserFile
+
+func NewUserManager() *UserManager {
 	// TODO: jones usersfile anlegen, wenn diese nicht existiert
-	// TODO: LoadUsers direkt beim NewUserManager ausführen -> refactoring
-	usersFile := "usersFile.csv"
-	if args != nil && args[0] != "" {
-		usersFile = args[0]
-	}
-	return UserManager{
+	return &UserManager{
 		UsersFile: usersFile,
 	}
 }
@@ -132,10 +129,6 @@ func (um *UserManager) Register(name string, password string) error {
 }
 
 func (um *UserManager) UserExists(name string) (bool, error) {
-	err := um.LoadUsers()
-	if err != nil {
-		return false, err
-	}
 	user := um.GetUser(name)
 	if user != nil {
 		return true, nil
@@ -144,10 +137,6 @@ func (um *UserManager) UserExists(name string) (bool, error) {
 }
 
 func (um *UserManager) Authenticate(user string, pw string) (bool, error) {
-	err := um.LoadUsers()
-	if err != nil {
-		return false, err
-	}
 	userObj := um.GetUser(user)
 	if userObj != nil {
 		ok, _ := userObj.ComparePassword(pw)
@@ -156,13 +145,4 @@ func (um *UserManager) Authenticate(user string, pw string) (bool, error) {
 		}
 	}
 	return false, nil
-}
-
-// TODO: test
-func (um *UserManager) AuthenticateHashedPassword(username string, hashedPw string) bool {
-	userObj := um.GetUser(username)
-	if userObj != nil {
-		return userObj.password == hashedPw
-	}
-	return false
 }

@@ -2,12 +2,12 @@ package DHBW_Photo_Server
 
 const (
 	// Image folder configuration
-	ImageDir 	= "images"
-	ThumbDir 	= "previews"
+	ImageDir    = "images"
+	ThumbDir    = "previews"
 	UserContent = "content.csv"
 
 	// userfiles
-	TestUserFile = "usersFile_test.csv"
+	TestUserFile = "../../test/usersFile_test.csv"
 	ProdUserFile = "usersFile.csv"
 
 	// user1

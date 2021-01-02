@@ -93,24 +93,46 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ThumbnailsRes
 	defer jsonUtil.EncodeResponse(w, &res)
 
-	// ToDo David: Return message if not all paramters are given
-
-	index, err := strconv.Atoi(r.URL.Query().Get("index"))
-	if err != nil {
-		res.Error = "Invalid index. Index must be an Integer"
-	}
-
-	length, err := strconv.Atoi(r.URL.Query().Get("length"))
-	if err != nil {
-		res.Error = "Invalid index. Index must be an Integer"
-	}
-
+	// Get username from basic authentication
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
 		return
 	}
 
+	// Get parameter "index" from url
+	strIndex := r.URL.Query().Get("index")
+	// Check if parameter "index" is given
+	if strIndex == "" {
+		res.Error = "Parameter index is missing"
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+	// Check if parameter "index" is an integer
+	index, err := strconv.Atoi(strIndex)
+	if err != nil {
+		res.Error = "Invalid index. Index must be an Integer"
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
+	// Get parameter "length" from url
+	strlength := r.URL.Query().Get("length")
+	// Check if parameter "length" is given
+	if strlength == "" {
+		res.Error = "Parameter length is missing"
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+	// Check if parameter "length" is an integer
+	length, err := strconv.Atoi(strlength)
+	if err != nil {
+		res.Error = "Invalid length. Length must be an Integer"
+		w.WriteHeader(http.StatusUnprocessableEntity)
+		return
+	}
+
+	// Load thumbnails from associated ImageManager
 	res.Images = GetThumbnail(username, index, length)
 	return
 }

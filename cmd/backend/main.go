@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	dhbwphotoserver "DHBW.Photo-Server"
@@ -133,7 +134,7 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Load thumbnails from associated ImageManager
-	res.Images = GetThumbnail(username, index, length)
+	res.Images = GetThumbnail(strings.ToLower(username), index, length)
 	return
 }
 
@@ -177,7 +178,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Save image for associated user
-	errorString := UploadImage(username, imgname, imgcreation, body)
+	errorString := UploadImage(strings.ToLower(username), imgname, imgcreation, body)
 	if errorString != "" {
 		res.Error = errorString
 		w.WriteHeader(http.StatusInternalServerError)
@@ -208,6 +209,6 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Load image from associated ImageManager
-	res.Image = GetImage(username, imgname)
+	res.Image = GetImage(strings.ToLower(username), imgname)
 	return
 }

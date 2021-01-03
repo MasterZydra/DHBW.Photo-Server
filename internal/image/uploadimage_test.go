@@ -1,9 +1,11 @@
 package image
 
 import (
+	dhbwphotoserver "DHBW.Photo-Server"
 	"bytes"
 	"io/ioutil"
 	"testing"
+	"time"
 )
 
 func TestNewUploadImage(t *testing.T) {
@@ -14,8 +16,10 @@ func TestNewUploadImage(t *testing.T) {
 		return
 	}
 
+	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-12-12")
+
 	// Create image
-	img := NewUploadImage("myImage.jpg", "2020-12-12", raw)
+	img := NewUploadImage("myImage.jpg", date, raw)
 
 	// Check struct content
 	if img.Name != "myImage.jpg" ||
@@ -29,12 +33,13 @@ func TestNewUploadImage(t *testing.T) {
 
 func TestUploadImage_SaveImageToDisk(t *testing.T) {
 	// Test data
-	rawdata := []byte{84,69,83,84}
+	rawdata := []byte{84, 69, 83, 84}
 
+	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-01-01")
 	// Initialize and save new image
 	upimg := UploadImage{
-		Raw: rawdata,
-		Image: *NewImage("imageWriteTest.txt", "2020-01-01", "d41d8cd98f00b204e9800998ecf8427e"),
+		Raw:      rawdata,
+		Image:    *NewImage("imageWriteTest.txt", date, "d41d8cd98f00b204e9800998ecf8427e"),
 		userPath: "../../test/output"}
 	upimg.SaveImageToDisk()
 

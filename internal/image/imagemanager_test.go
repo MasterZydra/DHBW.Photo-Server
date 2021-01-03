@@ -1,19 +1,23 @@
 package image
 
 import (
+	DHBW_Photo_Server "DHBW.Photo-Server"
 	"DHBW.Photo-Server/internal/util"
 	"bytes"
 	"io/ioutil"
 	"os"
 	"path"
 	"testing"
+	"time"
 )
 
 func TestNewImageManager(t *testing.T) {
 	// Test data
 	user := "../../test"
-	image1 := NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")
-	image2 := NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")
+	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-20")
+	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21")
+	image1 := NewImage("img1", date1, "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("img2", date2, "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Overwrite output file name
 	imagedir = ""
@@ -41,8 +45,10 @@ func TestNewImageManager(t *testing.T) {
 
 func TestImageManager_Contains_Hash(t *testing.T) {
 	// Test images
-	image1 := UploadImage{Image: *NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")}
-	image2 := UploadImage{Image: *NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")}
+	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-20")
+	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21")
+	image1 := UploadImage{Image: *NewImage("img1", date1, "d41d8cd98f00b204e9800998ecf8427e")}
+	image2 := UploadImage{Image: *NewImage("img2", date2, "d41d8cdb8f0db204a9800498ecf8427e")}
 
 	// Init ImageManager
 	imgMan := ImageManager{}
@@ -59,9 +65,11 @@ func TestImageManager_Contains_Hash(t *testing.T) {
 
 func TestImageManager_Contains_Filename(t *testing.T) {
 	// Test images
-	image1 := UploadImage{Image: *NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")}
-	image2 := UploadImage{Image: *NewImage("img1", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")}
-	image3 := UploadImage{Image: *NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")}
+	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-20")
+	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21")
+	image1 := UploadImage{Image: *NewImage("img1", date1, "d41d8cd98f00b204e9800998ecf8427e")}
+	image2 := UploadImage{Image: *NewImage("img1", date2, "d41d8cdb8f0db204a9800498ecf8427e")}
+	image3 := UploadImage{Image: *NewImage("img2", date2, "d41d8cdb8f0db204a9800498ecf8427e")}
 
 	// Init ImageManager
 	imgMan := ImageManager{}
@@ -93,8 +101,11 @@ func TestImageManager_Contains_WithExampleImages(t *testing.T) {
 		t.Errorf("Error reading image: %v", err)
 		return
 	}
-	image1 := NewUploadImage("img1", "2020-11-20", raw1)
-	image2 := NewUploadImage("img2", "2020-11-21", raw2)
+
+	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-20")
+	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21")
+	image1 := NewUploadImage("img1", date1, raw1)
+	image2 := NewUploadImage("img2", date2, raw2)
 
 	// Init ImageManager
 	imgMan := ImageManager{}
@@ -119,7 +130,9 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 		return
 	}
 	// Init upload image
-	upimg := NewUploadImage(fileName, "2020-01-01", raw)
+
+	date, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-01")
+	upimg := NewUploadImage(fileName, date, raw)
 
 	// Add image to ImageManager
 	imgMan := ImageManager{user: "../../test/output"}
@@ -174,8 +187,11 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 
 func TestImageManager_AddImage(t *testing.T) {
 	// Test images
-	image1 := NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")
-	image2 := NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")
+
+	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-20")
+	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21")
+	image1 := NewImage("img1", date1, "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("img2", date2, "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Init ImageManager
 	imgMan := ImageManager{}
@@ -206,9 +222,13 @@ func TestImageManager_AddImage(t *testing.T) {
 
 func TestImageManager_Sort(t *testing.T) {
 	// Test images
-	image1 := NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")
-	image0 := NewImage("img0", "2020-01-21", "d41d8cdb8f0db204a9800498ecf8427e")
-	image2 := NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")
+	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-20")
+	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-21")
+	date3, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21")
+
+	image1 := NewImage("img1", date1, "d41d8cd98f00b204e9800998ecf8427e")
+	image0 := NewImage("img0", date2, "d41d8cdb8f0db204a9800498ecf8427e")
+	image2 := NewImage("img2", date3, "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Init ImageManager
 	imgMan := ImageManager{}
@@ -218,9 +238,8 @@ func TestImageManager_Sort(t *testing.T) {
 
 	// Sort and check order
 	imgMan.sort()
-	if img := imgMan.images;
-		img[0].Name != "img2" || img[1].Name != "img1" || img[2].Name != "img0" {
-			t.Errorf("Images are in the wrong order")
+	if img := imgMan.images; img[0].Name != "img2" || img[1].Name != "img1" || img[2].Name != "img0" {
+		t.Errorf("Images are in the wrong order")
 	}
 }
 
@@ -233,7 +252,8 @@ func TestImageManager_GetImage(t *testing.T) {
 		t.Errorf("Could not read example image: %v", err)
 		return
 	}
-	upimg := NewUploadImage("img1.jpg", "2020-12-31", raw)
+	date, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-12-31")
+	upimg := NewUploadImage("img1.jpg", date, raw)
 
 	// Overwrite output file name
 	imagedir = ""

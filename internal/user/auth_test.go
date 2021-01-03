@@ -11,7 +11,7 @@ import (
 
 func createServer(auth AuthenticatorFunc) *httptest.Server {
 	return httptest.NewServer(
-		HandlerWrapper(auth,
+		AuthHandlerWrapper(auth,
 			func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, "string from server")
 			}))
@@ -19,7 +19,7 @@ func createServer(auth AuthenticatorFunc) *httptest.Server {
 
 func createFileServer(auth AuthenticatorFunc) *httptest.Server {
 	return httptest.NewServer(
-		FileServerWrapper(auth,
+		AuthFileServerWrapper(auth,
 			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, "string from server")
 			})))
@@ -150,7 +150,7 @@ func TestFileServerWrapperWithWrongPassword(t *testing.T) {
 
 func TestAuthenticateHandlerWithoutPassword(t *testing.T) {
 	usersFile = DHBW_Photo_Server.TestUserFile
-	server := createFileServer(AuthenticateHandler())
+	server := createFileServer(AuthHandler())
 	defer server.Close()
 
 	res, err := http.Get(server.URL)
@@ -160,7 +160,7 @@ func TestAuthenticateHandlerWithoutPassword(t *testing.T) {
 }
 
 func TestAuthenticateHandlerWithCorrectPassword(t *testing.T) {
-	server := createFileServer(AuthenticateHandler())
+	server := createFileServer(AuthHandler())
 	defer server.Close()
 	res, _ := doRequest(server.URL, DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw1Clear)
 
@@ -175,7 +175,7 @@ func TestAuthenticateHandlerWithCorrectPassword(t *testing.T) {
 }
 
 func TestAuthenticateHandlerWithWrongPassword(t *testing.T) {
-	server := createFileServer(AuthenticateHandler())
+	server := createFileServer(AuthHandler())
 	defer server.Close()
 	res, _ := doRequest(server.URL, "wrong", "credentials")
 
@@ -190,7 +190,7 @@ func TestAuthenticateHandlerWithWrongPassword(t *testing.T) {
 }
 
 func TestAuthenticateFileServerWrongPath(t *testing.T) {
-	server := createFileServer(AuthenticateFileServer())
+	server := createFileServer(AuthFileServer())
 	defer server.Close()
 
 	client := &http.Client{}
@@ -204,7 +204,7 @@ func TestAuthenticateFileServerWrongPath(t *testing.T) {
 }
 
 func TestAuthenticateFileServerCorrectPath(t *testing.T) {
-	server := createFileServer(AuthenticateFileServer())
+	server := createFileServer(AuthFileServer())
 	defer server.Close()
 
 	client := &http.Client{}
@@ -218,7 +218,7 @@ func TestAuthenticateFileServerCorrectPath(t *testing.T) {
 }
 
 func TestAuthenticateFileServerPathTooShort(t *testing.T) {
-	server := createFileServer(AuthenticateFileServer())
+	server := createFileServer(AuthFileServer())
 	defer server.Close()
 
 	client := &http.Client{}

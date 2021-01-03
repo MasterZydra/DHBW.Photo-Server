@@ -5,6 +5,7 @@ import (
 	"DHBW.Photo-Server/internal/util"
 	"os"
 	"path"
+	"time"
 )
 
 // The UploadImage struct is used to represent an uploaded image.
@@ -13,14 +14,14 @@ import (
 // directory where it will be stored.
 type UploadImage struct {
 	Image
-	Raw []byte
+	Raw      []byte
 	userPath string
 }
 
 // Create a new UploadImage object from the given image name, creation date and
 // the raw data of the image itself. It calculates the additional data like the
 // hash value.
-func NewUploadImage(name string, creationDate string, raw []byte) UploadImage {
+func NewUploadImage(name string, creationDate time.Time, raw []byte) UploadImage {
 	hash := cryptography.HashToString(cryptography.HashImage(&raw))
 	// ToDo Read Exif -> if no date use given creationdate
 	img := NewImage(name, creationDate, hash)

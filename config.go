@@ -26,4 +26,6 @@ const (
 	UsernameRegexWhitelist = `[a-zA-Z0-9\_\.\-]+`
 
 	BackendHost = "https://localhost:3000/"
+
+	TimeLayout = "2006-01-02"
 )

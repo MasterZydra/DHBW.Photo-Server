@@ -1,17 +1,16 @@
 package main
 
 import (
-	"DHBW.Photo-Server/internal/user"
-	"io/ioutil"
+	"encoding/base64"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	dhbwphotoserver "DHBW.Photo-Server"
 	"DHBW.Photo-Server/cmd/backend/jsonUtil"
 	"DHBW.Photo-Server/internal/api"
+	"DHBW.Photo-Server/internal/user"
 	"DHBW.Photo-Server/internal/util"
 )
 
@@ -29,20 +28,20 @@ func main() {
 	http.HandleFunc("/register", allowMethod(http.MethodPost, registerHandler))
 
 	// gibt Thumbnails mit den Infos dazu von index bis length zurück
-	http.HandleFunc("/thumbnails", user.HandlerWrapper(
-		user.AuthenticateHandler(),
+	http.HandleFunc("/thumbnails", user.AuthHandlerWrapper(
+		user.AuthHandler(),
 		allowMethod(http.MethodGet, thumbnailsHandler),
 	))
 
 	// lädt Image hoch
-	http.HandleFunc("/upload", user.HandlerWrapper(
-		user.AuthenticateHandler(),
+	http.HandleFunc("/upload", user.AuthHandlerWrapper(
+		user.AuthHandler(),
 		allowMethod(http.MethodPost, uploadHandler),
 	))
 
 	// Gibt Bild + Infos zurück
-	http.HandleFunc("/image", user.HandlerWrapper(
-		user.AuthenticateHandler(),
+	http.HandleFunc("/image", user.AuthHandlerWrapper(
+		user.AuthHandler(),
 		allowMethod(http.MethodGet, imageHandler),
 	))
 
@@ -101,6 +100,7 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: Jones: die Prüfungen der Parameter als Mustparams-Wrapper implementieren?
 	// Get parameter "index" from url
 	strIndex := r.URL.Query().Get("index")
 	// Check if parameter "index" is given
@@ -145,6 +145,14 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ImageUploadRes
 	defer jsonUtil.EncodeResponse(w, &res)
 
+	// decode data
+	var data api.ImageUploadReq
+	err := jsonUtil.DecodeBody(r, &data)
+	if err != nil {
+		res.Error = err.Error()
+		return
+	}
+
 	// Get username from basic authentication
 	username, _, ok := r.BasicAuth()
 	if !ok {
@@ -152,35 +160,23 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get key "imagename" from header
-	imgname := r.Header.Get("imagename")
-	// Check if key "imagename" is given
-	if imgname == "" {
-		res.Error = "Key imagename is missing"
-		w.WriteHeader(http.StatusUnprocessableEntity)
+	// TODO: Jones Check if key "imagename" is given (Must-Param Wrapper?)
+	//if imgname == "" {
+	//	res.Error = "Key imagename is missing"
+	//	w.WriteHeader(http.StatusUnprocessableEntity)
+	//	return
+	//}
+
+	imageBytes, err := base64.StdEncoding.DecodeString(data.Base64Image)
+	if err != nil {
+		res.Error = err.Error()
 		return
 	}
 
-	// ToDo: David - Move default value for date in NewUploadImage
-	imgcreation := r.Header.Get("imagecreationdate")
-	if imgcreation == "" {
-		imgcreation = time.Now().Format("2006-01-02")
-	}
-
-	// Read image raw data from body
-	var body []byte
-	if r.Body != nil {
-		var err error
-		body, err = ioutil.ReadAll(r.Body)
-		if err != nil {
-			// ToDo Error treatment
-		}
-	}
-
 	// Save image for associated user
-	errorString := UploadImage(strings.ToLower(username), imgname, imgcreation, body)
-	if errorString != "" {
-		res.Error = errorString
+	err = UploadImage(strings.ToLower(username), data.Filename, data.CreationDate, imageBytes)
+	if err != nil {
+		res.Error = err.Error()
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusOK)

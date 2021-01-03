@@ -17,7 +17,7 @@ func (af AuthenticatorFunc) Authenticate(user, password string, r *http.Request)
 	return af(user, password, r)
 }
 
-func HandlerWrapper(authenticator Authenticator, handler http.HandlerFunc) http.HandlerFunc {
+func AuthHandlerWrapper(authenticator Authenticator, handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		usr, pw, ok := r.BasicAuth()
 		if ok && authenticator.Authenticate(usr, pw, r) {
@@ -29,7 +29,7 @@ func HandlerWrapper(authenticator Authenticator, handler http.HandlerFunc) http.
 	}
 }
 
-func FileServerWrapper(authenticator Authenticator, h http.Handler) http.Handler {
+func AuthFileServerWrapper(authenticator Authenticator, h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		usr, pw, ok := r.BasicAuth()
 		if ok && authenticator.Authenticate(usr, pw, r) {
@@ -40,12 +40,12 @@ func FileServerWrapper(authenticator Authenticator, h http.Handler) http.Handler
 	})
 }
 
-func AuthenticateHandler() AuthenticatorFunc {
+func AuthHandler() AuthenticatorFunc {
 	return authenticate
 }
 
 // führt authenticate aus und überprüft, ob die aktuell angefragte Datei zum Benutzer gehört
-func AuthenticateFileServer() AuthenticatorFunc {
+func AuthFileServer() AuthenticatorFunc {
 	return func(username, password string, r *http.Request) bool {
 		urlParts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
 		return authenticate(username, password, r) &&

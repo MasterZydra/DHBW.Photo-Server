@@ -14,11 +14,6 @@ type Image struct {
 
 // Create a new Image object.
 // The date string will be converted into Time.
-func NewImage(name string, date string, hash string) *Image {
-	d, err := time.Parse("2006-01-02", date)
-	if err != nil {
-		// ToDo Implement Error Handling
-	}
-	return &Image{Name: name, Date: d, hash: hash}
+func NewImage(name string, date time.Time, hash string) *Image {
+	return &Image{Name: name, Date: date, hash: hash}
 }
-

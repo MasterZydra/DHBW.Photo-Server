@@ -23,46 +23,59 @@ func main() {
 
 	port := "3000"
 	// ermöglicht Registrierung
-	http.HandleFunc("/register", allowMethod(http.MethodPost, registerHandler))
+	http.HandleFunc("/register", mustParam(registerHandler, http.MethodPost))
 
 	// gibt Thumbnails mit den Infos dazu von index bis length zurück
 	http.HandleFunc("/thumbnails", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		allowMethod(http.MethodGet, thumbnailsHandler),
+		mustParam(thumbnailsHandler, http.MethodGet, "index", "length"),
 	))
 
 	// lädt Image hoch
 	http.HandleFunc("/upload", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		allowMethod(http.MethodPost, uploadHandler),
+		mustParam(uploadHandler, http.MethodPost),
 	))
 
 	// Gibt Bild + Infos zurück
 	http.HandleFunc("/image", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		allowMethod(http.MethodGet, imageHandler),
+		mustParam(imageHandler, http.MethodGet, "name"),
 	))
 
 	log.Println("backend listening on https://localhost:" + port)
 	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
 }
 
-func allowMethod(method string, h http.HandlerFunc) http.HandlerFunc {
+func mustParam(h http.HandlerFunc, method string, params ...string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != method {
-			w.WriteHeader(http.StatusMethodNotAllowed)
+			//w.WriteHeader(http.StatusMethodNotAllowed)
+			http.Error(w, "Method "+r.Method+" not allowed here", http.StatusMethodNotAllowed)
 			return
 		}
+
+		// check for missing GET parameters
+		if method == http.MethodGet && len(params) > 0 {
+			data := r.URL.Query()
+			for _, param := range params {
+				if len(data.Get(param)) == 0 {
+					http.Error(w, "missing GET parameter: "+param, http.StatusBadRequest)
+					return
+				}
+			}
+		}
+
 		h(w, r)
 	}
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) {
-	var res api.RegisterRes
+	var res api.RegisterResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
 	// decode data
-	var data api.RegisterReq
+	var data api.RegisterReqData
 	err := jsonUtil.DecodeBody(r, &data)
 	if err != nil {
 		res.Error = err.Error()
@@ -88,7 +101,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 // The request need to be send via the GET method and contain the parameters
 // index and length. Both parameters have to be integers.
 func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
-	var res api.ThumbnailsRes
+	var res api.ThumbnailsResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
 	// Get username from basic authentication
@@ -98,33 +111,16 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Jones: die Prüfungen der Parameter als Mustparams-Wrapper implementieren?
-	// Get parameter "index" from url
-	strIndex := r.URL.Query().Get("index")
-	// Check if parameter "index" is given
-	if strIndex == "" {
-		res.Error = "Parameter index is missing"
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		return
-	}
 	// Check if parameter "index" is an integer
-	index, err := strconv.Atoi(strIndex)
+	index, err := strconv.Atoi(r.URL.Query().Get("index"))
 	if err != nil {
 		res.Error = "Invalid index. Index must be an Integer"
 		w.WriteHeader(http.StatusUnprocessableEntity)
 		return
 	}
 
-	// Get parameter "length" from url
-	strlength := r.URL.Query().Get("length")
-	// Check if parameter "length" is given
-	if strlength == "" {
-		res.Error = "Parameter length is missing"
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		return
-	}
 	// Check if parameter "length" is an integer
-	length, err := strconv.Atoi(strlength)
+	length, err := strconv.Atoi(r.URL.Query().Get("length"))
 	if err != nil {
 		res.Error = "Invalid length. Length must be an Integer"
 		w.WriteHeader(http.StatusUnprocessableEntity)
@@ -136,15 +132,14 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-// Upload a new image. The image has to be given in the message body.
-// In the header the image name must be given with the key "imagename".
-// If known the creation date of the image (read from file system) can be given as key "imagecreationdate".
+// Upload a new image. The image has to be base64 encoded in the json struct.
+// The name of the image and the creation date will also be sent via the json struct.
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	var res api.ImageUploadRes
+	var res api.UploadResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
 	// decode data
-	var data api.ImageUploadReq
+	var data api.UploadReqData
 	err := jsonUtil.DecodeBody(r, &data)
 	if err != nil {
 		res.Error = err.Error()
@@ -183,7 +178,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 // Request details to an image. The result is a JSON object.
 // The request need to be send via the GET method and contain the parameter name which is the file name.
 func imageHandler(w http.ResponseWriter, r *http.Request) {
-	var res api.ImageRes
+	var res api.ImageResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
 	// Get username from basic authentication
@@ -194,15 +189,9 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get parameter "name" from url
-	imgname := r.URL.Query().Get("name")
-	// Check if parameter "name" is given
-	if imgname == "" {
-		res.Error = "Parameter name is missing"
-		w.WriteHeader(http.StatusUnprocessableEntity)
-		return
-	}
+	imgName := r.URL.Query().Get("name")
 
 	// Load image from associated ImageManager
-	res.Image = GetImage(username, imgname)
+	res.Image = GetImage(username, imgName)
 	return
 }

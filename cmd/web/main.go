@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"time"
@@ -54,13 +55,11 @@ func main() {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	defer layout(w, r, nil)
 	r.URL.Path = "index"
+	layout(w, r, nil)
 }
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	defer layout(w, r, nil)
-
 	if r.Method == http.MethodPost {
 		err := r.ParseMultipartForm(100 << 20) // max 100MB
 		if err != nil {
@@ -86,20 +85,27 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			// create request data with base64 encoded image buffer
-			req := api.ImageUploadReq{
+			data := api.UploadReqData{
 				Base64Image:  base64.StdEncoding.EncodeToString(buf),
 				Filename:     fh.Filename,
 				CreationDate: time.Now().Local(),
 			}
 
-			var res api.ImageUploadRes
-			err = callApi(r, "upload", req, &res)
+			req, err := newPostRequest("upload", data)
+			if err != nil {
+				internalServerError(w, err)
+				return
+			}
+
+			var res api.UploadResData
+			err = callApi(r, req, &res)
 			if err != nil {
 				badRequest(w, err)
 				return
 			}
 		}
 	}
+	layout(w, r, nil)
 }
 
 // TODO: jones tests schreiben
@@ -107,14 +113,20 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	defer layout(w, r, nil)
 
 	if r.Method == http.MethodPost {
-		data := api.RegisterReq{
+		data := api.RegisterReqData{
 			Username:             r.FormValue("user"),
 			Password:             r.FormValue("password"),
 			PasswordConfirmation: r.FormValue("passwordConfirmation"),
 		}
 
-		var res api.RegisterRes
-		err := callApi(r, "register", data, &res)
+		req, err := newPostRequest("register", data)
+		if err != nil {
+			internalServerError(w, err)
+			return
+		}
+
+		var res api.RegisterResData
+		err = callApi(r, req, &res)
 		if err != nil {
 			badRequest(w, err)
 			return
@@ -126,20 +138,24 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	var res api.ThumbnailsRes
-	defer layout(w, r, res)
+	var res api.ThumbnailsResData
+	payload := url.Values{
+		"index":  {"0"},
+		"length": {"25"},
+	}
+	req, err := newGetRequest("thumbnails?" + payload.Encode())
+	if err != nil {
+		internalServerError(w, err)
+		return
+	}
 
-	//data := api.ThumbnailsReq{
-	//	Index:  1,
-	//	Length: 25,
-	//}
-	//err := callApi(r, "thumbnails", data, &res)
-	//if err != nil {
-	//	badRequest(w, err)
-	//	return
-	//}
+	err = callApi(r, req, &res)
+	if err != nil {
+		internalServerError(w, err)
+		return
+	}
 
-	// TODO: Thumbnails zurückgeben
+	layout(w, r, res)
 }
 
 func layout(w http.ResponseWriter, r *http.Request, data interface{}) {
@@ -193,16 +209,32 @@ func badRequest(w http.ResponseWriter, err error) {
 	http.Error(w, err.Error(), http.StatusBadRequest)
 }
 
-func callApi(r *http.Request, url string, data interface{}, res api.BaseRes) error {
-	// encode data to jsonUtil
+// encode data to jsonUtil
+//jsonBytes, err := json.Marshal(data)
+//
+//// prepare request
+//req, err := http.NewRequest(method, DHBW_Photo_Server.BackendHost+url, bytes.NewBuffer(jsonBytes))
+//if err != nil {
+//return err
+//}
+
+func newPostRequest(url string, data interface{}) (*http.Request, error) {
 	jsonBytes, err := json.Marshal(data)
-
-	// prepare request
-	req, err := http.NewRequest(http.MethodPost, DHBW_Photo_Server.BackendHost+url, bytes.NewBuffer(jsonBytes))
 	if err != nil {
-		return err
+		return nil, err
 	}
+	return newRequest(http.MethodPost, url, jsonBytes)
+}
 
+func newGetRequest(url string) (*http.Request, error) {
+	return newRequest(http.MethodGet, url, nil)
+}
+
+func newRequest(method string, url string, data []byte) (*http.Request, error) {
+	return http.NewRequest(method, DHBW_Photo_Server.BackendHost+url, bytes.NewBuffer(data))
+}
+
+func callApi(r *http.Request, req *http.Request, res api.BaseRes) error {
 	// set basic auth for backend request if available
 	username, pw, ok := r.BasicAuth()
 	if ok {
@@ -222,7 +254,7 @@ func callApi(r *http.Request, url string, data interface{}, res api.BaseRes) err
 	}
 
 	// get jsonString from api response
-	jsonBytes, err = ioutil.ReadAll(apiRes.Body)
+	jsonBytes, err := ioutil.ReadAll(apiRes.Body)
 	if err != nil {
 		return err
 	}

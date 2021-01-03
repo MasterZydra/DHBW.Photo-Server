@@ -13,7 +13,7 @@ func TestDecodeBodyValid(t *testing.T) {
 	body := bytes.NewReader([]byte(jsonString))
 	req, _ := http.NewRequest(http.MethodGet, "/", body)
 
-	var data api.TestReq
+	var data api.TestReqData
 	err := DecodeBody(req, &data)
 
 	if err != nil || data.SomeString != "test" || data.SomeInteger != 1234 {
@@ -26,7 +26,7 @@ func TestDecodeBodyInvalid(t *testing.T) {
 	body := bytes.NewReader([]byte(jsonString))
 	req := httptest.NewRequest(http.MethodGet, "/", body)
 
-	var data api.TestReq
+	var data api.TestReqData
 	err := DecodeBody(req, &data)
 
 	if err == nil {
@@ -35,7 +35,7 @@ func TestDecodeBodyInvalid(t *testing.T) {
 }
 
 //func TestEncodeResponseValidNoError(t *testing.T) {
-//	res := api.TestRes{
+//	res := api.TestResData{
 //		"",
 //		"test",
 //	}

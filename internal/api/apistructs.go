@@ -11,65 +11,63 @@ type BaseRes interface {
 	GetError() string
 }
 
-type TestReq struct {
+type TestReqData struct {
 	SomeString  string
 	SomeInteger int
 }
-type TestRes struct {
+type TestResData struct {
 	Error      string
 	SomeResult string
 }
 
-func (a TestRes) GetError() string {
+func (a TestResData) GetError() string {
 	return a.Error
 }
 
-type RegisterReq struct {
+type RegisterReqData struct {
 	Username             string
 	Password             string
 	PasswordConfirmation string
 }
-type RegisterRes struct {
+type RegisterResData struct {
 	Error string
 }
 
-func (a RegisterRes) GetError() string {
+func (a RegisterResData) GetError() string {
 	return a.Error
 }
 
-type ImageUploadReq struct {
+type UploadReqData struct {
 	Base64Image  string
 	Filename     string
 	CreationDate time.Time
 }
-type ImageUploadRes struct {
+type UploadResData struct {
 	Error string
 }
 
-func (a ImageUploadRes) GetError() string {
+func (a UploadResData) GetError() string {
 	return a.Error
 }
 
-type ImageReq struct {
-}
-type ImageRes struct {
+type ImageResData struct {
 	Error string
 	Image *image.Image
 }
 
-func (a ImageRes) GetError() string {
+func (a ImageResData) GetError() string {
 	return a.Error
 }
 
-type ThumbnailsReq struct {
+type ThumbnailsReqData struct {
 	Index  int
 	Length int
 }
-type ThumbnailsRes struct {
+type ThumbnailsResData struct {
 	Error  string
 	Images []*image.Image
 }
 
-func (a ThumbnailsRes) GetError() string {
+func (a ThumbnailsResData) GetError() string {
 	return a.Error
 }

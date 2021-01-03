@@ -12,12 +12,13 @@ import (
 	"encoding/csv"
 	"os"
 	"path"
+	"time"
 )
 import "fmt"
 
 // Define pathes and filenames
-var imagedir 	= dhbwphotoserver.ImageDir
-var thumbdir 	= dhbwphotoserver.ThumbDir
+var imagedir = dhbwphotoserver.ImageDir
+var thumbdir = dhbwphotoserver.ThumbDir
 var usercontent = dhbwphotoserver.UserContent
 
 // Read content file for given user. The user has to be equal to the folder name.
@@ -47,7 +48,12 @@ func ReadContent(user string) *ImageManager {
 	// Store all data in ImageManager struct
 	imageManager := &ImageManager{user: user}
 	for _, img := range images {
-		imageManager.AddImage(NewImage(img[0], img[1], img[2]))
+		date, err := time.Parse(dhbwphotoserver.TimeLayout, img[1])
+		if err != nil {
+			// Error stuff
+			fmt.Println(err)
+		}
+		imageManager.AddImage(NewImage(img[0], date, img[2]))
 	}
 
 	return imageManager

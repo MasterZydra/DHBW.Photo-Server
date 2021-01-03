@@ -4,8 +4,10 @@ import (
 	"DHBW.Photo-Server"
 	"DHBW.Photo-Server/internal/api"
 	"DHBW.Photo-Server/internal/user"
+	"bufio"
 	"bytes"
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"html/template"
@@ -14,6 +16,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 // TODO: Jones Documentation
@@ -34,16 +37,16 @@ type GlobalVariables struct {
 func main() {
 	// serve images directory
 	fs := http.FileServer(http.Dir("./images"))
-	http.Handle("/images/", user.FileServerWrapper(
-		user.AuthenticateFileServer(),
+	http.Handle("/images/", user.AuthFileServerWrapper(
+		user.AuthFileServer(),
 		http.StripPrefix("/images", fs),
 	))
 
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/register", registerHandler)
-	http.HandleFunc("/home", user.HandlerWrapper(user.AuthenticateHandler(), homeHandler))
+	http.HandleFunc("/home", user.AuthHandlerWrapper(user.AuthHandler(), homeHandler))
 	// TODO: jones: uploadHandler implementieren
-	//http.HandleFunc("/upload", auth.HandlerWrapper(auth.AuthenticateHandler(), uploadHandler))
+	http.HandleFunc("/upload", user.AuthHandlerWrapper(user.AuthHandler(), uploadHandler))
 	// TODO: Jones: Frontend-Struktur überlegen und ApiCalls fürs Backend vorbereiten
 
 	log.Println("web listening on https://localhost:" + port)
@@ -53,6 +56,50 @@ func main() {
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	defer layout(w, r, nil)
 	r.URL.Path = "index"
+}
+
+func uploadHandler(w http.ResponseWriter, r *http.Request) {
+	defer layout(w, r, nil)
+
+	if r.Method == http.MethodPost {
+		err := r.ParseMultipartForm(100 << 20) // max 100MB
+		if err != nil {
+			internalServerError(w, err)
+			return
+		}
+
+		files := r.MultipartForm.File["images"]
+		for _, fh := range files {
+			file, err := fh.Open()
+			if err != nil {
+				internalServerError(w, err)
+				return
+			}
+
+			// read file content into buffer
+			buf := make([]byte, fh.Size)
+			fReader := bufio.NewReader(file)
+			_, err = fReader.Read(buf)
+			if err != nil {
+				internalServerError(w, err)
+				return
+			}
+
+			// create request data with base64 encoded image buffer
+			req := api.ImageUploadReq{
+				Base64Image:  base64.StdEncoding.EncodeToString(buf),
+				Filename:     fh.Filename,
+				CreationDate: time.Now().Local(),
+			}
+
+			var res api.ImageUploadRes
+			err = callApi(r, "upload", req, &res)
+			if err != nil {
+				badRequest(w, err)
+				return
+			}
+		}
+	}
 }
 
 // TODO: jones tests schreiben
@@ -65,6 +112,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			Password:             r.FormValue("password"),
 			PasswordConfirmation: r.FormValue("passwordConfirmation"),
 		}
+
 		var res api.RegisterRes
 		err := callApi(r, "register", data, &res)
 		if err != nil {

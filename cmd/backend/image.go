@@ -2,6 +2,8 @@ package main
 
 import (
 	"DHBW.Photo-Server/internal/image"
+	"errors"
+	"time"
 )
 
 var imageManagers = make(map[string]*image.ImageManager)
@@ -15,16 +17,16 @@ func getImageManager(user string) *image.ImageManager {
 	return imgman
 }
 
-func UploadImage(user, name, creationDate string, raw []byte) string {
+func UploadImage(user string, name string, creationDate time.Time, raw []byte) error {
 	upimg := image.NewUploadImage(name, creationDate, raw)
 
 	imgman := getImageManager(user)
 
 	if imgman.Contains(&upimg) {
-		return "Image is already stored"
+		return errors.New("Image is already stored")
 	}
 	imgman.AddImageUpload(&upimg)
-	return ""
+	return nil
 }
 
 func GetImage(username, imagename string) *image.Image {

@@ -2,6 +2,7 @@ package api
 
 import (
 	"DHBW.Photo-Server/internal/image"
+	"time"
 )
 
 // TODO: Jones Documentation
@@ -36,6 +37,11 @@ func (a RegisterRes) GetError() string {
 	return a.Error
 }
 
+type ImageUploadReq struct {
+	Base64Image  string
+	Filename     string
+	CreationDate time.Time
+}
 type ImageUploadRes struct {
 	Error string
 }

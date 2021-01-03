@@ -1,14 +1,18 @@
 package image
 
 import (
+	DHBW_Photo_Server "DHBW.Photo-Server"
 	"testing"
+	"time"
 )
 
 func TestReadContent(t *testing.T) {
 	user := "../../test"
 	// Test images
-	image1 := NewImage("img1", "2020-11-20", "d41d8cd98f00b204e9800998ecf8427e")
-	image2 := NewImage("img2", "2020-11-21", "d41d8cdb8f0db204a9800498ecf8427e")
+	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-20")
+	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21")
+	image1 := NewImage("img1", date1, "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("img2", date2, "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Overwrite output file name
 	imagedir = ""
@@ -57,8 +61,10 @@ func TestReadContent_FileNotExist(t *testing.T) {
 
 func TestWriteContent(t *testing.T) {
 	// Test images
-	image1 := NewImage("Image 1", "2020-01-02", "d41d8cd98f00b204e9800998ecf8427e")
-	image2 := NewImage("Image 2", "2020-01-01", "d41d8cd98f10b214e5803998ecf8427e")
+	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-02")
+	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-01")
+	image1 := NewImage("Image 1", date1, "d41d8cd98f00b204e9800998ecf8427e")
+	image2 := NewImage("Image 2", date2, "d41d8cd98f10b214e5803998ecf8427e")
 
 	// Overwrite output file name
 	imagedir = ""

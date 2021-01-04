@@ -89,6 +89,7 @@ JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
       - Beide - Image directory path (hier kommen Benutzerordner hin)
       - Backendsachen (David)
    - Prüfung POST req. Param (David)
+- Bilder-Cache? (siehe Punkt 8)
 - Bilder (David)
   - Thumbnail und Tests
 - Konsolen-Tests (Patricia)

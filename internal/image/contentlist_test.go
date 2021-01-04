@@ -2,6 +2,8 @@ package image
 
 import (
 	DHBW_Photo_Server "DHBW.Photo-Server"
+	"os"
+	"path"
 	"testing"
 	"time"
 )
@@ -60,6 +62,7 @@ func TestReadContent_FileNotExist(t *testing.T) {
 }
 
 func TestWriteContent(t *testing.T) {
+	user := "../../test/output"
 	// Test images
 	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-02")
 	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-01")
@@ -70,14 +73,17 @@ func TestWriteContent(t *testing.T) {
 	imagedir = ""
 	usercontent = "contentWriteTest.csv"
 
+	// Clean up
+	os.Remove(path.Join(user, usercontent))
+
 	// Creat new image manager, fill it with images and write that data
 	imgman := ImageManager{}
 	imgman.AddImage(image1)
 	imgman.AddImage(image2)
-	WriteContent("../../test/output", &imgman)
+	WriteContent(user, &imgman)
 
 	// Read file again
-	readImages := ReadContent("../../test/output")
+	readImages := ReadContent(user)
 	if readImages == nil {
 		t.Errorf("Written file could not be read")
 		return

@@ -5,18 +5,6 @@ import (
 	"os"
 )
 
-// TODO: Jones Documentation
-
-// TODO: Jones Tests schreiben, wenns überhaupt noch benötigt wird
-func ContainsString(haystack []string, needle string) bool {
-	for _, currentNeedle := range haystack {
-		if currentNeedle == needle {
-			return true
-		}
-	}
-	return false
-}
-
 // Returns read bytes for given file in param "path"
 func ReadRawImage(path string) ([]byte, error) {
 	readRawImage, err := ioutil.ReadFile(path)
@@ -24,6 +12,25 @@ func ReadRawImage(path string) ([]byte, error) {
 		return []byte{}, err
 	}
 	return readRawImage, nil
+}
+
+// Write raw bytes into file with given name
+func WriteRawImage(name string, image []byte) error {
+	// Open new file
+	imgFile, err := os.Create(name)
+	if err != nil {
+		return err
+	}
+
+	// Write data
+	imgFile.Write(image)
+
+	// Close file
+	imgFile.Close()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Check if given path exists.

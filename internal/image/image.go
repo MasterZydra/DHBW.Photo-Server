@@ -17,3 +17,7 @@ type Image struct {
 func NewImage(name string, date time.Time, hash string) *Image {
 	return &Image{Name: name, Date: date, hash: hash}
 }
+
+func (image *Image) FormattedDate() string {
+	return image.Date.Format(time.RFC822)
+}

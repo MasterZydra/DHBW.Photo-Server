@@ -29,7 +29,7 @@ func NewImageManager(userName string) *ImageManager {
 func (im *ImageManager) Contains(image *UploadImage) bool {
 	for _, i := range im.images {
 		if strings.Compare(i.hash, image.hash) == 0 ||
-			strings.ToLower(i.Name) == strings.ToLower(image.Name){
+			strings.ToLower(i.Name) == strings.ToLower(image.Name) {
 			return true
 		}
 	}
@@ -93,7 +93,8 @@ func (im *ImageManager) GetImage(name string) *Image {
 // The result Images are defined by the given start index and length.
 func (im *ImageManager) GetThumbnails(start, length int) *[]*Image {
 	if start >= len(im.images) {
-		return nil
+		// return empty array
+		return &[]*Image{}
 	}
 
 	end := int64(math.Min(float64(start+length), float64(len(im.images))))
@@ -101,4 +102,7 @@ func (im *ImageManager) GetThumbnails(start, length int) *[]*Image {
 	return &images
 }
 
-
+// Returns total number of Images of current ImageManager.
+func (im *ImageManager) TotalImages() int {
+	return len(im.images)
+}

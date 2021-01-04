@@ -14,8 +14,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 )
 
@@ -26,12 +28,18 @@ const port = "4443"
 
 type TemplateVariables struct {
 	Global GlobalVariables
+	Result interface{}
 	Local  interface{}
 }
 
 type GlobalVariables struct {
 	Username string
 	LoggedIn bool
+}
+
+var templateFuncMap = template.FuncMap{
+	"sub": sub,
+	"add": add,
 }
 
 func main() {
@@ -41,6 +49,10 @@ func main() {
 		user.AuthFileServer(),
 		http.StripPrefix("/images", fs),
 	))
+
+	// serve other static files (css, js etc.)
+	staticServer := http.FileServer(http.Dir("cmd/web/assets"))
+	http.Handle("/assets/", http.StripPrefix("/assets", staticServer))
 
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/register", registerHandler)
@@ -54,13 +66,11 @@ func main() {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	defer layout(w, r, nil)
 	r.URL.Path = "index"
+	layout(w, r, nil, nil)
 }
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	defer layout(w, r, nil)
-
 	if r.Method == http.MethodPost {
 		err := r.ParseMultipartForm(100 << 20) // max 100MB
 		if err != nil {
@@ -86,35 +96,48 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			// create request data with base64 encoded image buffer
-			req := api.ImageUploadReq{
+			data := api.UploadReqData{
 				Base64Image:  base64.StdEncoding.EncodeToString(buf),
 				Filename:     fh.Filename,
 				CreationDate: time.Now().Local(),
 			}
 
-			var res api.ImageUploadRes
-			err = callApi(r, "upload", req, &res)
+			req, err := newPostRequest("upload", data)
+			if err != nil {
+				internalServerError(w, err)
+				return
+			}
+
+			var res api.UploadResData
+			err = callApi(r, req, &res)
 			if err != nil {
 				badRequest(w, err)
 				return
 			}
 		}
 	}
+	layout(w, r, nil, nil)
 }
 
 // TODO: jones tests schreiben
 func registerHandler(w http.ResponseWriter, r *http.Request) {
-	defer layout(w, r, nil)
+	defer layout(w, r, nil, nil)
 
 	if r.Method == http.MethodPost {
-		data := api.RegisterReq{
+		data := api.RegisterReqData{
 			Username:             r.FormValue("user"),
 			Password:             r.FormValue("password"),
 			PasswordConfirmation: r.FormValue("passwordConfirmation"),
 		}
 
-		var res api.RegisterRes
-		err := callApi(r, "register", data, &res)
+		req, err := newPostRequest("register", data)
+		if err != nil {
+			internalServerError(w, err)
+			return
+		}
+
+		var res api.RegisterResData
+		err = callApi(r, req, &res)
 		if err != nil {
 			badRequest(w, err)
 			return
@@ -126,23 +149,53 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	var res api.ThumbnailsRes
-	defer layout(w, r, res)
+	query := r.URL.Query()
+	index := query.Get("index")
+	length := query.Get("length")
 
-	//data := api.ThumbnailsReq{
-	//	Index:  1,
-	//	Length: 25,
-	//}
-	//err := callApi(r, "thumbnails", data, &res)
-	//if err != nil {
-	//	badRequest(w, err)
-	//	return
-	//}
+	indexInt, _ := strconv.Atoi(index)
+	lengthInt, _ := strconv.Atoi(length)
 
-	// TODO: Thumbnails zurückgeben
+	if index == "" || indexInt < 0 {
+		index = "0"
+		indexInt = 0
+	}
+	if length == "" || lengthInt < 1 {
+		length = "25"
+		lengthInt = 25
+	}
+	//query := r.URL.Query()
+	//index, exists := query["index"]
+	//if !exists {
+	//}
+	//length := r.URL.Query().Get("length")
+
+	var res api.ThumbnailsResData
+	payload := url.Values{
+		"index":  {index},
+		"length": {length},
+	}
+	req, err := newGetRequest("thumbnails?" + payload.Encode())
+	if err != nil {
+		internalServerError(w, err)
+		return
+	}
+
+	err = callApi(r, req, &res)
+	if err != nil {
+		internalServerError(w, err)
+		return
+	}
+
+	local := struct {
+		Index  int
+		Length int
+	}{indexInt, lengthInt}
+
+	layout(w, r, res, local)
 }
 
-func layout(w http.ResponseWriter, r *http.Request, data interface{}) {
+func layout(w http.ResponseWriter, r *http.Request, result interface{}, local interface{}) {
 	wd, err := os.Getwd()
 	if err != nil {
 		internalServerError(w, err)
@@ -159,7 +212,8 @@ func layout(w http.ResponseWriter, r *http.Request, data interface{}) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(layout, publicFile)
+	tmpl := template.New("photoserver").Funcs(templateFuncMap)
+	tmpl, err = tmpl.ParseFiles(layout, publicFile)
 	if err != nil {
 		internalServerError(w, err)
 		return
@@ -174,11 +228,12 @@ func layout(w http.ResponseWriter, r *http.Request, data interface{}) {
 	}
 	templateVars := TemplateVariables{
 		Global: GlobalVariables{Username: username, LoggedIn: loggedIn},
-		Local:  data,
+		Result: result,
+		Local:  local,
 	}
 
 	// execute template and send data with it
-	err = tmpl.ExecuteTemplate(w, "layout", templateVars)
+	err = tmpl.Funcs(templateFuncMap).ExecuteTemplate(w, "layout", templateVars)
 	if err != nil {
 		internalServerError(w, err)
 		return
@@ -193,16 +248,32 @@ func badRequest(w http.ResponseWriter, err error) {
 	http.Error(w, err.Error(), http.StatusBadRequest)
 }
 
-func callApi(r *http.Request, url string, data interface{}, res api.BaseRes) error {
-	// encode data to jsonUtil
+// encode data to jsonUtil
+//jsonBytes, err := json.Marshal(data)
+//
+//// prepare request
+//req, err := http.NewRequest(method, DHBW_Photo_Server.BackendHost+url, bytes.NewBuffer(jsonBytes))
+//if err != nil {
+//return err
+//}
+
+func newPostRequest(url string, data interface{}) (*http.Request, error) {
 	jsonBytes, err := json.Marshal(data)
-
-	// prepare request
-	req, err := http.NewRequest(http.MethodPost, DHBW_Photo_Server.BackendHost+url, bytes.NewBuffer(jsonBytes))
 	if err != nil {
-		return err
+		return nil, err
 	}
+	return newRequest(http.MethodPost, url, jsonBytes)
+}
 
+func newGetRequest(url string) (*http.Request, error) {
+	return newRequest(http.MethodGet, url, nil)
+}
+
+func newRequest(method string, url string, data []byte) (*http.Request, error) {
+	return http.NewRequest(method, DHBW_Photo_Server.BackendHost+url, bytes.NewBuffer(data))
+}
+
+func callApi(r *http.Request, req *http.Request, res api.BaseRes) error {
 	// set basic auth for backend request if available
 	username, pw, ok := r.BasicAuth()
 	if ok {
@@ -222,7 +293,7 @@ func callApi(r *http.Request, url string, data interface{}, res api.BaseRes) err
 	}
 
 	// get jsonString from api response
-	jsonBytes, err = ioutil.ReadAll(apiRes.Body)
+	jsonBytes, err := ioutil.ReadAll(apiRes.Body)
 	if err != nil {
 		return err
 	}

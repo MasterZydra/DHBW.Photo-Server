@@ -1,7 +1,8 @@
 {{define "title"}}Upload Photos{{end}}
 
 {{define "body"}}
-<p>Hier kannst du Bilder hochladen (es sind nur .jpg-Dateien erlaubt):</p>
+<a href="/home">Home</a>
+<p>Hier kannst du (mehrere) Bilder hochladen (es sind nur .jpg-Dateien erlaubt):</p>
 <form method="post" enctype="multipart/form-data">
     <input type="file" name="images" multiple accept="image/jpeg">
     <input type="submit" value="Hochladen">

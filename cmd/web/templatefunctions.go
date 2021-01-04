@@ -1,9 +1,13 @@
 package main
 
-func sub(a, b int) int {
+// template functions to use in html templates
+
+// subtracts a from b and returns result
+func Sub(a, b int) int {
 	return a - b
 }
 
-func add(a, b int) int {
+// adds a to b and returns result
+func Add(a, b int) int {
 	return a + b
 }

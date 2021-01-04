@@ -79,12 +79,19 @@ JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
   2. Bild als Base64 -> Mehrere Bilder, da nur von A-Z, "/" und "+"
   
 **Aufgabenverteilung**  
-- Benutzerauthentifizierung (Jones)
-    - Webserver-Teil mit Auth-Wrapper für Handler
 - Webseite:
-  - Template-Engine
+  - Template-Engine -> Opt. JS für Image Popup
+  - Bestellung von Fotos (Jones)
+- Backend + Frontend
+   - Konfigurierbarkeit durch Flags
+      - Backend - Port
+      - Frontend - Port + Port von Backend
+      - Beide - Image directory path (hier kommen Benutzerordner hin)
+      - Backendsachen (David)
+   - Prüfung POST req. Param (David)
+- Bilder-Cache? (siehe Punkt 8)
 - Bilder (David)
-  - Einlesen/Schreiben der Bildliste
+  - Thumbnail und Tests
 - Konsolen-Tests (Patricia)
 - Exif-Parser (Patricia)
 

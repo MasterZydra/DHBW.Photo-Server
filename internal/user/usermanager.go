@@ -10,27 +10,28 @@ import (
 	"strings"
 )
 
-// TODO: Jones Documentation
-
-// TODO: Jones um im RAM halten
+// UserManager is used to manage a list of Users stored in the UsersFile
 type UserManager struct {
 	Users     []*User
 	UsersFile string
 }
 
+// define default usersFile (is changed in tests)
 var usersFile = DHBW_Photo_Server.ProdUserFile
 
+// create a new UserManager with the default usersFile and return a pointer to it
 func NewUserManager() *UserManager {
-	// TODO: jones usersfile anlegen, wenn diese nicht existiert
 	return &UserManager{
 		UsersFile: usersFile,
 	}
 }
 
+// adds a User pointer to the Users slice
 func (um *UserManager) AddUser(user *User) {
 	um.Users = append(um.Users, user)
 }
 
+// Load all users from the configured usersFile into the Users slice
 func (um *UserManager) LoadUsers() error {
 	// load Users from Users file into Users array
 
@@ -61,6 +62,8 @@ func (um *UserManager) LoadUsers() error {
 	return nil
 }
 
+// Get a specific User pointer via the name that is passed as an argument
+// username is not case sensitive.
 func (um *UserManager) GetUser(username string) *User {
 	for _, userObj := range um.Users {
 		if strings.ToLower(userObj.Name) == strings.ToLower(username) {
@@ -70,6 +73,7 @@ func (um *UserManager) GetUser(username string) *User {
 	return nil
 }
 
+// Convert each user in the Users slice to csv string and write it to the configured usersFile
 func (um *UserManager) StoreUsers() error {
 	// save Users array into usersfile
 
@@ -97,6 +101,10 @@ func (um *UserManager) StoreUsers() error {
 	return nil
 }
 
+// Register first checks if the passed username contains a not allowed character.
+// After that it checks if there is already a user with the passed username.
+// If it passes those two checks a new user is created, added, stored (into the usersfile).
+// Then the Users are loaded again to be up to date.
 func (um *UserManager) Register(name string, password string) error {
 	// check if user has not allowed characters in it (allowed are: a-z,A-Z,0-9,-,_ and .
 	matched, err := regexp.MatchString(DHBW_Photo_Server.UsernameRegexBlacklist, name)
@@ -105,10 +113,7 @@ func (um *UserManager) Register(name string, password string) error {
 	}
 
 	// check if Username already exists, and yes: error; if not add it to usersfile
-	exists, err := um.UserExists(name)
-	if err != nil {
-		return err
-	}
+	exists := um.UserExists(name)
 	if exists {
 		return errors.New("Username '" + name + "' already exists")
 	}
@@ -128,21 +133,20 @@ func (um *UserManager) Register(name string, password string) error {
 	return nil
 }
 
-func (um *UserManager) UserExists(name string) (bool, error) {
+// Gets the user via the passed username and returns if this user exists or not
+func (um *UserManager) UserExists(name string) bool {
 	user := um.GetUser(name)
-	if user != nil {
-		return true, nil
-	}
-	return false, nil
+	return user != nil
 }
 
-func (um *UserManager) Authenticate(user string, pw string) (bool, error) {
+// Gets the user via the passed username and executes the ComparePassword function
+// to check if the provided password is correct.
+// returns boolean value if username and password is correct or not
+func (um *UserManager) Authenticate(user string, pw string) bool {
 	userObj := um.GetUser(user)
 	if userObj != nil {
 		ok, _ := userObj.ComparePassword(pw)
-		if ok {
-			return true, nil
-		}
+		return ok
 	}
-	return false, nil
+	return false
 }

@@ -154,13 +154,6 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Jones Check if key "imagename" is given (Must-Param Wrapper?)
-	//if imgname == "" {
-	//	res.Error = "Key imagename is missing"
-	//	w.WriteHeader(http.StatusUnprocessableEntity)
-	//	return
-	//}
-
 	imageBytes, err := base64.StdEncoding.DecodeString(data.Base64Image)
 	if err != nil {
 		res.Error = err.Error()

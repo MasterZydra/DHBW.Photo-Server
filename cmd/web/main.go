@@ -38,8 +38,8 @@ type GlobalVariables struct {
 }
 
 var templateFuncMap = template.FuncMap{
-	"sub": sub,
-	"add": add,
+	"sub": Sub,
+	"add": Add,
 }
 
 func main() {
@@ -57,14 +57,13 @@ func main() {
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/home", user.AuthHandlerWrapper(user.AuthHandler(), homeHandler))
-	// TODO: jones: uploadHandler implementieren
 	http.HandleFunc("/upload", user.AuthHandlerWrapper(user.AuthHandler(), uploadHandler))
-	// TODO: Jones: Frontend-Struktur überlegen und ApiCalls fürs Backend vorbereiten
 
 	log.Println("web listening on https://localhost:" + port)
 	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
 }
 
+// TODO: jones tests schreiben?
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	r.URL.Path = "index"
 	layout(w, r, nil, nil)
@@ -102,14 +101,14 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 				CreationDate: time.Now().Local(),
 			}
 
-			req, err := newPostRequest("upload", data)
+			req, err := NewPostRequest("upload", data)
 			if err != nil {
 				internalServerError(w, err)
 				return
 			}
 
 			var res api.UploadResData
-			err = callApi(r, req, &res)
+			err = CallApi(r, req, &res)
 			if err != nil {
 				badRequest(w, err)
 				return
@@ -119,7 +118,6 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	layout(w, r, nil, nil)
 }
 
-// TODO: jones tests schreiben
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	defer layout(w, r, nil, nil)
 
@@ -130,14 +128,14 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			PasswordConfirmation: r.FormValue("passwordConfirmation"),
 		}
 
-		req, err := newPostRequest("register", data)
+		req, err := NewPostRequest("register", data)
 		if err != nil {
 			internalServerError(w, err)
 			return
 		}
 
 		var res api.RegisterResData
-		err = callApi(r, req, &res)
+		err = CallApi(r, req, &res)
 		if err != nil {
 			badRequest(w, err)
 			return
@@ -164,24 +162,19 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		length = "25"
 		lengthInt = 25
 	}
-	//query := r.URL.Query()
-	//index, exists := query["index"]
-	//if !exists {
-	//}
-	//length := r.URL.Query().Get("length")
 
-	var res api.ThumbnailsResData
 	payload := url.Values{
 		"index":  {index},
 		"length": {length},
 	}
-	req, err := newGetRequest("thumbnails?" + payload.Encode())
+	req, err := NewGetRequest("thumbnails?" + payload.Encode())
 	if err != nil {
 		internalServerError(w, err)
 		return
 	}
 
-	err = callApi(r, req, &res)
+	var res api.ThumbnailsResData
+	err = CallApi(r, req, &res)
 	if err != nil {
 		internalServerError(w, err)
 		return
@@ -248,32 +241,23 @@ func badRequest(w http.ResponseWriter, err error) {
 	http.Error(w, err.Error(), http.StatusBadRequest)
 }
 
-// encode data to jsonUtil
-//jsonBytes, err := json.Marshal(data)
-//
-//// prepare request
-//req, err := http.NewRequest(method, DHBW_Photo_Server.BackendHost+url, bytes.NewBuffer(jsonBytes))
-//if err != nil {
-//return err
-//}
-
-func newPostRequest(url string, data interface{}) (*http.Request, error) {
+func NewPostRequest(url string, data interface{}) (*http.Request, error) {
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
 		return nil, err
 	}
-	return newRequest(http.MethodPost, url, jsonBytes)
+	return NewRequest(http.MethodPost, url, jsonBytes)
 }
 
-func newGetRequest(url string) (*http.Request, error) {
-	return newRequest(http.MethodGet, url, nil)
+func NewGetRequest(url string) (*http.Request, error) {
+	return NewRequest(http.MethodGet, url, nil)
 }
 
-func newRequest(method string, url string, data []byte) (*http.Request, error) {
+func NewRequest(method string, url string, data []byte) (*http.Request, error) {
 	return http.NewRequest(method, DHBW_Photo_Server.BackendHost+url, bytes.NewBuffer(data))
 }
 
-func callApi(r *http.Request, req *http.Request, res api.BaseRes) error {
+func CallApi(r *http.Request, req *http.Request, res api.BaseRes) error {
 	// set basic auth for backend request if available
 	username, pw, ok := r.BasicAuth()
 	if ok {

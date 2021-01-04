@@ -12,12 +12,13 @@ type BaseRes interface {
 }
 
 type TestReqData struct {
-	SomeString  string
-	SomeInteger int
+	SomeString string
+	SomeInt    int
 }
 type TestResData struct {
-	Error      string
-	SomeResult string
+	Error            string
+	SomeResultString string
+	SomeResultInt    int
 }
 
 func (a TestResData) GetError() string {

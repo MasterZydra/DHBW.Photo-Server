@@ -12,7 +12,6 @@ import (
 
 // TODO: Jones Documentation
 
-// TODO: Jones um im RAM halten
 type UserManager struct {
 	Users     []*User
 	UsersFile string
@@ -21,7 +20,6 @@ type UserManager struct {
 var usersFile = DHBW_Photo_Server.ProdUserFile
 
 func NewUserManager() *UserManager {
-	// TODO: jones usersfile anlegen, wenn diese nicht existiert
 	return &UserManager{
 		UsersFile: usersFile,
 	}

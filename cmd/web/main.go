@@ -21,22 +21,21 @@ import (
 	"time"
 )
 
-// TODO: Jones Documentation
-
 // TODO: Port über go flag konfigurierbar machen können
 const port = "4443"
 
+// structs to send different variables to template
 type TemplateVariables struct {
 	Global GlobalVariables
 	Result interface{}
 	Local  interface{}
 }
-
 type GlobalVariables struct {
 	Username string
 	LoggedIn bool
 }
 
+// templateFuncMap initializes template functions to use in html templates.
 var templateFuncMap = template.FuncMap{
 	"sub": Sub,
 	"add": Add,
@@ -51,24 +50,29 @@ func main() {
 	))
 
 	// serve other static files (css, js etc.)
-	staticServer := http.FileServer(http.Dir("cmd/web/assets"))
-	http.Handle("/assets/", http.StripPrefix("/assets", staticServer))
+	//staticServer := http.FileServer(http.Dir("cmd/web/assets"))
+	//http.Handle("/assets/", http.StripPrefix("/assets", staticServer))
 
+	// Handlers with auth wrappers if needed
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/home", user.AuthHandlerWrapper(user.AuthHandler(), homeHandler))
 	http.HandleFunc("/upload", user.AuthHandlerWrapper(user.AuthHandler(), uploadHandler))
 
+	// listen and start server
 	log.Println("web listening on https://localhost:" + port)
 	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
 }
 
 // TODO: jones tests schreiben?
+// If navigating to the root the rootHandler sets index as the current path to load index.html in layout.
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	r.URL.Path = "index"
 	layout(w, r, nil, nil)
 }
 
+// The uploadHandler parses the files from the HTML upload form and triggers a new API call for each file.
+// If upload fails all following uploads are aborted.
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseMultipartForm(100 << 20) // max 100MB
@@ -118,9 +122,10 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	layout(w, r, nil, nil)
 }
 
+// The registerHandler takes user, password and passwordConfirmation from the HTML form
+// and triggers a API call to /register where it sends these values.
+// If successful the site simply reloads.
 func registerHandler(w http.ResponseWriter, r *http.Request) {
-	defer layout(w, r, nil, nil)
-
 	if r.Method == http.MethodPost {
 		data := api.RegisterReqData{
 			Username:             r.FormValue("user"),
@@ -144,8 +149,13 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
+	layout(w, r, nil, nil)
 }
 
+// If a user is logged and visits /home in the homeHandler is triggered.
+// It sets a default index and length GET values for the API call (/thumbnails)
+// to get the thumbnails from index to length.
+// Afterwards these variables are made available to the layout via TemplateVariables.Local
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	index := query.Get("index")
@@ -154,6 +164,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	indexInt, _ := strconv.Atoi(index)
 	lengthInt, _ := strconv.Atoi(length)
 
+	// set default values
 	if index == "" || indexInt < 0 {
 		index = "0"
 		indexInt = 0
@@ -163,6 +174,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		lengthInt = 25
 	}
 
+	// create GET request for API call
 	payload := url.Values{
 		"index":  {index},
 		"length": {length},
@@ -188,12 +200,17 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	layout(w, r, res, local)
 }
 
+// layout creates a new template, assigns its template functions from templateFuncMap,
+// loads the layout file + the current requested HTML file and adds the TemplateVariables
+// so they are accessible in the HTML templates.
+// After that the template is executed
 func layout(w http.ResponseWriter, r *http.Request, result interface{}, local interface{}) {
 	wd, err := os.Getwd()
 	if err != nil {
 		internalServerError(w, err)
 		return
 	}
+
 	dir := filepath.Join(wd, "cmd", "web")
 	layout := filepath.Join(dir, "templates", "layout.html")
 	publicFile := filepath.Join(dir, "public", filepath.Clean(r.URL.Path)+".html")
@@ -205,6 +222,7 @@ func layout(w http.ResponseWriter, r *http.Request, result interface{}, local in
 		return
 	}
 
+	// create template and add templateFuncMap
 	tmpl := template.New("photoserver").Funcs(templateFuncMap)
 	tmpl, err = tmpl.ParseFiles(layout, publicFile)
 	if err != nil {
@@ -212,7 +230,7 @@ func layout(w http.ResponseWriter, r *http.Request, result interface{}, local in
 		return
 	}
 
-	// set template variables
+	// set TemplateVariables
 	username, _, ok := r.BasicAuth()
 	loggedIn := true
 	if !ok {
@@ -233,14 +251,17 @@ func layout(w http.ResponseWriter, r *http.Request, result interface{}, local in
 	}
 }
 
+// simple helper for internal server error output
 func internalServerError(w http.ResponseWriter, err error) {
 	http.Error(w, http.StatusText(http.StatusInternalServerError)+": "+err.Error(), http.StatusInternalServerError)
 }
 
+// simple helper for a bad request response
 func badRequest(w http.ResponseWriter, err error) {
 	http.Error(w, err.Error(), http.StatusBadRequest)
 }
 
+// converts data to json bytes and passes it to NewRequest to return a new POST request
 func NewPostRequest(url string, data interface{}) (*http.Request, error) {
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
@@ -249,14 +270,21 @@ func NewPostRequest(url string, data interface{}) (*http.Request, error) {
 	return NewRequest(http.MethodPost, url, jsonBytes)
 }
 
+// simple wrapper for a new GET request
 func NewGetRequest(url string) (*http.Request, error) {
 	return NewRequest(http.MethodGet, url, nil)
 }
 
+// returns a new request with the configured BackendHost as a prefix to the url
 func NewRequest(method string, url string, data []byte) (*http.Request, error) {
 	return http.NewRequest(method, DHBW_Photo_Server.BackendHost+url, bytes.NewBuffer(data))
 }
 
+// Wrapper for making an API call.
+// CallApi takes two http.Request objects and a result object api.BaseRes.
+// The first request object is used to pass the basic auth credentials to the other request.
+// After that the second request is executed.
+// After getting a response, it is parsed into the given result object
 func CallApi(r *http.Request, req *http.Request, res api.BaseRes) error {
 	// set basic auth for backend request if available
 	username, pw, ok := r.BasicAuth()

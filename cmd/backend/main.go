@@ -129,6 +129,7 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Load thumbnails from associated ImageManager
 	res.Images = GetThumbnails(username, index, length)
+	res.TotalImages = GetTotalImages(username)
 	return
 }
 

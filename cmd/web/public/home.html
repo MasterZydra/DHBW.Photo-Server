@@ -3,14 +3,41 @@
 {{define "body"}}
 <p><a href="/upload">Bilder hochladen</a></p>
 <h3>Deine Bilder:</h3>
-{{if not .Local.Images}}
+{{if not .Result.Images}}
     <p>Du hast noch keine Bilder hochgeladen...</p>
 {{else}}
-    {{range .Local.Images}}
-        <a href="/images/{{$.Global.Username}}/{{.Name}}" style="text-decoration: none">
-            <img style="width: 200px" src="/images/{{$.Global.Username}}/previews/{{.Name}}">
-        </a>
+    {{range .Result.Images}}
+        <div style="display: inline-flex;flex-direction: column; padding: 1rem">
+            <a href="/images/{{$.Global.Username}}/{{.Name}}" class="image-link">
+                <img style="width: 200px" src="/images/{{$.Global.Username}}/previews/{{.Name}}" alt="{{.Name}}">
+            </a>
+            <span>{{.Name}}</span>
+            <span>{{.FormattedDate}}</span>
+            <br>
+        </div>
     {{end}}
+    <br>
+    <br>
+
+    <div style="display: flex; justify-content: space-between">
+        {{if gt .Local.Index 0}}
+            <a href="/home?index={{sub .Local.Index .Local.Length}}&length={{.Local.Length}}">< Vorherige Seite</a>
+        {{else}}
+            <span>&nbsp;</span>
+        {{end}}
+        <div>
+            <span>Bilder/Seite:</span>
+            <a href="home?index={{.Local.Index}}&length=5">5</a>
+            <a href="home?index={{.Local.Index}}&length=10">10</a>
+            <a href="home?index={{.Local.Index}}&length=25">25</a>
+            <a href="home?index={{.Local.Index}}&length=50">50</a>
+        </div>
+        {{if le (add .Local.Index .Local.Length) .Result.TotalImages}}
+            <a href="/home?index={{.Local.Length}}&length={{.Local.Length}}">Nächste Seite ></a>
+        {{else}}
+            <span>&nbsp;</span>
+        {{end}}
+    </div>
 {{end}}
 
 {{end}}

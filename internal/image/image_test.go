@@ -20,3 +20,13 @@ func TestNewImage(t *testing.T) {
 func TestNewImage_Invalid(t *testing.T) {
 	// ToDo Implement
 }
+
+func TestImage_FormattedDate(t *testing.T) {
+	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-11-20")
+	img := NewImage("img1", date, "d41d8cd98f00b204e9800998ecf8427e")
+	formattedDate := img.FormattedDate()
+
+	if formattedDate != "20 Nov 20 00:00 UTC" {
+		t.Error("Something went wrong during FormattedDate")
+	}
+}

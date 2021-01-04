@@ -277,5 +277,22 @@ func TestImageManager_GetImage(t *testing.T) {
 	}
 }
 
+func TestImageManager_TotalImages(t *testing.T) {
+	// Test data
+	user := "../../test"
+
+	// Overwrite output file name
+	imagedir = ""
+	usercontent = "contentNewImageManagerTest.csv"
+
+	// Init ImageManager for given user path
+	imgMan := NewImageManager(user)
+	totalImages := imgMan.TotalImages()
+
+	if totalImages != 2 {
+		t.Error("Wrong count of total images in ImageManager")
+	}
+}
+
 // ToDo Test GetImage
 // ToDo Test GetThumbnail

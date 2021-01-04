@@ -17,6 +17,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 )
 
@@ -27,12 +28,18 @@ const port = "4443"
 
 type TemplateVariables struct {
 	Global GlobalVariables
+	Result interface{}
 	Local  interface{}
 }
 
 type GlobalVariables struct {
 	Username string
 	LoggedIn bool
+}
+
+var templateFuncMap = template.FuncMap{
+	"sub": sub,
+	"add": add,
 }
 
 func main() {
@@ -42,6 +49,10 @@ func main() {
 		user.AuthFileServer(),
 		http.StripPrefix("/images", fs),
 	))
+
+	// serve other static files (css, js etc.)
+	staticServer := http.FileServer(http.Dir("cmd/web/assets"))
+	http.Handle("/assets/", http.StripPrefix("/assets", staticServer))
 
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/register", registerHandler)
@@ -56,7 +67,7 @@ func main() {
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	r.URL.Path = "index"
-	layout(w, r, nil)
+	layout(w, r, nil, nil)
 }
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -105,12 +116,12 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	layout(w, r, nil)
+	layout(w, r, nil, nil)
 }
 
 // TODO: jones tests schreiben
 func registerHandler(w http.ResponseWriter, r *http.Request) {
-	defer layout(w, r, nil)
+	defer layout(w, r, nil, nil)
 
 	if r.Method == http.MethodPost {
 		data := api.RegisterReqData{
@@ -138,10 +149,31 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	index := query.Get("index")
+	length := query.Get("length")
+
+	indexInt, _ := strconv.Atoi(index)
+	lengthInt, _ := strconv.Atoi(length)
+
+	if index == "" || indexInt < 0 {
+		index = "0"
+		indexInt = 0
+	}
+	if length == "" || lengthInt < 1 {
+		length = "25"
+		lengthInt = 25
+	}
+	//query := r.URL.Query()
+	//index, exists := query["index"]
+	//if !exists {
+	//}
+	//length := r.URL.Query().Get("length")
+
 	var res api.ThumbnailsResData
 	payload := url.Values{
-		"index":  {"0"},
-		"length": {"25"},
+		"index":  {index},
+		"length": {length},
 	}
 	req, err := newGetRequest("thumbnails?" + payload.Encode())
 	if err != nil {
@@ -155,10 +187,15 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	layout(w, r, res)
+	local := struct {
+		Index  int
+		Length int
+	}{indexInt, lengthInt}
+
+	layout(w, r, res, local)
 }
 
-func layout(w http.ResponseWriter, r *http.Request, data interface{}) {
+func layout(w http.ResponseWriter, r *http.Request, result interface{}, local interface{}) {
 	wd, err := os.Getwd()
 	if err != nil {
 		internalServerError(w, err)
@@ -175,7 +212,8 @@ func layout(w http.ResponseWriter, r *http.Request, data interface{}) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles(layout, publicFile)
+	tmpl := template.New("photoserver").Funcs(templateFuncMap)
+	tmpl, err = tmpl.ParseFiles(layout, publicFile)
 	if err != nil {
 		internalServerError(w, err)
 		return
@@ -190,11 +228,12 @@ func layout(w http.ResponseWriter, r *http.Request, data interface{}) {
 	}
 	templateVars := TemplateVariables{
 		Global: GlobalVariables{Username: username, LoggedIn: loggedIn},
-		Local:  data,
+		Result: result,
+		Local:  local,
 	}
 
 	// execute template and send data with it
-	err = tmpl.ExecuteTemplate(w, "layout", templateVars)
+	err = tmpl.Funcs(templateFuncMap).ExecuteTemplate(w, "layout", templateVars)
 	if err != nil {
 		internalServerError(w, err)
 		return

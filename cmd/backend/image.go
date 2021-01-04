@@ -38,3 +38,8 @@ func GetThumbnails(username string, start, length int) []*image.Image {
 	imgman := getImageManager(username)
 	return *imgman.GetThumbnails(start, length)
 }
+
+func GetTotalImages(username string) int {
+	imgman := getImageManager(username)
+	return imgman.TotalImages()
+}

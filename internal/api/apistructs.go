@@ -64,8 +64,9 @@ type ThumbnailsReqData struct {
 	Length int
 }
 type ThumbnailsResData struct {
-	Error  string
-	Images []*image.Image
+	Error       string
+	Images      []*image.Image
+	TotalImages int
 }
 
 func (a ThumbnailsResData) GetError() string {

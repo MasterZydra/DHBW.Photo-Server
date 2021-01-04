@@ -101,3 +101,8 @@ func (im *ImageManager) GetThumbnails(start, length int) *[]*Image {
 	images := im.images[start:end]
 	return &images
 }
+
+// Returns total number of Images of current ImageManager.
+func (im *ImageManager) TotalImages() int {
+	return len(im.images)
+}

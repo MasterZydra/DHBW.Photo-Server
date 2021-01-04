@@ -3,7 +3,6 @@ package image
 import (
 	"DHBW.Photo-Server/internal/cryptography"
 	"DHBW.Photo-Server/internal/util"
-	"os"
 	"path"
 	"time"
 )
@@ -37,45 +36,25 @@ func (i *UploadImage) SetUserPath(path string) {
 // Save the raw data of the image as a file in the user directory with the
 // given file name.
 func (i *UploadImage) SaveImageToDisk() error {
+	// Check if folder exists and if necessary create folder
 	err := util.CheckExistAndCreateFolder(path.Join(imagedir, i.userPath))
 	if err != nil {
 		return err
 	}
-	// Open new file
-	imgFile, err := os.Create(path.Join(imagedir, i.userPath, i.Name))
-	if err != nil {
-		return err
-	}
 
-	// Write data
-	imgFile.Write(i.Raw)
-
-	// Close file
-	imgFile.Close()
-	if err != nil {
-		return err
-	}
-	return nil
+	// Write image to disk
+	return util.WriteRawImage(path.Join(imagedir, i.userPath, i.Name), i.Raw)
 }
 
 func (i *UploadImage) GenerateAndSaveThumbnailToDisk() error {
+	// Check if folder exists and if necessary create folder
 	err := util.CheckExistAndCreateFolder(path.Join(imagedir, i.userPath, thumbdir))
 	if err != nil {
 		return err
 	}
-	// Open new file
-	imgFile, err := os.Create(path.Join(imagedir, i.userPath, thumbdir, i.Name))
-	if err != nil {
-		return err
-	}
 
-	// Write data
-	imgFile.Write(i.Raw)
+	// TODO Generate thumbnail
 
-	// Close file
-	imgFile.Close()
-	if err != nil {
-		return err
-	}
-	return nil
+	// Write image to disk
+	return util.WriteRawImage(path.Join(imagedir, i.userPath, i.Name), i.Raw)
 }

@@ -2,8 +2,10 @@ package image
 
 import (
 	dhbwphotoserver "DHBW.Photo-Server"
+	"DHBW.Photo-Server/internal/util"
 	"bytes"
 	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 )
@@ -62,5 +64,38 @@ func TestUploadImage_SetUserPath(t *testing.T) {
 	img.SetUserPath(newPath)
 	if img.userPath != newPath {
 		t.Errorf("Path %v expected but received %v", newPath, img.userPath)
+	}
+}
+
+func TestUploadImage_GenerateAndSaveThumbnailToDisk(t *testing.T) {
+	// Prepare test UploadImage
+	// Read example image
+	raw, err := util.ReadRawImage("../../test/example_imgs/img1.jpg")
+	if err != nil {
+		t.Errorf("Error reading example image: %v", err)
+		return
+	}
+	// Create new UploadImage
+	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-01-01")
+	upimg := NewUploadImage("img1.jpg", date, raw)
+	upimg.userPath = "test"
+
+	// Overwrite default pathes
+	imagedir = "../.."
+	thumbdir = "output"
+
+	// Clean up
+	os.Remove("../../test/output/img1.jpg")
+
+	// Generate and save thumbnail
+	err = upimg.GenerateAndSaveThumbnailToDisk()
+	if err != nil {
+		t.Errorf("Something went wrong generating and saving the thumbnail to disk: %v", err)
+	}
+
+	// Check if image is in folder
+	_, err = os.Stat("../../test/output/img1.jpg")
+	if err != nil {
+		t.Errorf("Error getting written image state: %v", err)
 	}
 }

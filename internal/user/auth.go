@@ -55,6 +55,6 @@ func AuthFileServer() AuthenticatorFunc {
 
 func authenticate(username, password string, r *http.Request) bool {
 	um := GetImageManager()
-	ok, _ := um.Authenticate(username, password)
+	ok := um.Authenticate(username, password)
 	return ok
 }

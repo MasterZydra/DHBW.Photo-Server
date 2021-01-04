@@ -3,6 +3,8 @@ package image
 import (
 	"DHBW.Photo-Server/internal/cryptography"
 	"DHBW.Photo-Server/internal/util"
+	"bytes"
+	"image/jpeg"
 	"path"
 	"time"
 )
@@ -53,8 +55,21 @@ func (i *UploadImage) GenerateAndSaveThumbnailToDisk() error {
 		return err
 	}
 
-	// TODO Generate thumbnail
+	// Create image.Image object
+	original, err := jpeg.Decode(bytes.NewReader(i.Raw))
+	if err != nil {
+		return err
+	}
 
-	// Write image to disk
-	return util.WriteRawImage(path.Join(imagedir, i.userPath, i.Name), i.Raw)
+	thumbnail := GenerateThumbnail(original, 200)
+
+	// Encode thumbnail to get byte slice and store it
+	var imageBuf bytes.Buffer
+	err = jpeg.Encode(&imageBuf,thumbnail, nil)
+	if err != nil {
+		return err
+	}
+
+	// Write thumbnail to disk
+	return util.WriteRawImage(path.Join(imagedir, i.userPath, thumbdir, i.Name), imageBuf.Bytes())
 }

@@ -13,7 +13,6 @@ type Image struct {
 }
 
 // Create a new Image object.
-// The date string will be converted into Time.
 func NewImage(name string, date time.Time, hash string) *Image {
 	return &Image{Name: name, Date: date, hash: hash}
 }

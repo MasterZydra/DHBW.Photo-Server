@@ -1,15 +1,17 @@
 package main
 
 import (
+	"encoding/base64"
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
+
 	dhbwphotoserver "DHBW.Photo-Server"
 	"DHBW.Photo-Server/cmd/backend/jsonUtil"
 	"DHBW.Photo-Server/internal/api"
 	"DHBW.Photo-Server/internal/user"
 	"DHBW.Photo-Server/internal/util"
-	"encoding/base64"
-	"log"
-	"net/http"
-	"strconv"
 )
 
 // TODO: Jones Documentation
@@ -128,7 +130,8 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Load thumbnails from associated ImageManager
-	res.Images = GetThumbnails(username, index, length)
+
+	res.Images = GetThumbnails(strings.ToLower(username), index, length)
 	res.TotalImages = GetTotalImages(username)
 	return
 }
@@ -161,7 +164,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Save image for associated user
-	err = UploadImage(username, data.Filename, data.CreationDate, imageBytes)
+	err = UploadImage(strings.ToLower(username), data.Filename, data.CreationDate, imageBytes)
 	if err != nil {
 		res.Error = err.Error()
 		w.WriteHeader(http.StatusInternalServerError)
@@ -186,6 +189,6 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	imgName := r.URL.Query().Get("name")
 
 	// Load image from associated ImageManager
-	res.Image = GetImage(username, imgName)
+	res.Image = GetImage(strings.ToLower(username), imgName)
 	return
 }

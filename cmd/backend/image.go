@@ -34,7 +34,7 @@ func GetImage(username, imagename string) *image.Image {
 	return imgman.GetImage(imagename)
 }
 
-func GetThumbnail(username string, start, length int) []*image.Image {
+func GetThumbnails(username string, start, length int) []*image.Image {
 	imgman := getImageManager(username)
 	return *imgman.GetThumbnails(start, length)
 }

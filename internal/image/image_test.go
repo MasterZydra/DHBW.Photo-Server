@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewImage(t *testing.T) {
-	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-11-20")
+	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-11-20 15:38:12")
 	img := NewImage("img1", date, "d41d8cd98f00b204e9800998ecf8427e")
 
 	if img.Name != "img1" ||
@@ -22,7 +22,7 @@ func TestNewImage_Invalid(t *testing.T) {
 }
 
 func TestImage_FormattedDate(t *testing.T) {
-	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-11-20")
+	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-11-21 13:14:15")
 	img := NewImage("img1", date, "d41d8cd98f00b204e9800998ecf8427e")
 	formattedDate := img.FormattedDate()
 

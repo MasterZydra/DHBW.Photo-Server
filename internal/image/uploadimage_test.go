@@ -18,7 +18,7 @@ func TestNewUploadImage(t *testing.T) {
 		return
 	}
 
-	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-12-12")
+	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-12-12 13:12:15")
 
 	// Create image
 	img := NewUploadImage("myImage.jpg", date, raw)
@@ -37,7 +37,7 @@ func TestUploadImage_SaveImageToDisk(t *testing.T) {
 	// Test data
 	rawdata := []byte{84, 69, 83, 84}
 
-	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-01-01")
+	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-01-01 13:12:25")
 	// Initialize and save new image
 	upimg := UploadImage{
 		Raw:      rawdata,
@@ -76,7 +76,7 @@ func TestUploadImage_GenerateAndSaveThumbnailToDisk(t *testing.T) {
 		return
 	}
 	// Create new UploadImage
-	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-01-01")
+	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-01-01 01:23:02")
 	upimg := NewUploadImage("img1.jpg", date, raw)
 	upimg.userPath = "test"
 

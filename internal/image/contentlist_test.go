@@ -11,8 +11,8 @@ import (
 func TestReadContent(t *testing.T) {
 	user := "../../test"
 	// Test images
-	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-20")
-	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21")
+	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-20 06:30:02")
+	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21 08:35:59")
 	image1 := NewImage("img1", date1, "d41d8cd98f00b204e9800998ecf8427e")
 	image2 := NewImage("img2", date2, "d41d8cdb8f0db204a9800498ecf8427e")
 
@@ -64,8 +64,8 @@ func TestReadContent_FileNotExist(t *testing.T) {
 func TestWriteContent(t *testing.T) {
 	user := "../../test/output"
 	// Test images
-	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-02")
-	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-01")
+	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-02 13:14:15")
+	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-01 13:30:16")
 	image1 := NewImage("Image 1", date1, "d41d8cd98f00b204e9800998ecf8427e")
 	image2 := NewImage("Image 2", date2, "d41d8cd98f10b214e5803998ecf8427e")
 

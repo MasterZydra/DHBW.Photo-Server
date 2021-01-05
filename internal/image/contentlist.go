@@ -79,7 +79,7 @@ func WriteContent(user string, imgs *ImageManager) error {
 	// Build array that will be stored in CSV format
 	var imgArray [][]string
 	for _, img := range imgs.images {
-		imgArray = append(imgArray, []string{img.Name, img.Date.Format("2006-01-02"), img.hash})
+		imgArray = append(imgArray, []string{img.Name, img.Date.Format(dhbwphotoserver.TimeLayout), img.hash})
 	}
 
 	// Write file

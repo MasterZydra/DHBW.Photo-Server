@@ -14,8 +14,6 @@ import (
 	"DHBW.Photo-Server/internal/util"
 )
 
-// TODO: Jones Documentation
-
 func main() {
 	// Setup
 	err := util.CheckExistAndCreateFolder(dhbwphotoserver.ImageDir())
@@ -24,22 +22,23 @@ func main() {
 	}
 
 	port := "3000"
-	// ermöglicht Registrierung
+
+	// API endpoint to register a new user
 	http.HandleFunc("/register", mustParam(registerHandler, http.MethodPost))
 
-	// gibt Thumbnails mit den Infos dazu von index bis length zurück
+	// returns thumbnails from index to length of currently authenticated user
 	http.HandleFunc("/thumbnails", user.AuthHandlerWrapper(
 		user.AuthHandler(),
 		mustParam(thumbnailsHandler, http.MethodGet, "index", "length"),
 	))
 
-	// lädt Image hoch
+	// uploads an image to the users image folder and generates a thumbnail
 	http.HandleFunc("/upload", user.AuthHandlerWrapper(
 		user.AuthHandler(),
 		mustParam(uploadHandler, http.MethodPost),
 	))
 
-	// Gibt Bild + Infos zurück
+	// returns one image object with it's information
 	http.HandleFunc("/image", user.AuthHandlerWrapper(
 		user.AuthHandler(),
 		mustParam(imageHandler, http.MethodGet, "name"),
@@ -49,10 +48,14 @@ func main() {
 	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
 }
 
+// The mustParam wrapper function is used to check if the correct HTTP method is used (POST or GET)
+// on the current API endpoint.
+// It also checks if all necessary parameters params are provided on a GET request.
 func mustParam(h http.HandlerFunc, method string, params ...string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		// check if method is allowed
 		if r.Method != method {
-			//w.WriteHeader(http.StatusMethodNotAllowed)
 			http.Error(w, "Method "+r.Method+" not allowed here", http.StatusMethodNotAllowed)
 			return
 		}
@@ -72,6 +75,11 @@ func mustParam(h http.HandlerFunc, method string, params ...string) http.Handler
 	}
 }
 
+// Register a new user with provided username, password and passwordConfirmation parameters.
+// These parameters are sent in a POST request as JSON.
+// It is decoded from JSON into the struct api.RegisterReqData.
+// After that it checks if the parameters password and passwordConfirmation match.
+// Once this is done it can execute the um.Register() function
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.RegisterResData
 	defer jsonUtil.EncodeResponse(w, &res)
@@ -136,8 +144,8 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-// Upload a new image. The image has to be base64 encoded in the json struct.
-// The name of the image and the creation date will also be sent via the json struct.
+// Upload a new image. The image has to be base64 encoded in the JSON struct.
+// The name of the image and the creation date will also be sent via the JSON struct.
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.UploadResData
 	defer jsonUtil.EncodeResponse(w, &res)

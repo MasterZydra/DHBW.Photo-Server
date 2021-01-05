@@ -5,7 +5,11 @@ import (
 	"time"
 )
 
-// TODO: Jones Documentation
+// These structs are used for easier consumption of the backend API.
+// For each POST request there is a RequestData object which defines the parameters of this request.
+// For each request there is a ResultData object which always has an Error field and some other result fields
+// to send back to the API client.
+// The Error field contains any error from the server that could have happened during the API call.
 
 type BaseRes interface {
 	GetError() string

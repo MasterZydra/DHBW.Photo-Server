@@ -1,8 +1,13 @@
 package DHBW_Photo_Server
 
+import (
+	"os"
+	"strings"
+)
+
 const (
 	// Image folder configuration
-	ImageDir    = "images"
+	imageDir    = "images" // absolut oder relativ zum Working Directory
 	ThumbDir    = "previews"
 	UserContent = "content.csv"
 
@@ -29,3 +34,7 @@ const (
 
 	TimeLayout = "2006-01-02"
 )
+
+func ImageDir() string {
+	return strings.Trim(strings.Trim(imageDir, "/"), string(os.PathSeparator))
+}

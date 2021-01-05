@@ -33,6 +33,7 @@ type TemplateVariables struct {
 type GlobalVariables struct {
 	Username string
 	LoggedIn bool
+	ThumbDir string
 }
 
 // templateFuncMap initializes template functions to use in html templates.
@@ -43,7 +44,7 @@ var templateFuncMap = template.FuncMap{
 
 func main() {
 	// serve images directory
-	fs := http.FileServer(http.Dir("./images"))
+	fs := http.FileServer(http.Dir(DHBW_Photo_Server.ImageDir()))
 	http.Handle("/images/", user.AuthFileServerWrapper(
 		user.AuthFileServer(),
 		http.StripPrefix("/images", fs),
@@ -238,7 +239,11 @@ func layout(w http.ResponseWriter, r *http.Request, result interface{}, local in
 		loggedIn = false
 	}
 	templateVars := TemplateVariables{
-		Global: GlobalVariables{Username: username, LoggedIn: loggedIn},
+		Global: GlobalVariables{
+			Username: username,
+			LoggedIn: loggedIn,
+			ThumbDir: DHBW_Photo_Server.ThumbDir,
+		},
 		Result: result,
 		Local:  local,
 	}

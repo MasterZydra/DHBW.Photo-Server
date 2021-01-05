@@ -18,7 +18,7 @@ import (
 
 func main() {
 	// Setup
-	err := util.CheckExistAndCreateFolder(dhbwphotoserver.ImageDir)
+	err := util.CheckExistAndCreateFolder(dhbwphotoserver.ImageDir())
 	if err != nil {
 		log.Fatalf("Error creating image folder: %v", err)
 	}

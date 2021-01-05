@@ -1,7 +1,6 @@
 {{define "title"}}Home Photo-Server{{end}}
 
 {{define "body"}}
-<!--TODO: jones image directory path und previews path aus config.go holen-->
 <p><a href="/upload">Bilder hochladen</a></p>
 <h3>Deine Bilder:</h3>
 {{if not .Result.Images}}
@@ -10,7 +9,7 @@
     {{range .Result.Images}}
         <div style="display: inline-flex;flex-direction: column; padding: 1rem">
             <a href="/images/{{$.Global.Username}}/{{.Name}}" class="image-link">
-                <img style="width: 200px" src="/images/{{$.Global.Username}}/previews/{{.Name}}" alt="{{.Name}}">
+                <img style="width: 200px" src="/images/{{$.Global.Username}}/{{$.Global.ThumbDir}}/{{.Name}}" alt="{{.Name}}">
             </a>
             <span>{{.Name}}</span>
             <span>{{.FormattedDate}}</span>

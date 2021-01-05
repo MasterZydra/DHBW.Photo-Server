@@ -17,7 +17,7 @@ import (
 import "fmt"
 
 // Define pathes and filenames
-var imagedir = dhbwphotoserver.ImageDir
+var imagedir = dhbwphotoserver.ImageDir()
 var thumbdir = dhbwphotoserver.ThumbDir
 var usercontent = dhbwphotoserver.UserContent
 

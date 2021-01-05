@@ -9,8 +9,6 @@ import (
 	"hash"
 )
 
-// TODO: Jones Documentation
-
 const (
 	saltSize   = 16
 	iterations = 1e4
@@ -56,6 +54,7 @@ func hashPassword(pw []byte, salt []byte) []byte {
 }
 
 // copied from "golang.org/x/crypto/pbkdf2"
+// Stichwort "Don't roll your own crypto"
 func createKey(password []byte, salt []byte, iter, keyLen int, h func() hash.Hash) []byte {
 	prf := hmac.New(h, password)
 	hashLen := prf.Size()

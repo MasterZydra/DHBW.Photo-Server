@@ -16,6 +16,8 @@ const (
 	iterations = 1e4
 )
 
+// CreatePassword generates a new salt and passes this with the provided clear password to the hashPassword function.
+// After that it encodes this new hashed password as a hex value and returns it.
 func CreatePassword(password string) (string, error) {
 	salt, err := createSalt(saltSize)
 	if err != nil {
@@ -25,6 +27,10 @@ func CreatePassword(password string) (string, error) {
 	return hex.EncodeToString(hashedPassword), nil
 }
 
+// ComparePassword takes a hashed password in hex encoding and a clear text password.
+// It decodes the hex hashed password into bytes and then hashes the clear password.
+// After that it can compare the bytes from the hashed clear password and the decoded hashed password
+// and return a boolean.
 func ComparePassword(hexHash string, password string) (bool, error) {
 	hashBytes, err := hex.DecodeString(hexHash)
 	if err != nil {
@@ -34,12 +40,15 @@ func ComparePassword(hexHash string, password string) (bool, error) {
 	return bytes.Equal(hashBytes, compareHashBytes), nil
 }
 
+// The internal function createSalt creates a random salt with the given n and returns these bytes.
 func createSalt(n int) ([]byte, error) {
 	b := make([]byte, n)
 	_, err := rand.Read(b)
 	return b, err
 }
 
+// hashPassword takes the password bytes and the salt bytes and hashes the password with creating a new key
+// and appending it to the salt.
 func hashPassword(pw []byte, salt []byte) []byte {
 	ret := make([]byte, len(salt))
 	copy(ret, salt)

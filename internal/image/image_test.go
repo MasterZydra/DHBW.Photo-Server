@@ -31,3 +31,5 @@ func TestImage_FormattedDate(t *testing.T) {
 		t.Errorf("Expected '%v' but received '%v'", expected, formattedDate)
 	}
 }
+
+// Todo Missing time + Missing Seconds ...

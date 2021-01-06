@@ -10,6 +10,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"flag"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -20,9 +21,6 @@ import (
 	"strconv"
 	"time"
 )
-
-// TODO: Port über go flag konfigurierbar machen können
-const port = "4443"
 
 // structs to send different variables to template
 type TemplateVariables struct {
@@ -45,9 +43,20 @@ var templateFuncMap = template.FuncMap{
 var webRoot = filepath.Join("cmd", "web")
 var layoutName = "layout"
 
-var backendServerRoot = DHBW_Photo_Server.BackendHost
+var backendServerRoot string
 
 func main() {
+	// Read flags
+	port 		:= flag.Int("port", DHBW_Photo_Server.WebDefaultPort, "Port the webserver listens on")
+	backendurl 	:= flag.String("backendurl", DHBW_Photo_Server.WebDefaultUrl, "Url of the backend")
+	backendport := flag.Int("backendport", DHBW_Photo_Server.BackendDefaultPort, "Port the backend is running on")
+	flag.Parse()
+
+	// Convert flags into right format and save as settings
+	portStr 			:= strconv.Itoa(*port)
+	backendportStr 		:= strconv.Itoa(*backendport)
+	backendServerRoot 	= *backendurl + ":" + backendportStr + "/"
+
 	// serve images directory
 	fs := http.FileServer(http.Dir(DHBW_Photo_Server.ImageDir()))
 	http.Handle("/images/", user.AuthFileServerWrapper(
@@ -67,8 +76,8 @@ func main() {
 	http.HandleFunc("/order-list", user.AuthHandlerWrapper(user.AuthHandler(), OrderListHandler))
 
 	// listen and start server
-	log.Println("web listening on https://localhost:" + port)
-	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
+	log.Println("web listening on https://localhost:" + portStr)
+	log.Fatalln(http.ListenAndServeTLS(":"+portStr, "cert.pem", "key.pem", nil))
 }
 
 // If navigating to the root the RootHandler sets index as the current path to load index.html in Layout.

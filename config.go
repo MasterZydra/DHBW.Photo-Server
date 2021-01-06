@@ -11,6 +11,11 @@ const (
 	ThumbDir    = "previews"
 	UserContent = "content.csv"
 
+	// Default values for server configurations
+	BackendDefaultPort	= 3000
+	WebDefaultUrl		= "https://localhost"
+	WebDefaultPort		= 4443
+
 	// userfiles
 	TestUserFile = "../../test/usersFile_test.csv"
 	ProdUserFile = "usersFile.csv"

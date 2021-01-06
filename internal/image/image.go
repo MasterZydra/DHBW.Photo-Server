@@ -17,6 +17,7 @@ func NewImage(name string, date time.Time, hash string) *Image {
 	return &Image{Name: name, Date: date, hash: hash}
 }
 
+// returns the Date field in a specific format
 func (image *Image) FormattedDate() string {
 	return image.Date.Format(time.RFC822)
 }

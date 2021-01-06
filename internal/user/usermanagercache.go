@@ -2,7 +2,9 @@ package user
 
 var userManager *UserManager
 
-func ImageManagerCache() *UserManager {
+// TODO: jones Documentation
+
+func UserManagerCache() *UserManager {
 	if userManager == nil {
 		userManager = NewUserManager()
 		_ = userManager.LoadUsers()
@@ -10,6 +12,6 @@ func ImageManagerCache() *UserManager {
 	return userManager
 }
 
-func ResetImageManagerCache() {
+func ResetUserManagerCache() {
 	userManager = nil
 }

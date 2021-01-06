@@ -1,0 +1,28 @@
+img {
+    width: 200px;
+}
+
+.image-container{
+    display: inline-flex;
+    flex-direction: column;
+    padding: 1rem;
+    text-align: center;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.grey-text {
+    color: grey;
+}
+
+td{
+    text-align: center;
+    min-width: 200px;
+}
+
+input[type=number] {
+    width: 40px;
+}

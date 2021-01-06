@@ -79,21 +79,21 @@ JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
   2. Bild als Base64 -> Mehrere Bilder, da nur von A-Z, "/" und "+"
   
 **Aufgabenverteilung**  
-- Webseite:
-  - Template-Engine -> Opt. JS für Image Popup
+- Webserver:
   - Bestellung von Fotos (Jones)
-- Backend + Frontend
-   - Konfigurierbarkeit durch Flags
+    - ZIP-Download
+    - Tests
+  - Bilder-Cache (Cache-Control Header) (Jones)
+- Backend:
+   - Konfigurierbarkeit durch Flags (David)
       - Backend - Port
       - Frontend - Port + Port von Backend
       - Beide - Image directory path (hier kommen Benutzerordner hin)
       - Backendsachen (David)
    - Prüfung POST req. Param (David)
-- Bilder-Cache? (siehe Punkt 8)
-- Bilder (David)
-  - Thumbnail und Tests
-- Konsolen-Tests (Patricia)
-- Exif-Parser (Patricia)
+- Konsolen-API-Kommunikation + Tests (Patricia)
+- Dokumentation
+- optionale Anforderungen
 
 ### Anforderungen
 1. Nicht funktional

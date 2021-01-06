@@ -18,8 +18,5 @@ func main() {
 	filePointers := ReadJPEGsFromPath(input.Path)
 
 	// send https request
-	// use encoded as body
-	// TODO: add restconsumer
-
 	UploadPhotos(input, filePointers)
 }

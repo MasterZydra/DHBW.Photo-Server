@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"os"
 	"regexp"
+	"strings"
 )
 
 func parseRawExifDataFromFile(file *os.File) ([]byte, error) {
@@ -63,10 +64,13 @@ func readSectionData (marker byte, br *bufio.Reader) ([]byte, error) {
 	return data, nil
 }
 
-func getDateFromData (data []byte) []byte {
+func getDateFromData (data []byte) string {
 	// DateTime Format: YYYY:MM:DD HH:MM:SS
 	dateRegex := regexp.MustCompile(`\d{4}\:(0[1-9]|1[012])\:(0[1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3]):([0-6][0-9]):([0-6][0-9])`)
 	// There are three Tags with this format in EXIF-Data: DateTime, DateTimeOriginal, DateTimeDigitized
 	// all three Tags usually contain the same value
-	return dateRegex.Find(data)
+	var date string = string(dateRegex.Find(data))
+	// wanted format: yyyy-mm-dd hh:mm:ss
+	date = strings.Replace(date, ":", "-", 2)
+	return date
 }

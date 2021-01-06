@@ -3,6 +3,7 @@ package main
 import (
 	"DHBW.Photo-Server/internal/order"
 	"encoding/base64"
+	"flag"
 	"log"
 	"net/http"
 	"strconv"
@@ -22,7 +23,12 @@ func main() {
 		log.Fatalf("Error creating image folder: %v", err)
 	}
 
-	port := "3000"
+	// Read flags
+	port := flag.Int("port", dhbwphotoserver.BackendDefaultPort, "Port the server listens on")
+	flag.Parse()
+
+	// Convert flags into right format
+	portStr := strconv.Itoa(*port)
 
 	// API endpoint to register a new user
 	http.HandleFunc("/register", mustParam(registerHandler, http.MethodPost))
@@ -72,8 +78,8 @@ func main() {
 		mustParam(deleteOrderListHandler, http.MethodPost),
 	))
 
-	log.Println("backend listening on https://localhost:" + port)
-	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
+	log.Println("backend listening on https://localhost:" + portStr)
+	log.Fatalln(http.ListenAndServeTLS(":"+portStr, "cert.pem", "key.pem", nil))
 }
 
 // The mustParam wrapper function is used to check if the correct HTTP method is used (POST or GET)

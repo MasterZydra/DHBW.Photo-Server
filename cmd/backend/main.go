@@ -99,7 +99,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// execute register function
-	um := user.GetImageManager()
+	um := user.ImageManagerCache()
 	err = um.Register(data.Username, data.Password)
 	if err != nil {
 		res.Error = err.Error()

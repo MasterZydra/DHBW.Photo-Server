@@ -151,6 +151,8 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		user.ResetImageManagerCache()
+
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}

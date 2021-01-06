@@ -2,6 +2,7 @@ package api
 
 import (
 	"DHBW.Photo-Server/internal/image"
+	"DHBW.Photo-Server/internal/order"
 	"time"
 )
 
@@ -75,5 +76,59 @@ type ThumbnailsResData struct {
 }
 
 func (a ThumbnailsResData) GetError() string {
+	return a.Error
+}
+
+type OrderListResData struct {
+	OrderList []*order.ListEntry
+	Error     string
+}
+
+func (a OrderListResData) GetError() string {
+	return a.Error
+}
+
+type AddOrderListEntryReqData struct {
+	ImageName string
+}
+type AddOrderListEntryResData struct {
+	Error string
+}
+
+func (a AddOrderListEntryResData) GetError() string {
+	return a.Error
+}
+
+type RemoveOrderListEntryReqData struct {
+	ImageName string
+}
+type RemoveOrderListEntryResData struct {
+	Error string
+}
+
+func (a RemoveOrderListEntryResData) GetError() string {
+	return a.Error
+}
+
+type ChangeOrderListEntryReqData struct {
+	ImageName      string
+	Format         string
+	NumberOfPrints int
+}
+type ChangeOrderListEntryResData struct {
+	Error string
+}
+
+func (a ChangeOrderListEntryResData) GetError() string {
+	return a.Error
+}
+
+type DeleteOrderListReqData struct {
+}
+type DeleteOrderListResData struct {
+	Error string
+}
+
+func (a DeleteOrderListResData) GetError() string {
 	return a.Error
 }

@@ -1,0 +1,59 @@
+{{define "title"}}Bestellliste Photo-Server{{end}}
+
+{{define "body"}}
+
+<p><a href="/home">Home</a></p>
+
+<h2>Deine Bestellliste:</h2>
+
+{{if .Result.OrderList}}
+    <a href="/order-list?deleteOrderList=1"><button>Bestelliste löschen</button></a>
+    <br>
+    <br>
+    <table>
+        <tr>
+            <th>Anzahl</th>
+            <th>Format</th>
+            <th>Bild</th>
+            <th>Aktionen</th>
+        </tr>
+        {{range .Result.OrderList}}
+        <tbody>
+            <tr>
+                <td>
+                    <input type="number" value="{{.NumberOfPrints}}" name="numberOfPrints" min="1" max="100"
+                           form="{{.Image.Name}}">
+                </td>
+                <td>
+                    <select name="format" form="{{.Image.Name}}">
+                        {{$selected:=.Format}}
+                        {{range $.Local.Formats}}
+                            <option {{if eq . $selected}}selected{{end}} value="{{.}}">{{.}}</option>
+                        {{end}}
+                    </select>
+                </td>
+                <td>
+                    <div class="image-container">
+                        <a href="/images/{{$.Global.Username}}/{{.Image.Name}}">
+                            <img src="/images/{{$.Global.Username}}/{{$.Global.ThumbDir}}/{{.Image.Name}}" alt="{{.Image.Name}}">
+                        </a>
+                        <span>{{.Image.Name}}</span>
+                        <span class="grey-text">{{.Image.FormattedDate}}</span>
+                        <br>
+                    </div>
+                </td>
+                <td>
+                    <form method="post" id="{{.Image.Name}}" style="display: inline">
+                        <input type="hidden" name="imageName" value="{{.Image.Name}}">
+                        <input type="submit" value="Speichern">
+                    </form>
+                    <a href="/order-list?ImageToRemove={{.Image.Name}}"><input type="submit" value="Löschen"></a>
+                </td>
+            </tr>
+        </tbody>
+        {{end}}
+    </table>
+{{else}}
+    <p>Deine Bestelliste ist leer...</p>
+{{end}}
+{{end}}

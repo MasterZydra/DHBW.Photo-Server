@@ -57,7 +57,6 @@ func (im *ImageManager) AddImageUpload(image *UploadImage) {
 	im.AddImage(&image.Image)
 	// Sort and store content file
 	im.sort()
-	// ToDo In own func
 	err = WriteContent(im.user, im)
 	if err != nil {
 		fmt.Errorf("error saving content file: %v", err)

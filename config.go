@@ -32,8 +32,10 @@ const (
 
 	BackendHost = "https://localhost:3000/"
 
-	TimeLayout = "2006-01-02"
+	TimeLayout = "2006-01-02 15:04:05"
 )
+
+var OrderListFormats = []string{"Junior Legal (8 x 5)", "Letter (8.5 x 11)", "Legal (8.5 x 14)", "Tabloid (11 x 17)"}
 
 func ImageDir() string {
 	return strings.Trim(strings.Trim(imageDir, "/"), string(os.PathSeparator))

@@ -5,21 +5,29 @@ import (
 	"testing"
 )
 
-func TestGetImageManagerNew(t *testing.T) {
+func TestUserManagerCacheNew(t *testing.T) {
 	usersFile = DHBW_Photo_Server.TestUserFile
 	userManager = nil
 	userManagerBefore := userManager
-	newUserManager := GetImageManager()
+	newUserManager := UserManagerCache()
 	if userManagerBefore != nil || newUserManager == nil {
-		t.Error("Something went wrong while getting new ImageManager")
+		t.Error("Something went wrong while getting new UserManager")
 	}
 }
 
-func TestGetImageManagerExists(t *testing.T) {
+func TestUserManagerCacheExists(t *testing.T) {
 	usersFile = "someweirdfile.csv"
 	userManager = NewUserManager()
-	newUserManager := GetImageManager()
+	newUserManager := UserManagerCache()
 	if newUserManager.UsersFile != usersFile {
-		t.Error("Something went wrong while getting existing ImageManager")
+		t.Error("Something went wrong while getting existing UserManager")
+	}
+}
+
+func TestResetUserManagerCache(t *testing.T) {
+	userManager = NewUserManager()
+	ResetUserManagerCache()
+	if userManager != nil {
+		t.Error("Something went wrong while resetting the userManager cache")
 	}
 }

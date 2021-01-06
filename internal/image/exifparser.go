@@ -3,12 +3,12 @@ package image
 import (
 	"bufio"
 	"encoding/binary"
-	"os"
+	"io"
 	"regexp"
 	"strings"
 )
 
-func parseRawExifDataFromFile(file *os.File) ([]byte, error) {
+func parseRawExifDataFromFile(file io.Reader) ([]byte, error) {
 	// EXIF-Data is in APP1-Section
 	// Marker for APP1-Section: 0xFFE1
 	// read App1-Section data

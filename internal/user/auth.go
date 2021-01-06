@@ -64,7 +64,7 @@ func AuthFileServer() AuthenticatorFunc {
 
 // Gets the imageManager from cache and executes Authenticate with the given username and password.
 func authenticate(username, password string, r *http.Request) bool {
-	um := GetImageManager()
+	um := ImageManagerCache()
 	ok := um.Authenticate(username, password)
 	return ok
 }

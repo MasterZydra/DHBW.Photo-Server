@@ -42,6 +42,11 @@ var templateFuncMap = template.FuncMap{
 	"add": Add,
 }
 
+var webRoot = filepath.Join("cmd", "web")
+var layoutName = "layout"
+
+var backendServerRoot = DHBW_Photo_Server.BackendHost
+
 func main() {
 	// serve images directory
 	fs := http.FileServer(http.Dir(DHBW_Photo_Server.ImageDir()))
@@ -55,26 +60,25 @@ func main() {
 	//http.Handle("/assets/", http.StripPrefix("/assets", staticServer))
 
 	// Handlers with auth wrappers if needed
-	http.HandleFunc("/", rootHandler)
-	http.HandleFunc("/register", registerHandler)
-	http.HandleFunc("/home", user.AuthHandlerWrapper(user.AuthHandler(), homeHandler))
-	http.HandleFunc("/upload", user.AuthHandlerWrapper(user.AuthHandler(), uploadHandler))
+	http.HandleFunc("/", RootHandler)
+	http.HandleFunc("/register", RegisterHandler)
+	http.HandleFunc("/home", user.AuthHandlerWrapper(user.AuthHandler(), HomeHandler))
+	http.HandleFunc("/upload", user.AuthHandlerWrapper(user.AuthHandler(), UploadHandler))
 
 	// listen and start server
 	log.Println("web listening on https://localhost:" + port)
 	log.Fatalln(http.ListenAndServeTLS(":"+port, "cert.pem", "key.pem", nil))
 }
 
-// TODO: jones tests schreiben?
-// If navigating to the root the rootHandler sets index as the current path to load index.html in layout.
-func rootHandler(w http.ResponseWriter, r *http.Request) {
+// If navigating to the root the RootHandler sets index as the current path to load index.html in Layout.
+func RootHandler(w http.ResponseWriter, r *http.Request) {
 	r.URL.Path = "index"
-	layout(w, r, nil, nil)
+	Layout(w, r, nil, nil)
 }
 
-// The uploadHandler parses the files from the HTML upload form and triggers a new API call for each file.
+// The UploadHandler parses the files from the HTML upload form and triggers a new API call for each file.
 // If upload fails all following uploads are aborted.
-func uploadHandler(w http.ResponseWriter, r *http.Request) {
+func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		err := r.ParseMultipartForm(100 << 20) // max 100MB
 		if err != nil {
@@ -120,13 +124,13 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-	layout(w, r, nil, nil)
+	Layout(w, r, nil, nil)
 }
 
-// The registerHandler takes user, password and passwordConfirmation from the HTML form
+// The RegisterHandler takes user, password and passwordConfirmation from the HTML form
 // and triggers a API call to /register where it sends these values.
 // If successful the site simply reloads.
-func registerHandler(w http.ResponseWriter, r *http.Request) {
+func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		data := api.RegisterReqData{
 			Username:             r.FormValue("user"),
@@ -147,17 +151,19 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		user.ResetImageManagerCache()
+
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
-	layout(w, r, nil, nil)
+	Layout(w, r, nil, nil)
 }
 
-// If a user is logged and visits /home in the homeHandler is triggered.
+// If a user is logged and visits /home in the HomeHandler is triggered.
 // It sets a default index and length GET values for the API call (/thumbnails)
 // to get the thumbnails from index to length.
-// Afterwards these variables are made available to the layout via TemplateVariables.Local
-func homeHandler(w http.ResponseWriter, r *http.Request) {
+// Afterwards these variables are made available to the Layout via TemplateVariables.Local
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	index := query.Get("index")
 	length := query.Get("length")
@@ -189,7 +195,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ThumbnailsResData
 	err = CallApi(r, req, &res)
 	if err != nil {
-		internalServerError(w, err)
+		badRequest(w, err)
 		return
 	}
 
@@ -198,22 +204,22 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		Length int
 	}{indexInt, lengthInt}
 
-	layout(w, r, res, local)
+	Layout(w, r, res, local)
 }
 
-// layout creates a new template, assigns its template functions from templateFuncMap,
-// loads the layout file + the current requested HTML file and adds the TemplateVariables
+// Layout creates a new template, assigns its template functions from templateFuncMap,
+// loads the Layout file + the current requested HTML file and adds the TemplateVariables
 // so they are accessible in the HTML templates.
 // After that the template is executed
-func layout(w http.ResponseWriter, r *http.Request, result interface{}, local interface{}) {
+func Layout(w http.ResponseWriter, r *http.Request, result interface{}, local interface{}) {
 	wd, err := os.Getwd()
 	if err != nil {
 		internalServerError(w, err)
 		return
 	}
 
-	dir := filepath.Join(wd, "cmd", "web")
-	layout := filepath.Join(dir, "templates", "layout.html")
+	dir := filepath.Join(wd, webRoot)
+	layout := filepath.Join(dir, "templates", layoutName+".html")
 	publicFile := filepath.Join(dir, "public", filepath.Clean(r.URL.Path)+".html")
 
 	// check if site exists or is a directory
@@ -249,7 +255,7 @@ func layout(w http.ResponseWriter, r *http.Request, result interface{}, local in
 	}
 
 	// execute template and send data with it
-	err = tmpl.Funcs(templateFuncMap).ExecuteTemplate(w, "layout", templateVars)
+	err = tmpl.Funcs(templateFuncMap).ExecuteTemplate(w, layoutName, templateVars)
 	if err != nil {
 		internalServerError(w, err)
 		return
@@ -282,7 +288,7 @@ func NewGetRequest(url string) (*http.Request, error) {
 
 // returns a new request with the configured BackendHost as a prefix to the url
 func NewRequest(method string, url string, data []byte) (*http.Request, error) {
-	return http.NewRequest(method, DHBW_Photo_Server.BackendHost+url, bytes.NewBuffer(data))
+	return http.NewRequest(method, backendServerRoot+url, bytes.NewBuffer(data))
 }
 
 // Wrapper for making an API call.

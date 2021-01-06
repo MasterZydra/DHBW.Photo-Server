@@ -3,10 +3,16 @@ package jsonUtil
 import (
 	"DHBW.Photo-Server/internal/api"
 	"bytes"
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
+
+func createServer(f http.HandlerFunc) *httptest.Server {
+	return httptest.NewServer(f)
+}
 
 func TestDecodeBodyValid(t *testing.T) {
 	jsonString := `{"SomeString": "test", "SomeInt": 1234}`
@@ -34,19 +40,23 @@ func TestDecodeBodyInvalid(t *testing.T) {
 	}
 }
 
-//func TestEncodeResponseValidNoError(t *testing.T) {
-//	res := api.TestResData{
-//		"",
-//		"test",
-//	}
-//	w := // TODO: jones wo krieg ich einen http.ResponseWriter her?
-//	err := EncodeResponse(w, &res)
-//}
+func TestEncodeResponseValid(t *testing.T) {
+	server := createServer(func(w http.ResponseWriter, r *http.Request) {
+		res := api.TestResData{
+			Error:            "",
+			SomeResultString: "fromserver",
+			SomeResultInt:    12,
+		}
+		_ = EncodeResponse(w, &res)
+	})
 
-//func TestEncodeResponseValidError(t *testing.T) {
-//
-//}
+	response, err := http.Get(server.URL)
 
-//func TestEncodeResponseInvalid(t *testing.T) {
-//
-//}
+	var res api.TestResData
+	jsonBytes, _ := ioutil.ReadAll(response.Body)
+	_ = json.Unmarshal(jsonBytes, &res)
+
+	if err != nil || res.Error != "" || res.SomeResultString != "fromserver" || res.SomeResultInt != 12 {
+		t.Error("Could not get ")
+	}
+}

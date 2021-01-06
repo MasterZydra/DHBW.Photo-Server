@@ -6,7 +6,7 @@ import (
 )
 
 func TestReadDate(t *testing.T) {
-	filename := "./Testbild.jpg"
+	filename := "../../test/Testbild.jpg"
 	file, err := os.Open(filename)
 	if err != nil {
 		t.Errorf("Error reading image: %v", err)

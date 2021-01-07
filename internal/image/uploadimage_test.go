@@ -81,7 +81,7 @@ func TestUploadImage_GenerateAndSaveThumbnailToDisk(t *testing.T) {
 	upimg.userPath = "test"
 
 	// Overwrite default pathes
-	imagedir = "../.."
+	dhbwphotoserver.SetImageDir("../..")
 	thumbdir = "output"
 
 	// Clean up

@@ -1,8 +1,13 @@
 package image
 
 import (
+	dhbwphotoserver "DHBW.Photo-Server"
 	"time"
 )
+
+// Define pathes and filenames
+var thumbdir = dhbwphotoserver.ThumbDir
+var usercontent = dhbwphotoserver.UserContent
 
 // The Image struct is used to represent one entry in the content file.
 // It only stores the name, creation date and hash value of the raw data.

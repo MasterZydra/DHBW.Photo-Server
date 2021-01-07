@@ -17,7 +17,7 @@ func TestReadContent(t *testing.T) {
 	image2 := NewImage("img2", date2, "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Overwrite output file name
-	imagedir = ""
+	DHBW_Photo_Server.SetImageDir("")
 	usercontent = "contentReadTest.csv"
 
 	// Read content file
@@ -37,7 +37,7 @@ func TestReadContent(t *testing.T) {
 func TestReadContent_UserFolderNotExist(t *testing.T) {
 	user := "../../test/someNoneExistingUser"
 	// Overwrite output file name
-	imagedir = ""
+	DHBW_Photo_Server.SetImageDir("")
 
 	// Read content file
 	readImages := ReadContent(user)
@@ -50,7 +50,7 @@ func TestReadContent_UserFolderNotExist(t *testing.T) {
 func TestReadContent_FileNotExist(t *testing.T) {
 	user := "../../test"
 	// Overwrite output file name
-	imagedir = ""
+	DHBW_Photo_Server.SetImageDir("")
 	usercontent = "contentWhichDoesNotExist.csv"
 
 	// Read content file
@@ -70,7 +70,7 @@ func TestWriteContent(t *testing.T) {
 	image2 := NewImage("Image 2", date2, "d41d8cd98f10b214e5803998ecf8427e")
 
 	// Overwrite output file name
-	imagedir = ""
+	DHBW_Photo_Server.SetImageDir("")
 	usercontent = "contentWriteTest.csv"
 
 	// Clean up

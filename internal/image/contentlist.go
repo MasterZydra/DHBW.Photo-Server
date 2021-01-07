@@ -16,16 +16,11 @@ import (
 )
 import "fmt"
 
-// Define pathes and filenames
-var imagedir = dhbwphotoserver.ImageDir()
-var thumbdir = dhbwphotoserver.ThumbDir
-var usercontent = dhbwphotoserver.UserContent
-
 // Read content file for given user. The user has to be equal to the folder name.
 // It returns an initialized ImageManager struct.
 func ReadContent(user string) *ImageManager {
 	// Open file
-	csvFile, err := os.Open(path.Join(imagedir, user, usercontent))
+	csvFile, err := os.Open(path.Join(dhbwphotoserver.ImageDir(), user, usercontent))
 	if os.IsNotExist(err) {
 		return &ImageManager{user: user}
 	}
@@ -61,13 +56,13 @@ func ReadContent(user string) *ImageManager {
 
 // Write content file for given user. The user has to be equal to the folder name.
 func WriteContent(user string, imgs *ImageManager) error {
-	err := util.CheckExistAndCreateFolder(path.Join(imagedir, user))
+	err := util.CheckExistAndCreateFolder(path.Join(dhbwphotoserver.ImageDir(), user))
 	if err != nil {
 		return err
 	}
 
 	// Create new file
-	f, err := os.Create(path.Join(imagedir, user, usercontent))
+	f, err := os.Create(path.Join(dhbwphotoserver.ImageDir(), user, usercontent))
 	if err != nil {
 		return err
 	}

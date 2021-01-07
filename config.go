@@ -7,7 +7,7 @@ import (
 
 const (
 	// Image folder configuration
-	imageDir    = "images" // absolut oder relativ zum Working Directory
+	DefaultImageDir    = "images" // absolut oder relativ zum Working Directory
 	ThumbDir    = "previews"
 	UserContent = "content.csv"
 
@@ -43,6 +43,12 @@ const (
 )
 
 var OrderListFormats = []string{"Junior Legal (8 x 5)", "Letter (8.5 x 11)", "Legal (8.5 x 14)", "Tabloid (11 x 17)"}
+
+var imageDir = DefaultImageDir
+
+func SetImageDir(image string) {
+	imageDir = image
+}
 
 func ImageDir() string {
 	return strings.Trim(strings.Trim(imageDir, "/"), string(os.PathSeparator))

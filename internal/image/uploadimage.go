@@ -1,6 +1,7 @@
 package image
 
 import (
+	dhbwphotoserver "DHBW.Photo-Server"
 	"DHBW.Photo-Server/internal/cryptography"
 	"DHBW.Photo-Server/internal/util"
 	"bytes"
@@ -39,18 +40,18 @@ func (i *UploadImage) SetUserPath(path string) {
 // given file name.
 func (i *UploadImage) SaveImageToDisk() error {
 	// Check if folder exists and if necessary create folder
-	err := util.CheckExistAndCreateFolder(path.Join(imagedir, i.userPath))
+	err := util.CheckExistAndCreateFolder(path.Join(dhbwphotoserver.ImageDir(), i.userPath))
 	if err != nil {
 		return err
 	}
 
 	// Write image to disk
-	return util.WriteRawImage(path.Join(imagedir, i.userPath, i.Name), i.Raw)
+	return util.WriteRawImage(path.Join(dhbwphotoserver.ImageDir(), i.userPath, i.Name), i.Raw)
 }
 
 func (i *UploadImage) GenerateAndSaveThumbnailToDisk() error {
 	// Check if folder exists and if necessary create folder
-	err := util.CheckExistAndCreateFolder(path.Join(imagedir, i.userPath, thumbdir))
+	err := util.CheckExistAndCreateFolder(path.Join(dhbwphotoserver.ImageDir(), i.userPath, thumbdir))
 	if err != nil {
 		return err
 	}
@@ -71,5 +72,5 @@ func (i *UploadImage) GenerateAndSaveThumbnailToDisk() error {
 	}
 
 	// Write thumbnail to disk
-	return util.WriteRawImage(path.Join(imagedir, i.userPath, thumbdir, i.Name), imageBuf.Bytes())
+	return util.WriteRawImage(path.Join(dhbwphotoserver.ImageDir(), i.userPath, thumbdir, i.Name), imageBuf.Bytes())
 }

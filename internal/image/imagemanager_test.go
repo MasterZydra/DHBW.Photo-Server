@@ -20,7 +20,7 @@ func TestNewImageManager(t *testing.T) {
 	image2 := NewImage("img2", date2, "d41d8cdb8f0db204a9800498ecf8427e")
 
 	// Overwrite output file name
-	imagedir = ""
+	DHBW_Photo_Server.SetImageDir("")
 	usercontent = "contentNewImageManagerTest.csv"
 
 	// Init ImageManager for given user path
@@ -256,7 +256,7 @@ func TestImageManager_GetImage(t *testing.T) {
 	upimg := NewUploadImage("img1.jpg", date, raw)
 
 	// Overwrite output file name
-	imagedir = ""
+	DHBW_Photo_Server.SetImageDir("")
 	usercontent = "contentGetImageTest.csv"
 
 	// Init ImageManager
@@ -282,7 +282,7 @@ func TestImageManager_TotalImages(t *testing.T) {
 	user := "../../test"
 
 	// Overwrite output file name
-	imagedir = ""
+	DHBW_Photo_Server.SetImageDir("")
 	usercontent = "contentNewImageManagerTest.csv"
 
 	// Init ImageManager for given user path

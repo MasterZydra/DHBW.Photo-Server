@@ -1,6 +1,7 @@
 package main
 
 import (
+	"DHBW.Photo-Server/internal/util"
 	"encoding/base64"
 	"flag"
 	"io/ioutil"
@@ -15,22 +16,23 @@ import (
 	"DHBW.Photo-Server/cmd/backend/jsonUtil"
 	"DHBW.Photo-Server/internal/api"
 	"DHBW.Photo-Server/internal/user"
-	"DHBW.Photo-Server/internal/util"
 )
 
 func main() {
+	// Read flags
+	port 		:= flag.Int("port", dhbwphotoserver.BackendDefaultPort, "Port the server listens on")
+	imagePath	:= flag.String("imagepath", dhbwphotoserver.DefaultImageDir, "Path of image directory")
+	flag.Parse()
+
+	// Convert flags into right format
+	portStr := strconv.Itoa(*port)
+	dhbwphotoserver.SetImageDir(*imagePath)
+
 	// Setup
 	err := util.CheckExistAndCreateFolder(dhbwphotoserver.ImageDir())
 	if err != nil {
 		log.Fatalf("Error creating image folder: %v", err)
 	}
-
-	// Read flags
-	port := flag.Int("port", dhbwphotoserver.BackendDefaultPort, "Port the server listens on")
-	flag.Parse()
-
-	// Convert flags into right format
-	portStr := strconv.Itoa(*port)
 
 	// API endpoint to register a new user
 	http.HandleFunc("/register", mustParam(registerHandler, http.MethodPost))

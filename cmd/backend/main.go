@@ -35,72 +35,71 @@ func main() {
 	}
 
 	// API endpoint to register a new user
-	http.HandleFunc("/register", mustParam(registerHandler, http.MethodPost))
+	http.HandleFunc("/register", MustParam(RegisterHandler, http.MethodPost))
 
 	// returns thumbnails from index to length of currently authenticated user
 	http.HandleFunc("/thumbnails", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(thumbnailsHandler, http.MethodGet, "index", "length"),
+		MustParam(thumbnailsHandler, http.MethodGet, "index", "length"),
 	))
 
 	// uploads an image to the users image folder and generates a thumbnail
 	http.HandleFunc("/upload", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(uploadHandler, http.MethodPost),
+		MustParam(uploadHandler, http.MethodPost),
 	))
 
 	// returns one image object with it's information
 	http.HandleFunc("/image", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(imageHandler, http.MethodGet, "name"),
+		MustParam(imageHandler, http.MethodGet, "name"),
 	))
 
 	// GET request that returns all order list entries
 	http.HandleFunc("/orderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(orderListEntryHandler, http.MethodGet),
+		MustParam(orderListEntryHandler, http.MethodGet),
 	))
 
 	// adds a new entry to the order list of the current user with the passed ImageName
 	http.HandleFunc("/addOrderListEntry", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(addOrderListEntryHandler, http.MethodPost),
+		MustParam(addOrderListEntryHandler, http.MethodPost),
 	))
 
 	// change parameter of a order list entry (e.g. Format or NumberOfPrints
 	http.HandleFunc("/changeOrderListEntry", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(changeOrderListEntryHandler, http.MethodPost),
+		MustParam(changeOrderListEntryHandler, http.MethodPost),
 	))
 
 	// remove a entry from the order list of the current user
 	http.HandleFunc("/removeOrderListEntry", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(removeOrderListEntryHandler, http.MethodPost),
+		MustParam(removeOrderListEntryHandler, http.MethodPost),
 	))
 
 	// delete the complete order list
 	http.HandleFunc("/deleteOrderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(deleteOrderListHandler, http.MethodPost),
+		MustParam(deleteOrderListHandler, http.MethodPost),
 	))
 
 	// download the current order list as a zip file with a content.json containing it's metadata
 	http.HandleFunc("/downloadOrderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(downloadOrderList, http.MethodGet),
+		MustParam(downloadOrderList, http.MethodGet),
 	))
 
 	log.Println("backend listening on https://localhost:" + portStr)
 	log.Fatalln(http.ListenAndServeTLS(":"+portStr, "cert.pem", "key.pem", nil))
 }
 
-// The mustParam wrapper function is used to check if the correct HTTP method is used (POST or GET)
+// The MustParam wrapper function is used to check if the correct HTTP method is used (POST or GET)
 // on the current API endpoint.
 // It also checks if all necessary parameters params are provided on a GET request.
-func mustParam(h http.HandlerFunc, method string, params ...string) http.HandlerFunc {
+func MustParam(h http.HandlerFunc, method string, params ...string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		// check if method is allowed
 		if r.Method != method {
 			http.Error(w, "Method "+r.Method+" not allowed here", http.StatusMethodNotAllowed)
@@ -127,7 +126,7 @@ func mustParam(h http.HandlerFunc, method string, params ...string) http.Handler
 // It is decoded from JSON into the struct api.RegisterReqData.
 // After that it checks if the parameters password and passwordConfirmation match.
 // Once this is done it can execute the um.Register() function
-func registerHandler(w http.ResponseWriter, r *http.Request) {
+func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.RegisterResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -136,12 +135,14 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	err := jsonUtil.DecodeBody(r, &data)
 	if err != nil {
 		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// check if confirmed password is correct
 	if data.Password != data.PasswordConfirmation {
 		res.Error = "The passwords do not match"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -150,6 +151,7 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 	err = um.Register(data.Username, data.Password)
 	if err != nil {
 		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 }
@@ -202,6 +204,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	err := jsonUtil.DecodeBody(r, &data)
 	if err != nil {
 		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -215,6 +218,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	imageBytes, err := base64.StdEncoding.DecodeString(data.Base64Image)
 	if err != nil {
 		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -222,7 +226,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	err = UploadImage(strings.ToLower(username), data.Filename, data.CreationDate, imageBytes)
 	if err != nil {
 		res.Error = err.Error()
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
 	}
 	w.WriteHeader(http.StatusOK)
 }
@@ -237,6 +241,7 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -258,6 +263,7 @@ func orderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -277,18 +283,21 @@ func addOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	err := jsonUtil.DecodeBody(r, &data)
 	if err != nil {
 		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	img := GetImage(username, data.ImageName)
 	if img == nil {
 		res.Error = "Could not get image '" + data.ImageName + "'"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -298,6 +307,7 @@ func addOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	err = usr.OrderList.AddOrderEntry(img)
 	if err != nil {
 		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 }
@@ -312,12 +322,14 @@ func removeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	err := jsonUtil.DecodeBody(r, &data)
 	if err != nil {
 		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -327,6 +339,7 @@ func removeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	exists := usr.OrderList.RemoveOrderEntry(data.ImageName)
 	if !exists {
 		res.Error = "Image '" + data.ImageName + "' does not exist for user '" + usr.Name + "'"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 }
@@ -341,12 +354,14 @@ func changeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	err := jsonUtil.DecodeBody(r, &data)
 	if err != nil {
 		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -356,6 +371,7 @@ func changeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	_, entry := usr.OrderList.GetOrderEntry(data.ImageName)
 	if entry == nil {
 		res.Error = "Could not find order entry with image '" + data.ImageName + "'"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	entry.Format = data.Format
@@ -370,6 +386,7 @@ func deleteOrderListHandler(w http.ResponseWriter, r *http.Request) {
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -387,6 +404,7 @@ func downloadOrderList(w http.ResponseWriter, r *http.Request) {
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -397,12 +415,14 @@ func downloadOrderList(w http.ResponseWriter, r *http.Request) {
 	err := user.CreateOrderListZipFile(zipFileName, usr.Name, usr.OrderList)
 	if err != nil {
 		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	zipFileBytes, err := ioutil.ReadFile(zipFileName)
 	if err != nil {
 		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -411,6 +431,7 @@ func downloadOrderList(w http.ResponseWriter, r *http.Request) {
 	err = os.Remove(zipFileName)
 	if err != nil {
 		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 }

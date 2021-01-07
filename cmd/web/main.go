@@ -47,15 +47,17 @@ var backendServerRoot string
 
 func main() {
 	// Read flags
-	port := flag.Int("port", DHBW_Photo_Server.WebDefaultPort, "Port the webserver listens on")
-	backendurl := flag.String("backendurl", DHBW_Photo_Server.WebDefaultUrl, "Url of the backend")
+	port 		:= flag.Int("port", DHBW_Photo_Server.WebDefaultPort, "Port the webserver listens on")
+	backendurl 	:= flag.String("backendurl", DHBW_Photo_Server.WebDefaultUrl, "Url of the backend")
 	backendport := flag.Int("backendport", DHBW_Photo_Server.BackendDefaultPort, "Port the backend is running on")
+	imagePath	:= flag.String("imagepath", DHBW_Photo_Server.DefaultImageDir, "Path of image directory")
 	flag.Parse()
 
 	// Convert flags into right format and save as settings
-	portStr := strconv.Itoa(*port)
-	backendportStr := strconv.Itoa(*backendport)
-	backendServerRoot = *backendurl + ":" + backendportStr + "/"
+	portStr 			:= strconv.Itoa(*port)
+	backendportStr		:= strconv.Itoa(*backendport)
+	backendServerRoot	= *backendurl + ":" + backendportStr + "/"
+	DHBW_Photo_Server.SetImageDir(*imagePath)
 
 	// serve images directory
 	fs := http.FileServer(http.Dir(DHBW_Photo_Server.ImageDir()))

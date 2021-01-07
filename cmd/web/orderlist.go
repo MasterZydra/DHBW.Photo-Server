@@ -10,11 +10,10 @@ import (
 	"strconv"
 )
 
-// TODO: Jones: Documentation
 // TODO: Jones: Test
 
+// outsourced function from web/main.go to update an order list entry
 func UpdateOrderListEntry(w http.ResponseWriter, r *http.Request) {
-	// update order list entry
 	numberOfPrints, err := strconv.Atoi(r.FormValue("numberOfPrints"))
 	if err != nil {
 		numberOfPrints = 1
@@ -39,6 +38,8 @@ func UpdateOrderListEntry(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// outsourced function from web/main.go to remove an order list entry
+// redirects with a GET request to /order-list afterwards
 func RemoveOrderListEntry(w http.ResponseWriter, r *http.Request, imageToRemove string) {
 	data := api.RemoveOrderListEntryReqData{ImageName: imageToRemove}
 	req, err := NewPostRequest("removeOrderListEntry", data)
@@ -57,6 +58,8 @@ func RemoveOrderListEntry(w http.ResponseWriter, r *http.Request, imageToRemove 
 	http.Redirect(w, r, "/order-list", http.StatusFound)
 }
 
+// outsourced function from web/main.go to delete a order list
+// redirects with a GET request to /order-list afterwards
 func DeleteOrderList(w http.ResponseWriter, r *http.Request) {
 	req, err := NewPostRequest("deleteOrderList", nil)
 	if err != nil {
@@ -74,6 +77,9 @@ func DeleteOrderList(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/order-list", http.StatusFound)
 }
 
+// outsourced function from web/main.go to download the order list of the current user as a .zip file
+// The file will be retrieved as base64 encoded string and converted to a real file.
+// After that the file can be served to the browser and deleted afterwards.
 func DownloadOrderList(w http.ResponseWriter, r *http.Request) {
 	req, err := NewGetRequest("downloadOrderList")
 	if err != nil {
@@ -95,6 +101,7 @@ func DownloadOrderList(w http.ResponseWriter, r *http.Request) {
 	}
 	zipFileName := "order-list-" + username + "-download.zip"
 
+	// convert backend result back to bytes to write the zipfile as a file
 	zipFileBytes, err := base64.StdEncoding.DecodeString(res.Base64ZipFile)
 	if err != nil {
 		internalServerError(w, err)
@@ -116,4 +123,34 @@ func DownloadOrderList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	return
+}
+
+// Outsourced function from web/main.go to add all chosen images as an order list entry.
+// Redirects with a GET request to /order-list afterwards.
+func AddOrderListEntries(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		internalServerError(w, err)
+		return
+	}
+	if len(r.PostForm) > 0 {
+		for _, value := range r.PostForm {
+			data := api.AddOrderListEntryReqData{ImageName: value[0]}
+
+			req, err := NewPostRequest("addOrderListEntry", data)
+			if err != nil {
+				internalServerError(w, err)
+				return
+			}
+
+			var res api.AddOrderListEntryResData
+			err = CallApi(r, req, &res)
+			if err != nil {
+				badRequest(w, err)
+				return
+			}
+		}
+		http.Redirect(w, r, "/order-list", http.StatusFound)
+		return
+	}
 }

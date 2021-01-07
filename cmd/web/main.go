@@ -177,38 +177,15 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	Layout(w, r, nil, nil)
 }
 
-// TODO: Jones: Tests anpassen/erweitern + Documentation
-// If a user is logged and visits /home in the HomeHandler is triggered.
-// It sets a default index and length GET values for the API call (/thumbnails)
-// to get the thumbnails from index to length.
+// TODO: Jones: Tests anpassen/erweitern
+// If a user is logged ind and visits /home the HomeHandler is triggered.
+// If it is a POST request the chosen images are added to the order list.
+// It it isn't a POST request it sets a default index and length GET values for the API call (/thumbnails) to get the
+// thumbnails from index to length.
 // Afterwards these variables are made available to the Layout via TemplateVariables.Local
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		err := r.ParseForm()
-		if err != nil {
-			internalServerError(w, err)
-			return
-		}
-		if len(r.PostForm) > 0 {
-			for _, value := range r.PostForm {
-				data := api.AddOrderListEntryReqData{ImageName: value[0]}
-
-				req, err := NewPostRequest("addOrderListEntry", data)
-				if err != nil {
-					internalServerError(w, err)
-					return
-				}
-
-				var res api.AddOrderListEntryResData
-				err = CallApi(r, req, &res)
-				if err != nil {
-					badRequest(w, err)
-					return
-				}
-			}
-			http.Redirect(w, r, "/order-list", http.StatusFound)
-			return
-		}
+		AddOrderListEntries(w, r)
 	}
 	query := r.URL.Query()
 	index := query.Get("index")
@@ -253,11 +230,14 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	Layout(w, r, res, local)
 }
 
-// TODO: Jones: Documentation
 // TODO: Jones: Test
 
+// The OrderListHandler handles many functions of the view "/order-list".
+// If the request method is POST the order list entries are updated
+// If the request query contains different parameters the chosen image will be removed or the complete order list will
+// be deleted or the order list is downloaded as a .zip file.
+// When no error is thrown it gets the order list of the current user and returns it's corresponding html file
 func OrderListHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: Unterfunktionen auslagern in eigene private Funktionen in eigener Datei
 	if r.Method == http.MethodPost {
 		UpdateOrderListEntry(w, r)
 	}
@@ -276,6 +256,7 @@ func OrderListHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	downloadOrderList := query.Get("downloadOrderList")
+	// download the order list as zip
 	if downloadOrderList == "1" {
 		DownloadOrderList(w, r)
 	}

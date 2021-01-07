@@ -33,72 +33,71 @@ func main() {
 	portStr := strconv.Itoa(*port)
 
 	// API endpoint to register a new user
-	http.HandleFunc("/register", mustParam(registerHandler, http.MethodPost))
+	http.HandleFunc("/register", MustParam(registerHandler, http.MethodPost))
 
 	// returns thumbnails from index to length of currently authenticated user
 	http.HandleFunc("/thumbnails", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(thumbnailsHandler, http.MethodGet, "index", "length"),
+		MustParam(thumbnailsHandler, http.MethodGet, "index", "length"),
 	))
 
 	// uploads an image to the users image folder and generates a thumbnail
 	http.HandleFunc("/upload", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(uploadHandler, http.MethodPost),
+		MustParam(uploadHandler, http.MethodPost),
 	))
 
 	// returns one image object with it's information
 	http.HandleFunc("/image", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(imageHandler, http.MethodGet, "name"),
+		MustParam(imageHandler, http.MethodGet, "name"),
 	))
 
 	// GET request that returns all order list entries
 	http.HandleFunc("/orderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(orderListEntryHandler, http.MethodGet),
+		MustParam(orderListEntryHandler, http.MethodGet),
 	))
 
 	// adds a new entry to the order list of the current user with the passed ImageName
 	http.HandleFunc("/addOrderListEntry", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(addOrderListEntryHandler, http.MethodPost),
+		MustParam(addOrderListEntryHandler, http.MethodPost),
 	))
 
 	// change parameter of a order list entry (e.g. Format or NumberOfPrints
 	http.HandleFunc("/changeOrderListEntry", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(changeOrderListEntryHandler, http.MethodPost),
+		MustParam(changeOrderListEntryHandler, http.MethodPost),
 	))
 
 	// remove a entry from the order list of the current user
 	http.HandleFunc("/removeOrderListEntry", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(removeOrderListEntryHandler, http.MethodPost),
+		MustParam(removeOrderListEntryHandler, http.MethodPost),
 	))
 
 	// delete the complete order list
 	http.HandleFunc("/deleteOrderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(deleteOrderListHandler, http.MethodPost),
+		MustParam(deleteOrderListHandler, http.MethodPost),
 	))
 
 	// download the current order list as a zip file with a content.json containing it's metadata
 	http.HandleFunc("/downloadOrderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		mustParam(downloadOrderList, http.MethodGet),
+		MustParam(downloadOrderList, http.MethodGet),
 	))
 
 	log.Println("backend listening on https://localhost:" + portStr)
 	log.Fatalln(http.ListenAndServeTLS(":"+portStr, "cert.pem", "key.pem", nil))
 }
 
-// The mustParam wrapper function is used to check if the correct HTTP method is used (POST or GET)
+// The MustParam wrapper function is used to check if the correct HTTP method is used (POST or GET)
 // on the current API endpoint.
 // It also checks if all necessary parameters params are provided on a GET request.
-func mustParam(h http.HandlerFunc, method string, params ...string) http.HandlerFunc {
+func MustParam(h http.HandlerFunc, method string, params ...string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		// check if method is allowed
 		if r.Method != method {
 			http.Error(w, "Method "+r.Method+" not allowed here", http.StatusMethodNotAllowed)

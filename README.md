@@ -31,24 +31,6 @@ Es soll ein System zur Verwaltung von Photos implementiert werden.
    - Caching
    - BasicAuth
 - Backend (REST-API)
-   - Jede Anfrage muss im Header Benutzername und Passwort enthalten
-
-**Projektstruktur**  
-```
-/docs       PDF, UML
-/cmd
-  /backend
-  /website
-  /terminal
-    main.go
-/internal
-  # EXIF-Parser
-  # Helper
-  # ImageManager
-  # ...
-/web
-/test
-```
 
 **Speichern der Bilder**  
 `Content.csv`enthält pro Bild:  
@@ -84,10 +66,7 @@ JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
     - Tests
 - Backend:
    - Konfigurierbarkeit durch Flags (David)
-      - Backend - Port
-      - Frontend - Port + Port von Backend
       - Beide - Image directory path (hier kommen Benutzerordner hin)
-      - Backendsachen (David)
    - Prüfung POST req. Param (David)
 - Konsolen-API-Kommunikation + Tests (Patricia)
 - Dokumentation

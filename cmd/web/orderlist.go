@@ -10,8 +10,6 @@ import (
 	"strconv"
 )
 
-// TODO: Jones: Test
-
 // outsourced function from web/main.go to update an order list entry
 func UpdateOrderListEntry(w http.ResponseWriter, r *http.Request) {
 	numberOfPrints, err := strconv.Atoi(r.FormValue("numberOfPrints"))
@@ -54,7 +52,6 @@ func RemoveOrderListEntry(w http.ResponseWriter, r *http.Request, imageToRemove 
 		badRequest(w, err)
 		return
 	}
-
 	http.Redirect(w, r, "/order-list", http.StatusFound)
 }
 
@@ -73,7 +70,6 @@ func DeleteOrderList(w http.ResponseWriter, r *http.Request) {
 		badRequest(w, err)
 		return
 	}
-
 	http.Redirect(w, r, "/order-list", http.StatusFound)
 }
 
@@ -87,19 +83,19 @@ func DownloadOrderList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var res api.DownloadOrderListResData
-	err = CallApi(r, req, &res)
-	if err != nil {
-		badRequest(w, err)
-		return
-	}
-
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		internalServerError(w, errors.New("Username couldn't be retrieved from Basic auth"))
 		return
 	}
 	zipFileName := "order-list-" + username + "-download.zip"
+
+	var res api.DownloadOrderListResData
+	err = CallApi(r, req, &res)
+	if err != nil {
+		badRequest(w, err)
+		return
+	}
 
 	// convert backend result back to bytes to write the zipfile as a file
 	zipFileBytes, err := base64.StdEncoding.DecodeString(res.Base64ZipFile)

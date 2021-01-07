@@ -177,7 +177,6 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	Layout(w, r, nil, nil)
 }
 
-// TODO: Jones: Tests anpassen/erweitern
 // If a user is logged ind and visits /home the HomeHandler is triggered.
 // If it is a POST request the chosen images are added to the order list.
 // It it isn't a POST request it sets a default index and length GET values for the API call (/thumbnails) to get the
@@ -229,8 +228,6 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 
 	Layout(w, r, res, local)
 }
-
-// TODO: Jones: Test
 
 // The OrderListHandler handles many functions of the view "/order-list".
 // If the request method is POST the order list entries are updated
@@ -348,7 +345,6 @@ func badRequest(w http.ResponseWriter, err error) {
 }
 
 // converts data to json bytes and passes it to NewRequest to return a new POST request
-// TODO: Jones: tests anpassen
 func NewPostRequest(url string, data interface{}) (*http.Request, error) {
 	if data == nil {
 		return NewRequest(http.MethodPost, url, nil)

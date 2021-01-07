@@ -82,7 +82,6 @@ JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
 - Webserver:
   - Bestellung von Fotos (Jones)
     - Tests
-  - Bilder-Cache (Cache-Control Header) (Jones)
 - Backend:
    - Konfigurierbarkeit durch Flags (David)
       - Backend - Port

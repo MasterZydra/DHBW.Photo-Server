@@ -128,6 +128,7 @@ func TestCallApiCustomError(t *testing.T) {
 }
 
 func TestNewRequest(t *testing.T) {
+	backendServerRoot = DHBW_Photo_Server.BackendHost
 	req, err := NewRequest("POST", "some/path", nil)
 	if err != nil || req.Method != "POST" || req.URL.Path != "/some/path" || !strings.Contains(DHBW_Photo_Server.BackendHost, req.URL.Host) {
 		t.Error("Error while creating new request")
@@ -405,7 +406,7 @@ securepw123
 
 	response, _ := postFormData(webServer, postData)
 
-	if response.StatusCode != http.StatusTemporaryRedirect || expectedUsername != "benutzer1" || expectedPw != "securepw123" || expectedPwConfirmation != "securepw123" {
+	if response.StatusCode != http.StatusOK || expectedUsername != "benutzer1" || expectedPw != "securepw123" || expectedPwConfirmation != "securepw123" {
 		t.Error("Something went wrong while testing registrationHandler")
 	}
 }

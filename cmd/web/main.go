@@ -77,6 +77,7 @@ func main() {
 
 	// listen and start server
 	log.Println("web listening on https://localhost:" + portStr)
+	log.Println("backend: " + backendServerRoot)
 	log.Fatalln(http.ListenAndServeTLS(":"+portStr, "cert.pem", "key.pem", nil))
 }
 

@@ -1,17 +1,20 @@
 package main
 
 import (
-	"DHBW.Photo-Server/internal/order"
 	"encoding/base64"
 	"flag"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	dhbwphotoserver "DHBW.Photo-Server"
 	"DHBW.Photo-Server/cmd/backend/jsonUtil"
 	"DHBW.Photo-Server/internal/api"
+	"DHBW.Photo-Server/internal/order"
 	"DHBW.Photo-Server/internal/user"
 	"DHBW.Photo-Server/internal/util"
 )
@@ -76,6 +79,11 @@ func main() {
 	http.HandleFunc("/deleteOrderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
 		mustParam(deleteOrderListHandler, http.MethodPost),
+	))
+
+	http.HandleFunc("/downloadOrderList", user.AuthHandlerWrapper(
+		user.AuthHandler(),
+		mustParam(downloadOrderList, http.MethodGet),
 	))
 
 	log.Println("backend listening on https://localhost:" + portStr)
@@ -362,4 +370,39 @@ func deleteOrderListHandler(w http.ResponseWriter, r *http.Request) {
 	usr := um.GetUser(username)
 
 	usr.OrderList = []*order.ListEntry{}
+}
+
+func downloadOrderList(w http.ResponseWriter, r *http.Request) {
+	var res api.DownloadOrderListResData
+	defer jsonUtil.EncodeResponse(w, &res)
+
+	username, _, ok := r.BasicAuth()
+	if !ok {
+		res.Error = "Could not get username"
+		return
+	}
+
+	um := user.UserManagerCache()
+	usr := um.GetUser(username)
+
+	zipFileName := filepath.Join(dhbwphotoserver.ImageDir(), usr.Name, "order-list-download.zip")
+	err := order.CreateOrderListZipFile(zipFileName, usr.Name, usr.OrderList)
+	if err != nil {
+		res.Error = err.Error()
+		return
+	}
+
+	zipFileBytes, err := ioutil.ReadFile(zipFileName)
+	if err != nil {
+		res.Error = err.Error()
+		return
+	}
+
+	res.Base64ZipFile = base64.StdEncoding.EncodeToString(zipFileBytes)
+
+	err = os.Remove(zipFileName)
+	if err != nil {
+		res.Error = err.Error()
+		return
+	}
 }

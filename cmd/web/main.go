@@ -47,15 +47,15 @@ var backendServerRoot string
 
 func main() {
 	// Read flags
-	port 		:= flag.Int("port", DHBW_Photo_Server.WebDefaultPort, "Port the webserver listens on")
-	backendurl 	:= flag.String("backendurl", DHBW_Photo_Server.WebDefaultUrl, "Url of the backend")
+	port := flag.Int("port", DHBW_Photo_Server.WebDefaultPort, "Port the webserver listens on")
+	backendurl := flag.String("backendurl", DHBW_Photo_Server.WebDefaultUrl, "Url of the backend")
 	backendport := flag.Int("backendport", DHBW_Photo_Server.BackendDefaultPort, "Port the backend is running on")
 	flag.Parse()
 
 	// Convert flags into right format and save as settings
-	portStr 			:= strconv.Itoa(*port)
-	backendportStr 		:= strconv.Itoa(*backendport)
-	backendServerRoot 	= *backendurl + ":" + backendportStr + "/"
+	portStr := strconv.Itoa(*port)
+	backendportStr := strconv.Itoa(*backendport)
+	backendServerRoot = *backendurl + ":" + backendportStr + "/"
 
 	// serve images directory
 	fs := http.FileServer(http.Dir(DHBW_Photo_Server.ImageDir()))
@@ -249,69 +249,27 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 // TODO: Jones: Test
 
 func OrderListHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO: Unterfunktionen auslagern in eigene private Funktionen in eigener Datei
 	if r.Method == http.MethodPost {
-		// update order list entry
-		numberOfPrints, err := strconv.Atoi(r.FormValue("numberOfPrints"))
-		if err != nil {
-			numberOfPrints = 1
-		}
-		data := api.ChangeOrderListEntryReqData{
-			ImageName:      r.FormValue("imageName"),
-			Format:         r.FormValue("format"),
-			NumberOfPrints: numberOfPrints,
-		}
-
-		req, err := NewPostRequest("changeOrderListEntry", data)
-		if err != nil {
-			internalServerError(w, err)
-			return
-		}
-
-		var res api.ChangeOrderListEntryResData
-		err = CallApi(r, req, &res)
-		if err != nil {
-			badRequest(w, err)
-			return
-		}
+		UpdateOrderListEntry(w, r)
 	}
 
 	query := r.URL.Query()
 	imageToRemove := query.Get("ImageToRemove")
 	// remove image from order list
 	if imageToRemove != "" {
-		data := api.RemoveOrderListEntryReqData{ImageName: imageToRemove}
-		req, err := NewPostRequest("removeOrderListEntry", data)
-		if err != nil {
-			internalServerError(w, err)
-			return
-		}
-
-		var res api.RemoveOrderListEntryResData
-		err = CallApi(r, req, &res)
-		if err != nil {
-			badRequest(w, err)
-			return
-		}
-
-		http.Redirect(w, r, "/order-list", http.StatusFound)
+		RemoveOrderListEntry(w, r, imageToRemove)
 	}
 
 	deleteOrderList := query.Get("deleteOrderList")
+	// remove all entries from order list
 	if deleteOrderList == "1" {
-		req, err := NewPostRequest("deleteOrderList", nil)
-		if err != nil {
-			internalServerError(w, err)
-			return
-		}
+		DeleteOrderList(w, r)
+	}
 
-		var res api.DeleteOrderListResData
-		err = CallApi(r, req, &res)
-		if err != nil {
-			badRequest(w, err)
-			return
-		}
-
-		http.Redirect(w, r, "/order-list", http.StatusFound)
+	downloadOrderList := query.Get("downloadOrderList")
+	if downloadOrderList == "1" {
+		DownloadOrderList(w, r)
 	}
 
 	// get order list from backend
@@ -416,11 +374,6 @@ func NewPostRequest(url string, data interface{}) (*http.Request, error) {
 // simple wrapper for a new GET request
 func NewGetRequest(url string) (*http.Request, error) {
 	return NewRequest(http.MethodGet, url, nil)
-}
-
-// simple wrapper for a new DELETE request
-func NewDeleteRequest(url string) (*http.Request, error) {
-	return NewRequest(http.MethodDelete, url, nil)
 }
 
 // returns a new request with the configured BackendHost as a prefix to the url

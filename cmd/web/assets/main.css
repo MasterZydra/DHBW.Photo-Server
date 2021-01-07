@@ -18,9 +18,9 @@ img {
     color: grey;
 }
 
-td{
+.order-list td{
     text-align: center;
-    min-width: 200px;
+    padding: 0 2em;
 }
 
 input[type=number] {

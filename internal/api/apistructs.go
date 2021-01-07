@@ -132,3 +132,12 @@ type DeleteOrderListResData struct {
 func (a DeleteOrderListResData) GetError() string {
 	return a.Error
 }
+
+type DownloadOrderListResData struct {
+	Error         string
+	Base64ZipFile string
+}
+
+func (a DownloadOrderListResData) GetError() string {
+	return a.Error
+}

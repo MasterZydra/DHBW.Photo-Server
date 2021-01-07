@@ -53,33 +53,37 @@ func main() {
 		mustParam(imageHandler, http.MethodGet, "name"),
 	))
 
-	// TODO: Jones: Documentation
-
+	// GET request that returns all order list entries
 	http.HandleFunc("/orderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
 		mustParam(orderListEntryHandler, http.MethodGet),
 	))
 
+	// adds a new entry to the order list of the current user with the passed ImageName
 	http.HandleFunc("/addOrderListEntry", user.AuthHandlerWrapper(
 		user.AuthHandler(),
 		mustParam(addOrderListEntryHandler, http.MethodPost),
 	))
 
+	// change parameter of a order list entry (e.g. Format or NumberOfPrints
 	http.HandleFunc("/changeOrderListEntry", user.AuthHandlerWrapper(
 		user.AuthHandler(),
 		mustParam(changeOrderListEntryHandler, http.MethodPost),
 	))
 
+	// remove a entry from the order list of the current user
 	http.HandleFunc("/removeOrderListEntry", user.AuthHandlerWrapper(
 		user.AuthHandler(),
 		mustParam(removeOrderListEntryHandler, http.MethodPost),
 	))
 
+	// delete the complete order list
 	http.HandleFunc("/deleteOrderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
 		mustParam(deleteOrderListHandler, http.MethodPost),
 	))
 
+	// download the current order list as a zip file with a content.json containing it's metadata
 	http.HandleFunc("/downloadOrderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
 		mustParam(downloadOrderList, http.MethodGet),
@@ -242,27 +246,26 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-// TODO: Jones: Documentation
 // TODO: Jones: Tests
 
+// Gets all order list entries and writes it in OrderListResData.OrderList
 func orderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.OrderListResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
-	// TODO: jones in eigene Funktion kapseln?
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
 		return
 	}
 
-	// TODO: jones anders kapseln? Wie david das mit image gelöst hat?
 	um := user.UserManagerCache()
 	usr := um.GetUser(username)
 
 	res.OrderList = usr.OrderList.Entries
 }
 
+// API endpoint for adding a new order list entry by passing a name of an image
 func addOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.AddOrderListEntryResData
 	defer jsonUtil.EncodeResponse(w, &res)
@@ -297,6 +300,7 @@ func addOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Removes a specific order list entry with an imageName.
 func removeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.RemoveOrderListEntryResData
 	defer jsonUtil.EncodeResponse(w, &res)
@@ -325,6 +329,7 @@ func removeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Modifies the Format and NumberOfPrints of an order list entry.
 func changeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ChangeOrderListEntryResData
 	defer jsonUtil.EncodeResponse(w, &res)
@@ -355,6 +360,7 @@ func changeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	entry.NumberOfPrints = data.NumberOfPrints
 }
 
+// Empties the complete order list array of the current user
 func deleteOrderListHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ChangeOrderListEntryResData
 	defer jsonUtil.EncodeResponse(w, &res)
@@ -371,6 +377,7 @@ func deleteOrderListHandler(w http.ResponseWriter, r *http.Request) {
 	usr.OrderList = &user.OrderList{Entries: []*user.OrderListEntry{}}
 }
 
+// Calls user.CreateOrderListZipFile and returns the zip files content to base64 encoded string.
 func downloadOrderList(w http.ResponseWriter, r *http.Request) {
 	var res api.DownloadOrderListResData
 	defer jsonUtil.EncodeResponse(w, &res)

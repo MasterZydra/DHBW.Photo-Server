@@ -10,8 +10,6 @@ import (
 	"path/filepath"
 )
 
-// TODO: Jones: tests
-
 type Metadata struct {
 	Path           string
 	Format         string

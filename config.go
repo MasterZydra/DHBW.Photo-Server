@@ -12,9 +12,9 @@ const (
 	UserContent = "content.csv"
 
 	// Default values for server configurations
-	BackendDefaultPort	= 3000
-	WebDefaultUrl		= "https://localhost"
-	WebDefaultPort		= 4443
+	BackendDefaultPort = 3000
+	WebDefaultUrl      = "https://localhost"
+	WebDefaultPort     = 4443
 
 	// userfiles
 	TestUserFile = "../../test/usersFile_test.csv"
@@ -38,6 +38,8 @@ const (
 	BackendHost = "https://localhost:3000/"
 
 	TimeLayout = "2006-01-02 15:04:05"
+
+	ImagesCacheControlMaxAge = "2592000"
 )
 
 var OrderListFormats = []string{"Junior Legal (8 x 5)", "Letter (8.5 x 11)", "Legal (8.5 x 14)", "Tabloid (11 x 17)"}

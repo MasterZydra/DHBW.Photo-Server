@@ -80,11 +80,10 @@ func main() {
 	log.Fatalln(http.ListenAndServeTLS(":"+portStr, "cert.pem", "key.pem", nil))
 }
 
-// TODO: Jones Test
 // sets a the cache-control header to 30 days of static file caching
 func CacheWrapper(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Cache-Control", "max-age=2592000") // 30 days cache
+		w.Header().Set("Cache-Control", "max-age="+DHBW_Photo_Server.ImagesCacheControlMaxAge) // 30 days cache
 		h.ServeHTTP(w, r)
 	})
 }

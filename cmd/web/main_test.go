@@ -19,6 +19,10 @@ func createServer(f http.HandlerFunc) *httptest.Server {
 	return httptest.NewServer(f)
 }
 
+func createFileServer(f http.Handler) *httptest.Server {
+	return httptest.NewServer(f)
+}
+
 func newPostReq(url string, data interface{}) (*http.Request, error) {
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
@@ -215,6 +219,19 @@ func TestLayoutValidTemplate(t *testing.T) {
 
 	if response.StatusCode != http.StatusOK || html != expectedHtml {
 		t.Error("valid Layout did not load correctly")
+	}
+}
+
+func TestCacheWrapper(t *testing.T) {
+	var cacheControlHeader string
+	server := createFileServer(CacheWrapper(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cacheControlHeader = w.Header().Get("Cache-Control")
+	})))
+
+	_, _ = http.Get(server.URL)
+
+	if cacheControlHeader == "" {
+		t.Error("Cache-Control header is empty!")
 	}
 }
 

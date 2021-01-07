@@ -81,7 +81,6 @@ JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
 **Aufgabenverteilung**  
 - Webserver:
   - Bestellung von Fotos (Jones)
-    - ZIP-Download
     - Tests
   - Bilder-Cache (Cache-Control Header) (Jones)
 - Backend:

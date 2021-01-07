@@ -61,7 +61,7 @@ func main() {
 	fs := http.FileServer(http.Dir(DHBW_Photo_Server.ImageDir()))
 	http.Handle("/images/", user.AuthFileServerWrapper(
 		user.AuthFileServer(),
-		http.StripPrefix("/images", fs),
+		CacheWrapper(http.StripPrefix("/images", fs)),
 	))
 
 	// serve other static files (css, js etc.)
@@ -78,6 +78,15 @@ func main() {
 	// listen and start server
 	log.Println("web listening on https://localhost:" + portStr)
 	log.Fatalln(http.ListenAndServeTLS(":"+portStr, "cert.pem", "key.pem", nil))
+}
+
+// TODO: Jones Test
+// sets a the cache-control header to 30 days of static file caching
+func CacheWrapper(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "max-age=2592000") // 30 days cache
+		h.ServeHTTP(w, r)
+	})
 }
 
 // If navigating to the root the RootHandler sets index as the current path to load index.html in Layout.

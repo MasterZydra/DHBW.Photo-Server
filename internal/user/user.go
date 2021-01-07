@@ -9,7 +9,7 @@ import (
 )
 
 // User is used to represent one user entry in the usersFile
-// It holds the users name and the users hashed password
+// It holds the users name, the users hashed password and the orderList from the user
 type User struct {
 	Name      string
 	password  string
@@ -36,6 +36,7 @@ func FromCsv(csvLine []string) User {
 }
 
 // Converts the current User to an array of strings, so it can be written into a csv file with a csvWriter
+// Note that the OrderList will not be stored in the csv
 func (u *User) ToCsv() []string {
 	return []string{u.Name, u.password}
 }
@@ -45,9 +46,8 @@ func (u *User) ComparePassword(clearPassword string) (bool, error) {
 	return cryptography.ComparePassword(u.password, clearPassword)
 }
 
-// TODO: Jones: Documentation
-// TODO: Jones: Tests
-
+// Checks first if this image is already in the orderList
+// After that it adds a new order entry with the passed image object pointer
 func (u *User) AddOrderEntry(image *image.Image) error {
 	_, entry := u.GetOrderEntry(image.Name)
 	if entry != nil {
@@ -62,6 +62,7 @@ func (u *User) AddOrderEntry(image *image.Image) error {
 	return nil
 }
 
+// Gets the order entry with the passed imageName string and removes this entry from the orderList preserving order
 func (u *User) RemoveOrderEntry(imageName string) bool {
 	i, entry := u.GetOrderEntry(imageName)
 	if entry != nil {
@@ -71,6 +72,8 @@ func (u *User) RemoveOrderEntry(imageName string) bool {
 	return false
 }
 
+// Gets the order entry with the image that has the name of the passed imageName
+// Returns it's index in the orderList and the a pointer to the order.ListEntry
 func (u *User) GetOrderEntry(imageName string) (index int, entry *order.ListEntry) {
 	for i, entry := range u.OrderList {
 		if entry.Image.Name == imageName {

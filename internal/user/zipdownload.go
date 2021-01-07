@@ -1,4 +1,4 @@
-package order
+package user
 
 import (
 	"DHBW.Photo-Server"
@@ -11,7 +11,6 @@ import (
 )
 
 // TODO: Jones: tests
-// TODO: Jones: Documentation
 
 type Metadata struct {
 	Path           string
@@ -19,7 +18,13 @@ type Metadata struct {
 	NumberOfPrints int
 }
 
-func CreateOrderListZipFile(zipFileName string, username string, orderList []*ListEntry) error {
+var imageDir = DHBW_Photo_Server.ImageDir()
+
+// Creates a new zip file named from the passed zipFileName string.
+// With the passed username the users image file path root is defined and then it loops over the passed orderList and
+// executes addFileToZip for each image file.
+// Then a json file with the metadata Format and NumberOfPrints is created and added to the resulting zip file.
+func CreateOrderListZipFile(zipFileName string, username string, orderList *OrderList) error {
 	newZipFile, err := os.Create(zipFileName)
 	if err != nil {
 		return err
@@ -31,9 +36,9 @@ func CreateOrderListZipFile(zipFileName string, username string, orderList []*Li
 
 	var metadata []Metadata
 
-	usersImageRoot := filepath.Join(DHBW_Photo_Server.ImageDir(), username)
+	usersImageRoot := filepath.Join(imageDir, username)
 	// for each order list entry add the corresponding image file to zip
-	for _, entry := range orderList {
+	for _, entry := range orderList.Entries {
 		imagePath := filepath.Join(usersImageRoot, entry.Image.Name)
 		err = addFileToZip(zw, imagePath)
 		if err != nil {
@@ -74,6 +79,7 @@ func CreateOrderListZipFile(zipFileName string, username string, orderList []*Li
 	return nil
 }
 
+// Adds the file behind filename to the passed zip.Writer
 func addFileToZip(zw *zip.Writer, filename string) error {
 	file, err := os.Open(filename)
 	if err != nil {

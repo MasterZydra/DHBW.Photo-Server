@@ -14,7 +14,6 @@ import (
 	dhbwphotoserver "DHBW.Photo-Server"
 	"DHBW.Photo-Server/cmd/backend/jsonUtil"
 	"DHBW.Photo-Server/internal/api"
-	"DHBW.Photo-Server/internal/order"
 	"DHBW.Photo-Server/internal/user"
 	"DHBW.Photo-Server/internal/util"
 )
@@ -261,7 +260,7 @@ func orderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	um := user.UserManagerCache()
 	usr := um.GetUser(username)
 
-	res.OrderList = usr.OrderList
+	res.OrderList = usr.OrderList.Entries
 }
 
 func addOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
@@ -291,7 +290,7 @@ func addOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	um := user.UserManagerCache()
 	usr := um.GetUser(username)
 
-	err = usr.AddOrderEntry(img)
+	err = usr.OrderList.AddOrderEntry(img)
 	if err != nil {
 		res.Error = err.Error()
 		return
@@ -319,7 +318,7 @@ func removeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	um := user.UserManagerCache()
 	usr := um.GetUser(username)
 
-	exists := usr.RemoveOrderEntry(data.ImageName)
+	exists := usr.OrderList.RemoveOrderEntry(data.ImageName)
 	if !exists {
 		res.Error = "Image '" + data.ImageName + "' does not exist for user '" + usr.Name + "'"
 		return
@@ -347,7 +346,7 @@ func changeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	um := user.UserManagerCache()
 	usr := um.GetUser(username)
 
-	_, entry := usr.GetOrderEntry(data.ImageName)
+	_, entry := usr.OrderList.GetOrderEntry(data.ImageName)
 	if entry == nil {
 		res.Error = "Could not find order entry with image '" + data.ImageName + "'"
 		return
@@ -369,7 +368,7 @@ func deleteOrderListHandler(w http.ResponseWriter, r *http.Request) {
 	um := user.UserManagerCache()
 	usr := um.GetUser(username)
 
-	usr.OrderList = []*order.ListEntry{}
+	usr.OrderList = &user.OrderList{Entries: []*user.OrderListEntry{}}
 }
 
 func downloadOrderList(w http.ResponseWriter, r *http.Request) {
@@ -386,7 +385,7 @@ func downloadOrderList(w http.ResponseWriter, r *http.Request) {
 	usr := um.GetUser(username)
 
 	zipFileName := filepath.Join(dhbwphotoserver.ImageDir(), usr.Name, "order-list-download.zip")
-	err := order.CreateOrderListZipFile(zipFileName, usr.Name, usr.OrderList)
+	err := user.CreateOrderListZipFile(zipFileName, usr.Name, usr.OrderList)
 	if err != nil {
 		res.Error = err.Error()
 		return

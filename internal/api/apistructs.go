@@ -2,7 +2,7 @@ package api
 
 import (
 	"DHBW.Photo-Server/internal/image"
-	"DHBW.Photo-Server/internal/order"
+	"DHBW.Photo-Server/internal/user"
 	"time"
 )
 
@@ -80,7 +80,7 @@ func (a ThumbnailsResData) GetError() string {
 }
 
 type OrderListResData struct {
-	OrderList []*order.ListEntry
+	OrderList []*user.OrderListEntry
 	Error     string
 }
 

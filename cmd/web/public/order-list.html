@@ -8,9 +8,10 @@
 
 {{if .Result.OrderList}}
     <a href="/order-list?deleteOrderList=1"><button>Bestelliste löschen</button></a>
+    <a href="/order-list?downloadOrderList=1"><button>Bestelliste herunterladen (ZIP)</button></a>
     <br>
     <br>
-    <table>
+    <table class="order-list">
         <tr>
             <th>Anzahl</th>
             <th>Format</th>

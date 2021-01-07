@@ -19,6 +19,10 @@ func createServer(f http.HandlerFunc) *httptest.Server {
 	return httptest.NewServer(f)
 }
 
+func createFileServer(f http.Handler) *httptest.Server {
+	return httptest.NewServer(f)
+}
+
 func newPostReq(url string, data interface{}) (*http.Request, error) {
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
@@ -128,6 +132,7 @@ func TestCallApiCustomError(t *testing.T) {
 }
 
 func TestNewRequest(t *testing.T) {
+	backendServerRoot = DHBW_Photo_Server.BackendHost
 	req, err := NewRequest("POST", "some/path", nil)
 	if err != nil || req.Method != "POST" || req.URL.Path != "/some/path" || !strings.Contains(DHBW_Photo_Server.BackendHost, req.URL.Host) {
 		t.Error("Error while creating new request")
@@ -153,7 +158,7 @@ func TestNewPostRequestValidJson(t *testing.T) {
 }
 
 func TestNewPostRequestInvalidJson(t *testing.T) {
-	// nicht testbar, da es sehr schwierig ist ungültige Daten in json.Marshal reinzuschicken
+	// nicht testbar, da es sehr schwierig ist über ein interface{} ungültige Daten in json.Marshal reinzuschicken
 }
 
 func TestLayoutFileNotFound(t *testing.T) {
@@ -217,6 +222,19 @@ func TestLayoutValidTemplate(t *testing.T) {
 	}
 }
 
+func TestCacheWrapper(t *testing.T) {
+	var cacheControlHeader string
+	server := createFileServer(CacheWrapper(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cacheControlHeader = w.Header().Get("Cache-Control")
+	})))
+
+	_, _ = http.Get(server.URL)
+
+	if cacheControlHeader == "" {
+		t.Error("Cache-Control header is empty!")
+	}
+}
+
 func TestRootHandler(t *testing.T) {
 	webRoot = "../../test/html"
 	layoutName = "valid-template"
@@ -235,10 +253,18 @@ func TestRootHandler(t *testing.T) {
 	}
 }
 
-func postFormData(server *httptest.Server, postData string) (resp *http.Response, err error) {
+func postBinaryData(server *httptest.Server, postData string) (resp *http.Response, err error) {
 	return http.Post(
 		server.URL,
 		`multipart/form-data; boundary=xxx`,
+		ioutil.NopCloser(strings.NewReader(postData)),
+	)
+}
+
+func postFormData(server *httptest.Server, postData string) (resp *http.Response, err error) {
+	return http.Post(
+		server.URL,
+		`application/x-www-form-urlencoded`,
 		ioutil.NopCloser(strings.NewReader(postData)),
 	)
 }
@@ -252,7 +278,7 @@ func TestUploadHandlerMultipartFormError(t *testing.T) {
 	})
 	defer server.Close()
 
-	response, _ := postFormData(server, "invaliddata")
+	response, _ := postBinaryData(server, "invaliddata")
 
 	if response.StatusCode != http.StatusInternalServerError {
 		t.Error("Parsing the multipart form should fail here")
@@ -300,7 +326,7 @@ Content-Transfer-Encoding: binary
 binary data2
 --xxx--
 `
-	response, _ := postFormData(webServer, postData)
+	response, _ := postBinaryData(webServer, postData)
 
 	if response.StatusCode != http.StatusOK || expectedImages[0] != "binary data1" || expectedImages[1] != "binary data2" {
 		t.Error("Uploading the two images should work here")
@@ -335,7 +361,7 @@ Content-Transfer-Encoding: binary
 binary data1
 --xxx--
 `
-	response, _ := postFormData(webServer, postData)
+	response, _ := postBinaryData(webServer, postData)
 
 	if response.StatusCode != http.StatusBadRequest {
 		t.Error("Uploading the two images should work here")
@@ -403,9 +429,9 @@ securepw123
 --xxx--
 `
 
-	response, _ := postFormData(webServer, postData)
+	response, _ := postBinaryData(webServer, postData)
 
-	if response.StatusCode != http.StatusTemporaryRedirect || expectedUsername != "benutzer1" || expectedPw != "securepw123" || expectedPwConfirmation != "securepw123" {
+	if response.StatusCode != http.StatusOK || expectedUsername != "benutzer1" || expectedPw != "securepw123" || expectedPwConfirmation != "securepw123" {
 		t.Error("Something went wrong while testing registrationHandler")
 	}
 }
@@ -435,7 +461,7 @@ Content-Disposition: form-data; name="user"
 benutzer1
 --xxx--
 `
-	response, _ := postFormData(webServer, postData)
+	response, _ := postBinaryData(webServer, postData)
 
 	if response.StatusCode != http.StatusBadRequest {
 		t.Error("Something went wrong while testing registrationHandler")
@@ -500,5 +526,429 @@ func TestHomeHandlerBadApiRequest(t *testing.T) {
 
 	if response.StatusCode != http.StatusBadRequest {
 		t.Error("Something went wrong while testing HomeHandler")
+	}
+}
+
+func TestHomeHandlerAddOrderListEntries(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		r.SetBasicAuth("name", "pw")
+		HomeHandler(w, r)
+	})
+	defer webServer.Close()
+
+	var imageNames []string
+	backendServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		var res api.AddOrderListEntryResData
+		defer jsonUtil.EncodeResponse(w, &res)
+
+		var data api.AddOrderListEntryReqData
+		_ = jsonUtil.DecodeBody(r, &data)
+		imageNames = append(imageNames, data.ImageName)
+	})
+	BackendUrlRoot := backendServer.URL + "/"
+	backendServer.URL = BackendUrlRoot + "addOrderListEntry"
+	backendServerRoot = BackendUrlRoot
+
+	defer backendServer.Close()
+
+	postData := `toOrderListimg1.jpg=img1.jpg&toOrderListimg2.jpg=img2.jpg`
+	response, _ := postFormData(webServer, postData)
+
+	if response.StatusCode != http.StatusOK || imageNames[0] != "img1.jpg" || imageNames[1] != "img2.jpg" {
+		t.Error("wrong status code or wrong imageNames received at the server")
+	}
+}
+
+func TestHomeHandlerAddOrderListEntriesInvalidForm(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		r.SetBasicAuth("name", "pw")
+		HomeHandler(w, r)
+	})
+	defer webServer.Close()
+
+	postData := `invaliddata:;_!"§$%&/()"`
+	response, _ := postFormData(webServer, postData)
+
+	if response.StatusCode != http.StatusInternalServerError {
+		t.Error("wrong status code or wrong imageNames received at the server")
+	}
+}
+
+func TestHomeHandlerAddOrderListEntriesBadApiRequest(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		r.SetBasicAuth("name", "pw")
+		HomeHandler(w, r)
+	})
+	defer webServer.Close()
+
+	backendServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		return
+	})
+	BackendUrlRoot := backendServer.URL + "/"
+	backendServer.URL = BackendUrlRoot + "addOrderListEntry"
+	backendServerRoot = BackendUrlRoot
+
+	defer backendServer.Close()
+
+	postData := `invalid=data`
+	response, _ := postFormData(webServer, postData)
+
+	if response.StatusCode != http.StatusBadRequest {
+		t.Error("wrong status code")
+	}
+}
+
+func TestUpdateOrderListEntry(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		r.SetBasicAuth("name", "pw")
+		if r.Method == http.MethodPost {
+			OrderListHandler(w, r)
+		}
+	})
+	defer webServer.Close()
+
+	var imageName string
+	var format string
+	var numberOfPrints int
+	backendServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		var res api.ChangeOrderListEntryResData
+		defer jsonUtil.EncodeResponse(w, &res)
+
+		if r.Method == http.MethodPost {
+			var data api.ChangeOrderListEntryReqData
+			_ = jsonUtil.DecodeBody(r, &data)
+
+			imageName = data.ImageName
+			format = data.Format
+			numberOfPrints = data.NumberOfPrints
+		}
+	})
+	BackendUrlRoot := backendServer.URL + "/"
+	backendServer.URL = BackendUrlRoot + "changeOrderListEntry"
+	backendServerRoot = BackendUrlRoot
+
+	defer backendServer.Close()
+
+	postData := "imageName=img1.jpg&format=Letter&numberOfPrints='3'"
+	response, _ := postFormData(webServer, postData)
+
+	if response.StatusCode != http.StatusOK || imageName != "img1.jpg" || format != "Letter" || numberOfPrints != 1 {
+		t.Error("Wrong status code or wrong parameters received on the server")
+	}
+}
+
+func TestUpdateOrderListEntryBadApiRequest(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		r.SetBasicAuth("name", "pw")
+		if r.Method == http.MethodPost {
+			OrderListHandler(w, r)
+		}
+	})
+	defer webServer.Close()
+
+	backendServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		return
+	})
+	BackendUrlRoot := backendServer.URL + "/"
+	backendServer.URL = BackendUrlRoot + "changeOrderListEntry"
+	backendServerRoot = BackendUrlRoot
+
+	defer backendServer.Close()
+
+	postData := "invaliddata=blabla"
+	response, _ := postFormData(webServer, postData)
+
+	if response.StatusCode != http.StatusBadRequest {
+		t.Error("Wrong status code")
+	}
+}
+
+func TestRemoveOrderListEntry(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		r.SetBasicAuth("name", "pw")
+		imageToRemove := r.URL.Query().Get("ImageToRemove")
+		if imageToRemove != "" {
+			OrderListHandler(w, r)
+		}
+	})
+	defer webServer.Close()
+
+	var imageName string
+	backendServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		var res api.RemoveOrderListEntryResData
+		defer jsonUtil.EncodeResponse(w, &res)
+		if r.Method == http.MethodPost {
+			var data api.RemoveOrderListEntryReqData
+			_ = jsonUtil.DecodeBody(r, &data)
+
+			imageName = data.ImageName
+		}
+	})
+	BackendUrlRoot := backendServer.URL + "/"
+	backendServer.URL = BackendUrlRoot + "removeOrderListEntry"
+	backendServerRoot = BackendUrlRoot
+
+	defer backendServer.Close()
+
+	payload := url.Values{
+		"ImageToRemove": {"img1.jpg"},
+	}
+	response, _ := http.Get(webServer.URL + "/?" + payload.Encode())
+
+	if response.StatusCode != http.StatusOK || imageName != "img1.jpg" {
+		t.Error("Wrong status code or wrong parameters received on the server")
+	}
+}
+
+func TestRemoveOrderListEntryBadApiRequest(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		r.SetBasicAuth("name", "pw")
+		imageToRemove := r.URL.Query().Get("ImageToRemove")
+		if imageToRemove != "" {
+			OrderListHandler(w, r)
+		}
+	})
+	defer webServer.Close()
+
+	backendServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		return
+	})
+	BackendUrlRoot := backendServer.URL + "/"
+	backendServer.URL = BackendUrlRoot + "removeOrderListEntry"
+	backendServerRoot = BackendUrlRoot
+
+	defer backendServer.Close()
+
+	payload := url.Values{
+		"ImageToRemove": {"img1.jpg"},
+	}
+	response, _ := http.Get(webServer.URL + "/?" + payload.Encode())
+
+	if response.StatusCode != http.StatusBadRequest {
+		t.Error("Wrong status code")
+	}
+}
+
+func TestDeleteOrderList(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		r.SetBasicAuth("name", "pw")
+		deleteOrderList := r.URL.Query().Get("deleteOrderList")
+		if deleteOrderList == "1" {
+			OrderListHandler(w, r)
+		}
+	})
+	defer webServer.Close()
+
+	backendServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		var res api.DeleteOrderListResData
+		defer jsonUtil.EncodeResponse(w, &res)
+	})
+	BackendUrlRoot := backendServer.URL + "/"
+	backendServer.URL = BackendUrlRoot + "deleteOrderList"
+	backendServerRoot = BackendUrlRoot
+
+	defer backendServer.Close()
+
+	payload := url.Values{
+		"deleteOrderList": {"1"},
+	}
+	response, _ := http.Get(webServer.URL + "/?" + payload.Encode())
+
+	if response.StatusCode != http.StatusOK {
+		t.Error("Wrong status code")
+	}
+}
+
+func TestDeleteOrderListBadApiRequest(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		r.SetBasicAuth("name", "pw")
+		deleteOrderList := r.URL.Query().Get("deleteOrderList")
+		if deleteOrderList == "1" {
+			OrderListHandler(w, r)
+		}
+	})
+	defer webServer.Close()
+
+	backendServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		return
+	})
+	BackendUrlRoot := backendServer.URL + "/"
+	backendServer.URL = BackendUrlRoot + "deleteOrderList"
+	backendServerRoot = BackendUrlRoot
+
+	defer backendServer.Close()
+
+	payload := url.Values{
+		"deleteOrderList": {"1"},
+	}
+	response, _ := http.Get(webServer.URL + "/?" + payload.Encode())
+
+	if response.StatusCode != http.StatusBadRequest {
+		t.Error("Wrong status code")
+	}
+}
+
+func TestDownloadOrderList(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		r.SetBasicAuth("name", "pw")
+		downloadOrderList := r.URL.Query().Get("downloadOrderList")
+		if downloadOrderList == "1" {
+			OrderListHandler(w, r)
+		}
+	})
+	defer webServer.Close()
+
+	var base64String string
+	backendServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		var res api.DownloadOrderListResData
+		defer jsonUtil.EncodeResponse(w, &res)
+
+		base64String = "SGVsbXV0IE5lZW1hbm4="
+	})
+	BackendUrlRoot := backendServer.URL + "/"
+	backendServer.URL = BackendUrlRoot + "downloadOrderList"
+	backendServerRoot = BackendUrlRoot
+
+	defer backendServer.Close()
+
+	payload := url.Values{
+		"downloadOrderList": {"1"},
+	}
+	response, _ := http.Get(webServer.URL + "/?" + payload.Encode())
+
+	if response.StatusCode != http.StatusOK || base64String != "SGVsbXV0IE5lZW1hbm4=" {
+		t.Error("Wrong status code")
+	}
+}
+
+func TestDownloadOrderListBadApiRequest(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		r.SetBasicAuth("name", "pw")
+		downloadOrderList := r.URL.Query().Get("downloadOrderList")
+		if downloadOrderList == "1" {
+			OrderListHandler(w, r)
+		}
+	})
+	defer webServer.Close()
+
+	backendServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		return
+	})
+	BackendUrlRoot := backendServer.URL + "/"
+	backendServer.URL = BackendUrlRoot + "downloadOrderList"
+	backendServerRoot = BackendUrlRoot
+
+	defer backendServer.Close()
+
+	payload := url.Values{
+		"downloadOrderList": {"1"},
+	}
+	response, _ := http.Get(webServer.URL + "/?" + payload.Encode())
+
+	if response.StatusCode != http.StatusBadRequest {
+		t.Error("Wrong status code")
+	}
+}
+
+func TestDownloadOrderListNoBasicAuth(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		downloadOrderList := r.URL.Query().Get("downloadOrderList")
+		if downloadOrderList == "1" {
+			OrderListHandler(w, r)
+		}
+	})
+	defer webServer.Close()
+
+	payload := url.Values{
+		"downloadOrderList": {"1"},
+	}
+	response, _ := http.Get(webServer.URL + "/?" + payload.Encode())
+
+	if response.StatusCode != http.StatusInternalServerError {
+		t.Error("Wrong status code")
+	}
+}
+
+func TestDownloadOrderListInvalidBase64(t *testing.T) {
+	webRoot = "../../test/html"
+	layoutName = "valid-template"
+
+	webServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/test-home"
+		r.SetBasicAuth("name", "pw")
+		downloadOrderList := r.URL.Query().Get("downloadOrderList")
+		if downloadOrderList == "1" {
+			OrderListHandler(w, r)
+		}
+	})
+	defer webServer.Close()
+
+	backendServer := createServer(func(w http.ResponseWriter, r *http.Request) {
+		var res api.DownloadOrderListResData
+		defer jsonUtil.EncodeResponse(w, &res)
+
+		res.Base64ZipFile = "INVALIDBASE64StRing"
+	})
+	BackendUrlRoot := backendServer.URL + "/"
+	backendServer.URL = BackendUrlRoot + "downloadOrderList"
+	backendServerRoot = BackendUrlRoot
+
+	defer backendServer.Close()
+
+	payload := url.Values{
+		"downloadOrderList": {"1"},
+	}
+	response, _ := http.Get(webServer.URL + "/?" + payload.Encode())
+
+	if response.StatusCode != http.StatusInternalServerError {
+		t.Error("Wrong status code")
 	}
 }

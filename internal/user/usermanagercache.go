@@ -2,8 +2,10 @@ package user
 
 var userManager *UserManager
 
-// TODO: jones Documentation
-
+// The UserManagerCache is used to only load the users in go objects and store it in the variable userManager
+// at runtime.
+// This way the usersFile doesn't need to be loaded at every request.
+// This results in less IO usage and faster response times.
 func UserManagerCache() *UserManager {
 	if userManager == nil {
 		userManager = NewUserManager()

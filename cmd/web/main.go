@@ -47,21 +47,21 @@ var backendServerRoot string
 
 func main() {
 	// Read flags
-	port 		:= flag.Int("port", DHBW_Photo_Server.WebDefaultPort, "Port the webserver listens on")
-	backendurl 	:= flag.String("backendurl", DHBW_Photo_Server.WebDefaultUrl, "Url of the backend")
+	port := flag.Int("port", DHBW_Photo_Server.WebDefaultPort, "Port the webserver listens on")
+	backendurl := flag.String("backendurl", DHBW_Photo_Server.WebDefaultUrl, "Url of the backend")
 	backendport := flag.Int("backendport", DHBW_Photo_Server.BackendDefaultPort, "Port the backend is running on")
 	flag.Parse()
 
 	// Convert flags into right format and save as settings
-	portStr 			:= strconv.Itoa(*port)
-	backendportStr 		:= strconv.Itoa(*backendport)
-	backendServerRoot 	= *backendurl + ":" + backendportStr + "/"
+	portStr := strconv.Itoa(*port)
+	backendportStr := strconv.Itoa(*backendport)
+	backendServerRoot = *backendurl + ":" + backendportStr + "/"
 
 	// serve images directory
 	fs := http.FileServer(http.Dir(DHBW_Photo_Server.ImageDir()))
 	http.Handle("/images/", user.AuthFileServerWrapper(
 		user.AuthFileServer(),
-		http.StripPrefix("/images", fs),
+		CacheWrapper(http.StripPrefix("/images", fs)),
 	))
 
 	// serve other static files (css, js etc.)
@@ -79,6 +79,14 @@ func main() {
 	log.Println("web listening on https://localhost:" + portStr)
 	log.Println("backend: " + backendServerRoot)
 	log.Fatalln(http.ListenAndServeTLS(":"+portStr, "cert.pem", "key.pem", nil))
+}
+
+// sets a the cache-control header to 30 days of static file caching
+func CacheWrapper(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "max-age="+DHBW_Photo_Server.ImagesCacheControlMaxAge) // 30 days cache
+		h.ServeHTTP(w, r)
+	})
 }
 
 // If navigating to the root the RootHandler sets index as the current path to load index.html in Layout.
@@ -170,38 +178,14 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	Layout(w, r, nil, nil)
 }
 
-// TODO: Jones: Tests anpassen/erweitern + Documentation
-// If a user is logged and visits /home in the HomeHandler is triggered.
-// It sets a default index and length GET values for the API call (/thumbnails)
-// to get the thumbnails from index to length.
+// If a user is logged ind and visits /home the HomeHandler is triggered.
+// If it is a POST request the chosen images are added to the order list.
+// It it isn't a POST request it sets a default index and length GET values for the API call (/thumbnails) to get the
+// thumbnails from index to length.
 // Afterwards these variables are made available to the Layout via TemplateVariables.Local
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		err := r.ParseForm()
-		if err != nil {
-			internalServerError(w, err)
-			return
-		}
-		if len(r.PostForm) > 0 {
-			for _, value := range r.PostForm {
-				data := api.AddOrderListEntryReqData{ImageName: value[0]}
-
-				req, err := NewPostRequest("addOrderListEntry", data)
-				if err != nil {
-					internalServerError(w, err)
-					return
-				}
-
-				var res api.AddOrderListEntryResData
-				err = CallApi(r, req, &res)
-				if err != nil {
-					badRequest(w, err)
-					return
-				}
-			}
-			http.Redirect(w, r, "/order-list", http.StatusFound)
-			return
-		}
+		AddOrderListEntries(w, r)
 	}
 	query := r.URL.Query()
 	index := query.Get("index")
@@ -246,73 +230,33 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	Layout(w, r, res, local)
 }
 
-// TODO: Jones: Documentation
-// TODO: Jones: Test
-
+// The OrderListHandler handles many functions of the view "/order-list".
+// If the request method is POST the order list entries are updated
+// If the request query contains different parameters the chosen image will be removed or the complete order list will
+// be deleted or the order list is downloaded as a .zip file.
+// When no error is thrown it gets the order list of the current user and returns it's corresponding html file
 func OrderListHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		// update order list entry
-		numberOfPrints, err := strconv.Atoi(r.FormValue("numberOfPrints"))
-		if err != nil {
-			numberOfPrints = 1
-		}
-		data := api.ChangeOrderListEntryReqData{
-			ImageName:      r.FormValue("imageName"),
-			Format:         r.FormValue("format"),
-			NumberOfPrints: numberOfPrints,
-		}
-
-		req, err := NewPostRequest("changeOrderListEntry", data)
-		if err != nil {
-			internalServerError(w, err)
-			return
-		}
-
-		var res api.ChangeOrderListEntryResData
-		err = CallApi(r, req, &res)
-		if err != nil {
-			badRequest(w, err)
-			return
-		}
+		UpdateOrderListEntry(w, r)
 	}
 
 	query := r.URL.Query()
 	imageToRemove := query.Get("ImageToRemove")
 	// remove image from order list
 	if imageToRemove != "" {
-		data := api.RemoveOrderListEntryReqData{ImageName: imageToRemove}
-		req, err := NewPostRequest("removeOrderListEntry", data)
-		if err != nil {
-			internalServerError(w, err)
-			return
-		}
-
-		var res api.RemoveOrderListEntryResData
-		err = CallApi(r, req, &res)
-		if err != nil {
-			badRequest(w, err)
-			return
-		}
-
-		http.Redirect(w, r, "/order-list", http.StatusFound)
+		RemoveOrderListEntry(w, r, imageToRemove)
 	}
 
 	deleteOrderList := query.Get("deleteOrderList")
+	// remove all entries from order list
 	if deleteOrderList == "1" {
-		req, err := NewPostRequest("deleteOrderList", nil)
-		if err != nil {
-			internalServerError(w, err)
-			return
-		}
+		DeleteOrderList(w, r)
+	}
 
-		var res api.DeleteOrderListResData
-		err = CallApi(r, req, &res)
-		if err != nil {
-			badRequest(w, err)
-			return
-		}
-
-		http.Redirect(w, r, "/order-list", http.StatusFound)
+	downloadOrderList := query.Get("downloadOrderList")
+	// download the order list as zip
+	if downloadOrderList == "1" {
+		DownloadOrderList(w, r)
 	}
 
 	// get order list from backend
@@ -402,7 +346,6 @@ func badRequest(w http.ResponseWriter, err error) {
 }
 
 // converts data to json bytes and passes it to NewRequest to return a new POST request
-// TODO: Jones: tests anpassen
 func NewPostRequest(url string, data interface{}) (*http.Request, error) {
 	if data == nil {
 		return NewRequest(http.MethodPost, url, nil)
@@ -417,11 +360,6 @@ func NewPostRequest(url string, data interface{}) (*http.Request, error) {
 // simple wrapper for a new GET request
 func NewGetRequest(url string) (*http.Request, error) {
 	return NewRequest(http.MethodGet, url, nil)
-}
-
-// simple wrapper for a new DELETE request
-func NewDeleteRequest(url string) (*http.Request, error) {
-	return NewRequest(http.MethodDelete, url, nil)
 }
 
 // returns a new request with the configured BackendHost as a prefix to the url

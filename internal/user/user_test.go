@@ -8,7 +8,7 @@ import (
 func TestNewUser(t *testing.T) {
 	name := "Helmut"
 	user := NewUser(name, "12345678")
-	if user.Name != name || user.password == "" {
+	if user.Name != name || user.password == "" || len(user.OrderList.Entries) > 0 {
 		t.Errorf("Creating user %v didn't work", name)
 	}
 }

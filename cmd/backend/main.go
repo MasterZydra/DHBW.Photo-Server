@@ -20,8 +20,8 @@ import (
 
 func main() {
 	// Read flags
-	port 		:= flag.Int("port", dhbwphotoserver.BackendDefaultPort, "Port the server listens on")
-	imagePath	:= flag.String("imagepath", dhbwphotoserver.DefaultImageDir, "Path of image directory")
+	port := flag.Int("port", dhbwphotoserver.BackendDefaultPort, "Port the server listens on")
+	imagePath := flag.String("imagepath", dhbwphotoserver.DefaultImageDir, "Path of image directory")
 	flag.Parse()
 
 	// Convert flags into right format
@@ -40,7 +40,7 @@ func main() {
 	// returns thumbnails from index to length of currently authenticated user
 	http.HandleFunc("/thumbnails", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		MustParam(thumbnailsHandler, http.MethodGet, "index", "length"),
+		MustParam(ThumbnailsHandler, http.MethodGet, "index", "length"),
 	))
 
 	// uploads an image to the users image folder and generates a thumbnail
@@ -159,7 +159,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 // Request a range of thumbnails. The result is a JSON object.
 // The request need to be send via the GET method and contain the parameters
 // index and length. Both parameters have to be integers.
-func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
+func ThumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ThumbnailsResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -167,6 +167,7 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -174,7 +175,7 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	index, err := strconv.Atoi(r.URL.Query().Get("index"))
 	if err != nil {
 		res.Error = "Invalid index. Index must be an Integer"
-		w.WriteHeader(http.StatusUnprocessableEntity)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -182,12 +183,11 @@ func thumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	length, err := strconv.Atoi(r.URL.Query().Get("length"))
 	if err != nil {
 		res.Error = "Invalid length. Length must be an Integer"
-		w.WriteHeader(http.StatusUnprocessableEntity)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// Load thumbnails from associated ImageManager
-
 	res.Images = GetThumbnails(strings.ToLower(username), index, length)
 	res.TotalImages = GetTotalImages(username)
 	return

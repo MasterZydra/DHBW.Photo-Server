@@ -90,15 +90,15 @@ func (im *ImageManager) GetImage(name string) *Image {
 
 // Return a pointer to an array of Image object pointer which are in the ImageManager.
 // The result Images are defined by the given start index and length.
-func (im *ImageManager) GetThumbnails(start, length int) *[]*Image {
+func (im *ImageManager) GetThumbnails(start, length int) []*Image {
 	if start >= len(im.images) {
 		// return empty array
-		return &[]*Image{}
+		return []*Image{}
 	}
 
 	end := int64(math.Min(float64(start+length), float64(len(im.images))))
 	images := im.images[start:end]
-	return &images
+	return images
 }
 
 // Returns total number of Images of current ImageManager.

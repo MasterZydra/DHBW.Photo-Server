@@ -7,8 +7,8 @@ import (
 
 // Hash image with md5 algorithm. The image needs to be a pointer to a byte array.
 // It returns a new byte array which contains the hashed result.
-func HashImage(image *[]byte) []byte {
-	hash := md5.Sum(*image)
+func HashImage(image []byte) []byte {
+	hash := md5.Sum(image)
 	return hash[:]
 }
 

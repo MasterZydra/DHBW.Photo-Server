@@ -24,7 +24,7 @@ type UploadImage struct {
 // the raw data of the image itself. It calculates the additional data like the
 // hash value.
 func NewUploadImage(name string, creationDate time.Time, raw []byte) UploadImage {
-	hash := cryptography.HashToString(cryptography.HashImage(&raw))
+	hash := cryptography.HashToString(cryptography.HashImage(raw))
 
 	var img *Image
 	// TODO CreationDate -> Wenn nicht gegeben?

@@ -1,11 +1,12 @@
 package main
 
 import (
+	"path/filepath"
 	"testing"
 )
 
 func ExampleReadJPEGsFromPath() {
-	ReadJPEGsFromPath("./")
+	ReadJPEGsFromPath("../../test/")
 	// Output:
 	// --------------
 	// Folder successfully read in
@@ -14,6 +15,15 @@ func ExampleReadJPEGsFromPath() {
 	// --------------
 	// Successfully read 1 files
 	// --------------
+}
+
+func TestReadJPEGsFromPath(t *testing.T) {
+	path := "../../test"
+	jpegs := ReadJPEGsFromPath(path)
+	// there should be one JPEG (Testbild.jpg)
+	if len(jpegs) < 1 || filepath.Base(jpegs[0].Name()) != "Testbild.jpg" {
+		t.Errorf("Error: Testbild not found")
+	}
 }
 
 func TestIsJpgCheck (t *testing.T) {

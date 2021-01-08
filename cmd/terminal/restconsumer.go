@@ -81,7 +81,6 @@ func UploadPhoto(input UserInput, img *os.File, wg *sync.WaitGroup) {
 }
 
 func UploadPhotos(input UserInput, imgs []*os.File) {
-	// TODO: test
 	wg := sync.WaitGroup{}
 	for _, img := range imgs {
 		wg.Add(1)

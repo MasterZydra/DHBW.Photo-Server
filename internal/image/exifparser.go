@@ -12,16 +12,9 @@ func parseRawExifDataFromFile(file io.Reader) ([]byte, error) {
 	// EXIF-Data is in APP1-Section
 	// Marker for APP1-Section: 0xFFE1
 	// read App1-Section data
-	app1Section, err := readSectionData(0xE1, bufio.NewReader(file))
+	var marker byte = 0xE1
+	br := bufio.NewReader(file)
 
-	if err != nil {
-		return nil, err
-	}
-
-	return app1Section, nil
-}
-
-func readSectionData (marker byte, br *bufio.Reader) ([]byte, error) {
 	// find marker in reader and go there
 	var dataLength int = 0
 	var markerFound bool = false
@@ -32,7 +25,7 @@ func readSectionData (marker byte, br *bufio.Reader) ([]byte, error) {
 		} else if c == marker {
 			// marker found
 			markerFound = true
-			// first two bytes after marker are size of APP1-Section-Data
+			// first two bytes after marker are size of APP1-Section-Data (dataLength)
 			bytes := make([]byte, 2)
 			for k, _ := range bytes {
 				c, err := br.ReadByte()
@@ -47,7 +40,6 @@ func readSectionData (marker byte, br *bufio.Reader) ([]byte, error) {
 	}
 
 	// read data
-
 	alreadyRead := 0
 	data := make([]byte, 0)
 

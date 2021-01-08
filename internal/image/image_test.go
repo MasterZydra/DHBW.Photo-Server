@@ -32,4 +32,14 @@ func TestImage_FormattedDate(t *testing.T) {
 	}
 }
 
-// Todo Missing time + Missing Seconds ...
+func TestImage_FormattedDate_Invalid(t *testing.T) {
+	expected := "01 Jan 01 00:00 UTC"
+	date, err := time.Parse(dhbwphotoserver.TimeLayout, "2020-11-20")
+	if err == nil {
+		t.Errorf("Parsing should fail, but did not")
+	}
+	img := NewImage("", date, "")
+	if img.FormattedDate() != expected {
+		t.Errorf("Expected '%v' but received '%v'", expected, img.FormattedDate())
+	}
+}

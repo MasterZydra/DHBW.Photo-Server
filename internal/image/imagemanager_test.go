@@ -11,9 +11,11 @@ import (
 	"time"
 )
 
+const testDir = "../../test"
+const testOutputDir = "../../test/output"
+
 func TestNewImageManager(t *testing.T) {
 	// Test data
-	user := "../../test"
 	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-20 14:13:43")
 	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21 23:12:24")
 	image1 := NewImage("img1", date1, "d41d8cd98f00b204e9800998ecf8427e")
@@ -24,7 +26,7 @@ func TestNewImageManager(t *testing.T) {
 	usercontent = "contentNewImageManagerTest.csv"
 
 	// Init ImageManager for given user path
-	imgMan := NewImageManager(user)
+	imgMan := NewImageManager(testDir)
 
 	if imgMan == nil {
 		t.Errorf("Something went wrong creating a ImageManager from user path")
@@ -32,7 +34,7 @@ func TestNewImageManager(t *testing.T) {
 	}
 
 	// Check if given parameter is stored in object
-	if imgMan.user != user {
+	if imgMan.user != testDir {
 		t.Errorf("Property user is not filled correctly")
 	}
 
@@ -90,13 +92,13 @@ func TestImageManager_Contains_Filename(t *testing.T) {
 func TestImageManager_Contains_WithExampleImages(t *testing.T) {
 	// Test images
 	// Read bytes of example image 1
-	raw1, err := ioutil.ReadFile("../../test/example_imgs/img1.jpg")
+	raw1, err := ioutil.ReadFile(path.Join(testDir, "example_imgs/img1.jpg"))
 	if err != nil {
 		t.Errorf("Error reading image: %v", err)
 		return
 	}
 	// Read bytes of example image 2
-	raw2, err := ioutil.ReadFile("../../test/example_imgs/img2.jpg")
+	raw2, err := ioutil.ReadFile(path.Join(testDir, "example_imgs/img2.jpg"))
 	if err != nil {
 		t.Errorf("Error reading image: %v", err)
 		return
@@ -124,22 +126,30 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 	// Test data
 	fileName := "MyImg.jpg"
 	// Read bytes of example image
-	raw, err := ioutil.ReadFile("../../test/example_imgs/img1.jpg")
+	raw, err := ioutil.ReadFile(path.Join(testDir, "example_imgs/img1.jpg"))
 	if err != nil {
 		t.Errorf("Error reading image: %v", err)
 		return
 	}
-	// Init upload image
 
+	// Clean up before running test logic
+	os.Remove(path.Join(testOutputDir, "MyImg.jpg"))
+	os.Remove(path.Join(testOutputDir, "content.csv"))
+	os.RemoveAll(path.Join(testOutputDir, thumbdir))
+
+	// Overwrite default settings
+	DHBW_Photo_Server.SetImageDir("")
+
+	// Init upload image
 	date, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-01 23:12:24")
 	upimg := NewUploadImage(fileName, date, raw)
 
 	// Add image to ImageManager
-	imgMan := ImageManager{user: "../../test/output"}
+	imgMan := ImageManager{user: testOutputDir}
 	imgMan.AddImageUpload(&upimg)
 
 	// Check if image is stored to directory
-	dir, err := os.Open("../../test/output")
+	dir, err := os.Open(testOutputDir)
 	if err != nil {
 		t.Errorf("Failed to open output folder: %v", err)
 		return
@@ -173,7 +183,7 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 	}
 
 	// Read saved image to check if raw data is equal
-	readRawImage, err := ioutil.ReadFile(path.Join("../../test/output", fileName))
+	readRawImage, err := ioutil.ReadFile(path.Join(testOutputDir, fileName))
 	if err != nil {
 		t.Errorf("Error reading saved image: %v", err)
 		return
@@ -187,7 +197,6 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 
 func TestImageManager_AddImage(t *testing.T) {
 	// Test images
-
 	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-20 23:12:24")
 	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21 15:41:20")
 	image1 := NewImage("img1", date1, "d41d8cd98f00b204e9800998ecf8427e")
@@ -245,9 +254,8 @@ func TestImageManager_Sort(t *testing.T) {
 
 func TestImageManager_GetImage(t *testing.T) {
 	// Test data
-	user := "../../test/output"
 	// Read test image
-	raw, err := util.ReadRawImage("../../test/example_imgs/img1.jpg")
+	raw, err := util.ReadRawImage(path.Join(testDir, "example_imgs/img1.jpg"))
 	if err != nil {
 		t.Errorf("Could not read example image: %v", err)
 		return
@@ -260,11 +268,11 @@ func TestImageManager_GetImage(t *testing.T) {
 	usercontent = "contentGetImageTest.csv"
 
 	// Init ImageManager
-	imgMan := NewImageManager(user)
+	imgMan := NewImageManager(testOutputDir)
 	imgMan.AddImageUpload(&upimg)
 
 	// Get image and compare raw data
-	imgManRead := NewImageManager(user)
+	imgManRead := NewImageManager(testOutputDir)
 	readimg := imgManRead.GetImage("img1.jpg")
 	if readimg.Name != "img1.jpg" || readimg.hash != upimg.hash {
 		t.Errorf("Image from GetImage is not equal to stored image")
@@ -278,15 +286,12 @@ func TestImageManager_GetImage(t *testing.T) {
 }
 
 func TestImageManager_TotalImages(t *testing.T) {
-	// Test data
-	user := "../../test"
-
 	// Overwrite output file name
 	DHBW_Photo_Server.SetImageDir("")
 	usercontent = "contentNewImageManagerTest.csv"
 
 	// Init ImageManager for given user path
-	imgMan := NewImageManager(user)
+	imgMan := NewImageManager(testDir)
 	totalImages := imgMan.TotalImages()
 
 	if totalImages != 2 {
@@ -294,5 +299,25 @@ func TestImageManager_TotalImages(t *testing.T) {
 	}
 }
 
-// ToDo Test GetImage
-// ToDo Test GetThumbnail
+func TestImageManager_GetThumbnails(t *testing.T) {
+	// Overwrite output file name
+	DHBW_Photo_Server.SetImageDir("")
+	usercontent = "contentLongList.csv"
+
+	// Init ImageManager
+	imgMan := NewImageManager(testDir)
+
+	// Test 0 to 4
+	thumbs := imgMan.GetThumbnails(0, 5)
+	if thumbs[0] != imgMan.images[0] || thumbs[1] != imgMan.images[1] || thumbs[2] != imgMan.images[2] || thumbs[3] != imgMan.images[3] || thumbs[4] != imgMan.images[4] ||
+		len(thumbs) != 5 {
+		t.Errorf("False thumbnails returned (1)")
+	}
+
+	// Test last ones
+	thumbs = imgMan.GetThumbnails(6, 5)
+	if thumbs[0] != imgMan.images[6] || thumbs[1] != imgMan.images[7] || thumbs[2] != imgMan.images[8] ||
+		len(thumbs) != 3 {
+		t.Errorf("False thumbnails returned (2)")
+	}
+}

@@ -24,7 +24,6 @@ func TestUsernameValidation (t *testing.T) {
 }
 
 func TestHostValidation (t *testing.T) {
-	// TODO: implement
 	allowedHosts := [3]string{"localhost:8080", "https://localhost:4443", "http://192.168.2.162:8888/"}
 	forbiddenHosts := [3]string{"localhost", "1234", "192.168.2.162"}
 
@@ -43,4 +42,12 @@ func TestHostValidation (t *testing.T) {
 			t.Error("Error while validating forbidden host '" + host + "'")
 		}
 	}
+}
+
+func ExampleWriteMessage() {
+	WriteMessage("Test message")
+	// Output:
+	// --------------
+	// Test message
+	// --------------
 }

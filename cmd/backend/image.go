@@ -36,7 +36,7 @@ func GetImage(username, imagename string) *image.Image {
 
 func GetThumbnails(username string, start, length int) []*image.Image {
 	imgman := getImageManager(username)
-	return *imgman.GetThumbnails(start, length)
+	return imgman.GetThumbnails(start, length)
 }
 
 func GetTotalImages(username string) int {

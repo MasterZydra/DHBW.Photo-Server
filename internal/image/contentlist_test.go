@@ -9,7 +9,6 @@ import (
 )
 
 func TestReadContent(t *testing.T) {
-	user := "../../test"
 	// Test images
 	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-20 06:30:02")
 	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21 08:35:59")
@@ -21,8 +20,8 @@ func TestReadContent(t *testing.T) {
 	usercontent = "contentReadTest.csv"
 
 	// Read content file
-	readImages := ReadContent(user)
-	if readImages == nil || len(readImages.images) != 2 || readImages.user != user {
+	readImages := ReadContent(testDir)
+	if readImages == nil || len(readImages.images) != 2 || readImages.user != testDir {
 		t.Errorf("File was not read correctly")
 		return
 	}
@@ -62,7 +61,6 @@ func TestReadContent_FileNotExist(t *testing.T) {
 }
 
 func TestWriteContent(t *testing.T) {
-	user := "../../test/output"
 	// Test images
 	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-02 13:14:15")
 	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-01-01 13:30:16")
@@ -74,16 +72,16 @@ func TestWriteContent(t *testing.T) {
 	usercontent = "contentWriteTest.csv"
 
 	// Clean up
-	os.Remove(path.Join(user, usercontent))
+	os.Remove(path.Join(testOutputDir, usercontent))
 
 	// Creat new image manager, fill it with images and write that data
 	imgman := ImageManager{}
 	imgman.AddImage(image1)
 	imgman.AddImage(image2)
-	WriteContent(user, &imgman)
+	WriteContent(testOutputDir, &imgman)
 
 	// Read file again
-	readImages := ReadContent(user)
+	readImages := ReadContent(testOutputDir)
 	if readImages == nil {
 		t.Errorf("Written file could not be read")
 		return

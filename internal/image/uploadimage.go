@@ -24,9 +24,21 @@ type UploadImage struct {
 // the raw data of the image itself. It calculates the additional data like the
 // hash value.
 func NewUploadImage(name string, creationDate time.Time, raw []byte) UploadImage {
-	hash := cryptography.HashToString(cryptography.HashImage(&raw))
-	// ToDo Read Exif -> if no date use given creationdate
-	img := NewImage(name, creationDate, hash)
+	hash := cryptography.HashToString(cryptography.HashImage(raw))
+
+	var img *Image
+	// TODO CreationDate -> Wenn nicht gegeben?
+	exifData, err := parseRawExifDataFromFile(bytes.NewReader(raw))
+	if err != nil {
+		// Error stuff
+	}
+	exifDate, err := time.Parse(dhbwphotoserver.TimeLayout, string(getDateFromData(exifData)))
+	if err != nil {
+		img = NewImage(name, creationDate, hash)
+	} else {
+		img = NewImage(name, exifDate, hash)
+	}
+
 	return UploadImage{Image: *img, Raw: raw}
 }
 

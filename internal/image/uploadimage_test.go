@@ -17,17 +17,14 @@ func TestNewUploadImage(t *testing.T) {
 		t.Errorf("Error reading image: %v", err)
 		return
 	}
-
 	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-12-12 13:12:15")
 
 	// Create image
 	img := NewUploadImage("myImage.jpg", date, raw)
-
 	// Check struct content
 	if img.Name != "myImage.jpg" ||
 		img.hash != "fe430f8f373ec2abd6880bfdaebcd9ae" ||
-		// ToDo Add check for correct date + Example with image without exif creation date
-		//img.Date.Format("2006-01-02") != "2020-12-12" ||
+		img.FormattedDate() != "22 Jun 17 21:13 UTC" ||
 		bytes.Compare(img.Raw, raw) != 0 {
 		t.Errorf("UploadImage content does not match with given data")
 	}

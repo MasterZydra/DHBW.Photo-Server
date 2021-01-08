@@ -4,12 +4,31 @@ import (
 	DHBW_Photo_Server "DHBW.Photo-Server"
 	"DHBW.Photo-Server/internal/api"
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
+
+func resetUsersFile() {
+	csvFile, err := os.Create(DHBW_Photo_Server.UsersFile())
+	if err != nil {
+		log.Fatal(err)
+	}
+	csvWriter := csv.NewWriter(csvFile)
+	var data = [][]string{
+		{DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw1Hash},
+		{DHBW_Photo_Server.User2Name, DHBW_Photo_Server.Pw2Hash},
+	}
+	err = csvWriter.WriteAll(data)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func createServer(f http.HandlerFunc) *httptest.Server {
 	return httptest.NewServer(f)
@@ -77,6 +96,9 @@ func TestMustParamWithGetParams(t *testing.T) {
 }
 
 func TestRegisterHandler(t *testing.T) {
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
+	resetUsersFile()
+	defer resetUsersFile()
 	server := createServer(func(w http.ResponseWriter, r *http.Request) {
 		RegisterHandler(w, r)
 	})

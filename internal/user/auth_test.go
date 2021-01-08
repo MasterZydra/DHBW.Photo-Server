@@ -149,7 +149,7 @@ func TestFileServerWrapperWithWrongPassword(t *testing.T) {
 }
 
 func TestAuthenticateHandlerWithoutPassword(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	server := createFileServer(AuthHandler())
 	defer server.Close()
 

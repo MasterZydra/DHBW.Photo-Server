@@ -16,8 +16,8 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
-	usersFile = DHBW_Photo_Server.TestUserFile
-	csvFile, err := os.Create(usersFile)
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
+	csvFile, err := os.Create(DHBW_Photo_Server.UsersFile())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,17 +33,17 @@ func setup() {
 }
 
 func TestNewUsersManager(t *testing.T) {
-	usersFile = DHBW_Photo_Server.ProdUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.ProdUsersFile)
 	um1 := NewUserManager()
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um2 := NewUserManager()
-	if um1.UsersFile != DHBW_Photo_Server.ProdUserFile || um2.UsersFile != DHBW_Photo_Server.TestUserFile {
+	if um1.UsersFile != DHBW_Photo_Server.ProdUsersFile || um2.UsersFile != DHBW_Photo_Server.TestUsersFile {
 		t.Error("At least one users file is not correct in the usermanager")
 	}
 }
 
 func TestAddUserCount(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	usersCountBefore := len(um.Users)
@@ -57,7 +57,7 @@ func TestAddUserCount(t *testing.T) {
 	}
 }
 func TestAddUserContent(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	newUser := NewUser("manuela", "testPW")
@@ -69,7 +69,7 @@ func TestAddUserContent(t *testing.T) {
 }
 
 func TestLoadUsersCount(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	usersCountBefore := len(um.Users)
 	_ = um.LoadUsers()
@@ -79,7 +79,7 @@ func TestLoadUsersCount(t *testing.T) {
 }
 
 func TestLoadUsersContent(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	max := um.Users[0]
@@ -90,8 +90,7 @@ func TestLoadUsersContent(t *testing.T) {
 }
 
 func TestLoadUsersWrongFile(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
-	usersFile = "wrongfile.csv"
+	DHBW_Photo_Server.SetUsersFile("wrongfile.csv")
 	um := NewUserManager()
 	err := um.LoadUsers()
 	if err == nil {
@@ -100,7 +99,7 @@ func TestLoadUsersWrongFile(t *testing.T) {
 }
 
 func TestLoadUsersMultiple(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	usersCountBetween := len(um.Users)
@@ -111,7 +110,7 @@ func TestLoadUsersMultiple(t *testing.T) {
 }
 
 func TestUsersManager_GetUserSuccess(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	max := um.GetUser(DHBW_Photo_Server.User1Name)
@@ -121,7 +120,7 @@ func TestUsersManager_GetUserSuccess(t *testing.T) {
 }
 
 func TestUsersManager_GetUserFail(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	username := "unknownUser"
@@ -132,7 +131,7 @@ func TestUsersManager_GetUserFail(t *testing.T) {
 }
 
 func TestStoreUsers(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	usersCountBefore := len(um.Users)
@@ -146,7 +145,7 @@ func TestStoreUsers(t *testing.T) {
 }
 
 func TestUsersManager_UserExistsTrue(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	exists := um.UserExists(DHBW_Photo_Server.User1Name)
@@ -166,7 +165,7 @@ func TestUsersManager_UserExistsFalse(t *testing.T) {
 }
 
 func TestRegister(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	err := um.Register("robert", "1234")
@@ -176,7 +175,7 @@ func TestRegister(t *testing.T) {
 }
 
 func TestUsersManager_RegisterWrongUsername(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	err := um.Register("robert*", "1234")
@@ -186,7 +185,7 @@ func TestUsersManager_RegisterWrongUsername(t *testing.T) {
 }
 
 func TestUsersManager_RegisterExistingUser(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	err := um.Register(DHBW_Photo_Server.User1Name, "0987")
@@ -196,7 +195,7 @@ func TestUsersManager_RegisterExistingUser(t *testing.T) {
 }
 
 func TestUsersManager_AuthenticateCorrect(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	ok := um.Authenticate(DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw1Clear)
@@ -206,7 +205,7 @@ func TestUsersManager_AuthenticateCorrect(t *testing.T) {
 }
 
 func TestUsersManager_AuthenticateWrongUser(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	ok := um.Authenticate("wrongUserName", DHBW_Photo_Server.Pw1Clear)
@@ -216,7 +215,7 @@ func TestUsersManager_AuthenticateWrongUser(t *testing.T) {
 }
 
 func TestUsersManager_AuthenticateWrongPW(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	um := NewUserManager()
 	_ = um.LoadUsers()
 	ok := um.Authenticate(DHBW_Photo_Server.User1Name, DHBW_Photo_Server.Pw2Clear)

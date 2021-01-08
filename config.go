@@ -7,9 +7,9 @@ import (
 
 const (
 	// Image folder configuration
-	DefaultImageDir    = "images" // absolut oder relativ zum Working Directory
-	ThumbDir    = "previews"
-	UserContent = "content.csv"
+	DefaultImageDir = "images" // absolut oder relativ zum Working Directory
+	ThumbDir        = "previews"
+	UserContent     = "content.csv"
 
 	// Default values for server configurations
 	BackendDefaultPort = 3000
@@ -17,8 +17,8 @@ const (
 	WebDefaultPort     = 4443
 
 	// userfiles
-	TestUserFile = "../../test/usersFile_test.csv"
-	ProdUserFile = "usersFile.csv"
+	TestUsersFile = "../../test/usersFile_test.csv"
+	ProdUsersFile = "usersFile.csv"
 
 	// user1
 	User1Name = "Max"
@@ -52,4 +52,14 @@ func SetImageDir(image string) {
 
 func ImageDir() string {
 	return strings.Trim(strings.Trim(imageDir, "/"), string(os.PathSeparator))
+}
+
+var usersFile = ProdUsersFile
+
+func SetUsersFile(file string) {
+	usersFile = file
+}
+
+func UsersFile() string {
+	return usersFile
 }

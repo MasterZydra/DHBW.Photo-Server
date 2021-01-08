@@ -16,13 +16,10 @@ type UserManager struct {
 	UsersFile string
 }
 
-// define default usersFile (is changed in tests)
-var usersFile = DHBW_Photo_Server.ProdUserFile
-
 // create a new UserManager with the default usersFile and return a pointer to it
 func NewUserManager() *UserManager {
 	return &UserManager{
-		UsersFile: usersFile,
+		UsersFile: DHBW_Photo_Server.UsersFile(),
 	}
 }
 

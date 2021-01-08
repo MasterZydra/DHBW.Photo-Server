@@ -6,7 +6,7 @@ import (
 )
 
 func TestUserManagerCacheNew(t *testing.T) {
-	usersFile = DHBW_Photo_Server.TestUserFile
+	DHBW_Photo_Server.SetUsersFile(DHBW_Photo_Server.TestUsersFile)
 	userManager = nil
 	userManagerBefore := userManager
 	newUserManager := UserManagerCache()
@@ -16,10 +16,10 @@ func TestUserManagerCacheNew(t *testing.T) {
 }
 
 func TestUserManagerCacheExists(t *testing.T) {
-	usersFile = "someweirdfile.csv"
+	DHBW_Photo_Server.SetUsersFile("somenonexistingcsv.csv")
 	userManager = NewUserManager()
 	newUserManager := UserManagerCache()
-	if newUserManager.UsersFile != usersFile {
+	if newUserManager.UsersFile != DHBW_Photo_Server.UsersFile() {
 		t.Error("Something went wrong while getting existing UserManager")
 	}
 }

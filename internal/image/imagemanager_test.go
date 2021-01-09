@@ -191,8 +191,6 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 	if bytes.Compare(raw, readRawImage) != 0 {
 		t.Errorf("Writen and read image raw data is not equal")
 	}
-
-	// ToDo Test if image is in content file
 }
 
 func TestImageManager_AddImage(t *testing.T) {
@@ -314,10 +312,16 @@ func TestImageManager_GetThumbnails(t *testing.T) {
 		t.Errorf("False thumbnails returned (1)")
 	}
 
-	// Test last ones
+	// Test latest ones
 	thumbs = imgMan.GetThumbnails(6, 5)
 	if thumbs[0] != imgMan.images[6] || thumbs[1] != imgMan.images[7] || thumbs[2] != imgMan.images[8] ||
 		len(thumbs) != 3 {
 		t.Errorf("False thumbnails returned (2)")
+	}
+
+	// Test if start index is to big
+	thumbs = imgMan.GetThumbnails(100, 5)
+	if len(thumbs) != 0 {
+		t.Errorf("Returned thumbnails even if start index is greater then the highest index")
 	}
 }

@@ -42,7 +42,7 @@
                 <a href="home?index={{.Local.Index}}&length=50">50</a>
             </div>
             {{if le (add .Local.Index .Local.Length) .Result.TotalImages}}
-                <a href="/home?index={{.Local.Length}}&length={{.Local.Length}}">Nächste Seite ></a>
+                <a href="/home?index={{add .Local.Length .Local.Index}}&length={{.Local.Length}}">Nächste Seite ></a>
             {{else}}
                 <span>&nbsp;</span>
             {{end}}

@@ -60,10 +60,7 @@ JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
   1. Ein Bild pro Aufruf (als Base64)
   2. Bild als Base64 -> Mehrere Bilder, da nur von A-Z, "/" und "+"
   
-**Aufgabenverteilung**  
-- Webserver:
-  - Bestellung von Fotos (Jones)
-    - Tests
+**Aufgabenverteilung**
 - Backend:
    - Konfigurierbarkeit durch Flags (David)
       - Beide - Image directory path (hier kommen Benutzerordner hin)

@@ -102,7 +102,7 @@ func ExampleUploadPhotoErrorDoingReq()  {
 	// --------------
 	// Successfully read 1 files
 	// --------------
-	// Post "/upload": unsupported protocol scheme ""
+	// Post /upload: unsupported protocol scheme ""
 }
 
 func ExampleUploadPhotoInvalidJsonRes() {

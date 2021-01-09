@@ -17,10 +17,6 @@ func TestNewImage(t *testing.T) {
 	}
 }
 
-func TestNewImage_Invalid(t *testing.T) {
-	// ToDo Implement
-}
-
 func TestImage_FormattedDate(t *testing.T) {
 	expected := "21 Nov 20 13:14 UTC"
 	date, _ := time.Parse(dhbwphotoserver.TimeLayout, "2020-11-21 13:14:15")

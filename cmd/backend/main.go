@@ -232,6 +232,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// TODO: Jones: tests
 // ATTENTION!
 // There are NO TESTS for this function because this API endpoint would be used for the comment feature which is not implemented.
 // Request details to an image. The result is a JSON object.

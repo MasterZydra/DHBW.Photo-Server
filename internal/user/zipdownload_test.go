@@ -10,7 +10,7 @@ import (
 )
 
 func TestCreateOrderListZipFile(t *testing.T) {
-	usr := NewUser("Max", "12345678")
+	usr := NewUser("max", "12345678")
 	date1, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21 08:35:59")
 	date2, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21 08:35:59")
 	img1 := image.NewImage("img1.jpg", date1, "d41d8cd98f00b204e9800998ecf8427e")
@@ -18,8 +18,8 @@ func TestCreateOrderListZipFile(t *testing.T) {
 	_ = usr.OrderList.AddOrderEntry(img1)
 	_ = usr.OrderList.AddOrderEntry(img2)
 
-	imageDir = "../../test/example_imgs"
-	zipFileName := filepath.Join(imageDir, usr.Name, "download.zip")
+	DHBW_Photo_Server.SetImageDir("../../test/example_imgs")
+	zipFileName := filepath.Join(DHBW_Photo_Server.ImageDir(), usr.Name, "download.zip")
 	err := CreateOrderListZipFile(zipFileName, usr.Name, usr.OrderList)
 	defer os.Remove(zipFileName)
 
@@ -31,13 +31,13 @@ func TestCreateOrderListZipFile(t *testing.T) {
 }
 
 func TestCreateOrderListZipFileInvalidImage(t *testing.T) {
-	usr := NewUser("Max", "12345678")
+	usr := NewUser("max", "12345678")
 	date, _ := time.Parse(DHBW_Photo_Server.TimeLayout, "2020-11-21 08:35:59")
 	img := image.NewImage("invalidfile.jpg", date, "d41d8cd98f00b204e9800998ecf8427e")
 	_ = usr.OrderList.AddOrderEntry(img)
 
-	imageDir = "../../test/example_imgs"
-	zipFileName := filepath.Join(imageDir, usr.Name, "download.zip")
+	DHBW_Photo_Server.SetImageDir("../../test/example_imgs")
+	zipFileName := filepath.Join(DHBW_Photo_Server.ImageDir(), usr.Name, "download.zip")
 	err := CreateOrderListZipFile(zipFileName, usr.Name, usr.OrderList)
 	defer os.Remove(zipFileName)
 

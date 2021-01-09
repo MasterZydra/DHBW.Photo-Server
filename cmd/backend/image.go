@@ -25,8 +25,7 @@ func UploadImage(user string, name string, creationDate time.Time, raw []byte) e
 	if imgman.Contains(&upimg) {
 		return errors.New("Image is already stored")
 	}
-	imgman.AddImageUpload(&upimg)
-	return nil
+	return imgman.AddImageUpload(&upimg)
 }
 
 func GetImage(username, imagename string) *image.Image {

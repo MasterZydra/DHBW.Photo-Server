@@ -60,17 +60,18 @@ JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
   1. Ein Bild pro Aufruf (als Base64)
   2. Bild als Base64 -> Mehrere Bilder, da nur von A-Z, "/" und "+"
   
-**Aufgabenverteilung**  
-- Webserver:
-  - Bestellung von Fotos (Jones)
-    - Tests
+**Aufgabenverteilung**
 - Backend:
    - Konfigurierbarkeit durch Flags (David)
       - Beide - Image directory path (hier kommen Benutzerordner hin)
-   - Prüfung POST req. Param (David)
+   - Prüfung POST req. Param (David) (eher weglassen?)
 - Konsolen-API-Kommunikation + Tests (Patricia)
 - Dokumentation
+  - eigener Doku-Teil (Beiträge der Gruppenmitglieder)
+  - Architektur-Doku
+  - Klassendiagramm?
 - optionale Anforderungen
+- Matrikelnummern in alle Source-Dateien
 
 ### Anforderungen
 1. Nicht funktional

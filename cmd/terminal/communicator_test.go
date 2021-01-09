@@ -2,9 +2,9 @@ package main
 
 import "testing"
 
-func TestUsernameValidation (t *testing.T) {
-	allowedUnames := [6]string{"TestUser", "User123", "Max", "Ana", "manuela", "robert"}
-	forbiddenUnames := [6]string{"%TestUser%", "_User123_", "#Max", "(Ana)", "<manuela>", "!robert!"}
+func TestUsernameValidation(t *testing.T) {
+	allowedUnames := [6]string{"TestUser", "User123", "max", "ana", "manuela", "robert"}
+	forbiddenUnames := [6]string{"%TestUser%", "_User123_", "#max", "(ana)", "<manuela>", "!robert!"}
 
 	for _, name := range allowedUnames {
 		err := validateUsername(name)
@@ -23,7 +23,7 @@ func TestUsernameValidation (t *testing.T) {
 	}
 }
 
-func TestHostValidation (t *testing.T) {
+func TestHostValidation(t *testing.T) {
 	allowedHosts := [3]string{"localhost:8080", "https://localhost:4443", "http://192.168.2.162:8888/"}
 	forbiddenHosts := [3]string{"localhost", "1234", "192.168.2.162"}
 

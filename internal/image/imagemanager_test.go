@@ -133,9 +133,9 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 	}
 
 	// Clean up before running test logic
-	os.Remove(path.Join(testOutputDir, "MyImg.jpg"))
-	os.Remove(path.Join(testOutputDir, "content.csv"))
-	os.RemoveAll(path.Join(testOutputDir, thumbdir))
+	_ = os.Remove(path.Join(testOutputDir, "MyImg.jpg"))
+	_ = os.Remove(path.Join(testOutputDir, "content.csv"))
+	_ = os.RemoveAll(path.Join(testOutputDir, thumbdir))
 
 	// Overwrite default settings
 	DHBW_Photo_Server.SetImageDir("")
@@ -146,7 +146,7 @@ func TestImageManager_AddImageUpload(t *testing.T) {
 
 	// Add image to ImageManager
 	imgMan := ImageManager{user: testOutputDir}
-	imgMan.AddImageUpload(&upimg)
+	_ = imgMan.AddImageUpload(&upimg)
 
 	// Check if image is stored to directory
 	dir, err := os.Open(testOutputDir)
@@ -267,7 +267,7 @@ func TestImageManager_GetImage(t *testing.T) {
 
 	// Init ImageManager
 	imgMan := NewImageManager(testOutputDir)
-	imgMan.AddImageUpload(&upimg)
+	_ = imgMan.AddImageUpload(&upimg)
 
 	// Get image and compare raw data
 	imgManRead := NewImageManager(testOutputDir)

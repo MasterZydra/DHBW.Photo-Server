@@ -1,7 +1,6 @@
 package image
 
 import (
-	"fmt"
 	"math"
 	"sort"
 	"strings"
@@ -40,18 +39,18 @@ func (im *ImageManager) Contains(image *UploadImage) bool {
 // The UploadImage will be stored in the associated user directory.
 // The image will also be added to the Image array and stored in the content
 // file.
-func (im *ImageManager) AddImageUpload(image *UploadImage) {
+func (im *ImageManager) AddImageUpload(image *UploadImage) error {
 	// Set path to user directory
 	image.SetUserPath(im.user)
 	// Store file to disk
 	err := image.SaveImageToDisk()
 	if err != nil {
-		fmt.Errorf("error saving image to disk: %v", err)
+		return err
 	}
 	// Store thumbnail to disk
 	err = image.GenerateAndSaveThumbnailToDisk()
 	if err != nil {
-		fmt.Errorf("error saving image to disk: %v", err)
+		return err
 	}
 	// Add file to image array
 	im.AddImage(&image.Image)
@@ -59,8 +58,9 @@ func (im *ImageManager) AddImageUpload(image *UploadImage) {
 	im.sort()
 	err = WriteContent(im.user, im)
 	if err != nil {
-		fmt.Errorf("error saving content file: %v", err)
+		return err
 	}
+	return nil
 }
 
 // Add an Image object to the Image array.

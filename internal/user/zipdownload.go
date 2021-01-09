@@ -16,8 +16,6 @@ type Metadata struct {
 	NumberOfPrints int
 }
 
-var imageDir = DHBW_Photo_Server.ImageDir()
-
 // Creates a new zip file named from the passed zipFileName string.
 // With the passed username the users image file path root is defined and then it loops over the passed orderList and
 // executes addFileToZip for each image file.
@@ -34,7 +32,7 @@ func CreateOrderListZipFile(zipFileName string, username string, orderList *Orde
 
 	var metadata []Metadata
 
-	usersImageRoot := filepath.Join(imageDir, username)
+	usersImageRoot := filepath.Join(DHBW_Photo_Server.ImageDir(), username)
 	// for each order list entry add the corresponding image file to zip
 	for _, entry := range orderList.Entries {
 		imagePath := filepath.Join(usersImageRoot, entry.Image.Name)

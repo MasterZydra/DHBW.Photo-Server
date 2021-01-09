@@ -46,7 +46,7 @@ func main() {
 	// uploads an image to the users image folder and generates a thumbnail
 	http.HandleFunc("/upload", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		MustParam(uploadHandler, http.MethodPost),
+		MustParam(UploadHandler, http.MethodPost),
 	))
 
 	// returns one image object with it's information
@@ -58,37 +58,37 @@ func main() {
 	// GET request that returns all order list entries
 	http.HandleFunc("/orderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		MustParam(orderListEntryHandler, http.MethodGet),
+		MustParam(OrderListEntryHandler, http.MethodGet),
 	))
 
 	// adds a new entry to the order list of the current user with the passed ImageName
 	http.HandleFunc("/addOrderListEntry", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		MustParam(addOrderListEntryHandler, http.MethodPost),
+		MustParam(AddOrderListEntryHandler, http.MethodPost),
 	))
 
 	// change parameter of a order list entry (e.g. Format or NumberOfPrints
 	http.HandleFunc("/changeOrderListEntry", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		MustParam(changeOrderListEntryHandler, http.MethodPost),
+		MustParam(ChangeOrderListEntryHandler, http.MethodPost),
 	))
 
 	// remove a entry from the order list of the current user
 	http.HandleFunc("/removeOrderListEntry", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		MustParam(removeOrderListEntryHandler, http.MethodPost),
+		MustParam(RemoveOrderListEntryHandler, http.MethodPost),
 	))
 
 	// delete the complete order list
 	http.HandleFunc("/deleteOrderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		MustParam(deleteOrderListHandler, http.MethodPost),
+		MustParam(DeleteOrderListHandler, http.MethodPost),
 	))
 
 	// download the current order list as a zip file with a content.json containing it's metadata
 	http.HandleFunc("/downloadOrderList", user.AuthHandlerWrapper(
 		user.AuthHandler(),
-		MustParam(downloadOrderList, http.MethodGet),
+		MustParam(DownloadOrderList, http.MethodGet),
 	))
 
 	log.Println("backend listening on https://localhost:" + portStr)
@@ -195,7 +195,7 @@ func ThumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 
 // Upload a new image. The image has to be base64 encoded in the JSON struct.
 // The name of the image and the creation date will also be sent via the JSON struct.
-func uploadHandler(w http.ResponseWriter, r *http.Request) {
+func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.UploadResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -212,6 +212,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	username, _, ok := r.BasicAuth()
 	if !ok {
 		res.Error = "Could not get username"
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -227,10 +228,12 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		res.Error = err.Error()
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
-	w.WriteHeader(http.StatusOK)
 }
 
+// ATTENTION!
+// There are NO TESTS for this function because this API endpoint would be used for the comment feature which is not implemented.
 // Request details to an image. The result is a JSON object.
 // The request need to be send via the GET method and contain the parameter name which is the file name.
 func imageHandler(w http.ResponseWriter, r *http.Request) {
@@ -253,10 +256,8 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-// TODO: Jones: Tests
-
 // Gets all order list entries and writes it in OrderListResData.OrderList
-func orderListEntryHandler(w http.ResponseWriter, r *http.Request) {
+func OrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.OrderListResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -274,7 +275,7 @@ func orderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // API endpoint for adding a new order list entry by passing a name of an image
-func addOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
+func AddOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.AddOrderListEntryResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -313,7 +314,7 @@ func addOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Removes a specific order list entry with an imageName.
-func removeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
+func RemoveOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.RemoveOrderListEntryResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -345,7 +346,7 @@ func removeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Modifies the Format and NumberOfPrints of an order list entry.
-func changeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
+func ChangeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ChangeOrderListEntryResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -379,7 +380,7 @@ func changeOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Empties the complete order list array of the current user
-func deleteOrderListHandler(w http.ResponseWriter, r *http.Request) {
+func DeleteOrderListHandler(w http.ResponseWriter, r *http.Request) {
 	var res api.ChangeOrderListEntryResData
 	defer jsonUtil.EncodeResponse(w, &res)
 
@@ -397,7 +398,7 @@ func deleteOrderListHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Calls user.CreateOrderListZipFile and returns the zip files content to base64 encoded string.
-func downloadOrderList(w http.ResponseWriter, r *http.Request) {
+func DownloadOrderList(w http.ResponseWriter, r *http.Request) {
 	var res api.DownloadOrderListResData
 	defer jsonUtil.EncodeResponse(w, &res)
 

@@ -60,7 +60,7 @@ func WaitForUserInput() UserInput {
 	fmt.Print("Host of the server: ")
 	host, err := reader.ReadString('\n')
 	if err != nil {
-		log.Fatalf("Error while reading password: %v", err)
+		log.Fatalf("Error while reading host: %v", err)
 	}
 	host = strings.TrimSuffix(host, "\n")
 	// check if host is valid
@@ -73,7 +73,7 @@ func WaitForUserInput() UserInput {
 	fmt.Print("Path of the folder with the photos: ")
 	path, err := reader.ReadString('\n')
 	if err != nil {
-		log.Fatalf("Error while reading password: %v", err)
+		log.Fatalf("Error while reading path: %v", err)
 	}
 	path = strings.TrimSuffix(path, "\n")
 
@@ -107,4 +107,23 @@ func validateHost(host string) error {
 func WriteMessage(msg string) {
 	separator := "\n--------------\n"
 	fmt.Print(separator, msg, separator)
+}
+
+func UploadAnotherFolder() bool {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Do you want to upload another folder? (y/n)")
+	answer, _, _ := reader.ReadRune()
+	return string(answer) == "y"
+}
+
+func EnterNewPath() string {
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Print("Path of the folder with the photos: ")
+	path, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatalf("Error while reading path: %v", err)
+	}
+	path = strings.TrimSuffix(path, "\n")
+	return path
 }

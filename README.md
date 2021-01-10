@@ -65,8 +65,6 @@ JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
   - eigener Doku-Teil (Beiträge der Gruppenmitglieder)
   - Architektur-Doku
   - Systemdiagramm (David)
-  - Klassendiagramm (Jones)
-- Matrikelnummern in alle Source-Dateien (Ist das nicht durch den Einseiter zum eigenen Beitrag erledigt?)
 
 ### Anforderungen
 1. Nicht funktional

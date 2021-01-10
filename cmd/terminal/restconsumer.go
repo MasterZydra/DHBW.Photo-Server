@@ -1,3 +1,10 @@
+/*
+ * DHBW Mosbach project of subject "Programmieren 2" from:
+ * 6439456
+ * 8093702
+ * 9752762
+ */
+
 package main
 
 import (
@@ -45,7 +52,7 @@ func UploadPhoto(input UserInput, img *os.File, wg *sync.WaitGroup) {
 	// create a new request with method POST
 	// the url is the host entered by the user linked to the endpoint /upload
 	// as body the json encoded data is set
-	req, err := http.NewRequest("POST", input.Host + "/upload", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest("POST", input.Host+"/upload", bytes.NewBuffer(jsonData))
 	if err != nil {
 		fmt.Println(err)
 		wg.Done()

@@ -1,3 +1,10 @@
+/*
+ * DHBW Mosbach project of subject "Programmieren 2" from:
+ * 6439456
+ * 8093702
+ * 9752762
+ */
+
 package image
 
 import (
@@ -25,7 +32,7 @@ func GenerateThumbnail(original image.Image, width int) image.Image {
 	stepSize := int(math.Round(float64(imgWidth) / float64(width)))
 
 	// Create a new empty RGBA image with reduced size
-	thumbnail := image.NewRGBA(image.Rect(0,0, imgWidth / stepSize, imgHeight / stepSize))
+	thumbnail := image.NewRGBA(image.Rect(0, 0, imgWidth/stepSize, imgHeight/stepSize))
 	// Iterate through every pixel of the new image and assign the responding pixel of the original image
 	for y := 0; ; y++ {
 		// Calculate yPos once for all x in that row
@@ -33,9 +40,9 @@ func GenerateThumbnail(original image.Image, width int) image.Image {
 		if yPos >= imgHeight {
 			break
 		}
-		for x := 0; stepSize * x < imgWidth; x++ {
+		for x := 0; stepSize*x < imgWidth; x++ {
 			// Use Pixel struct to convert the result of the RGBA() func into a color.RGBA object
-			thumbnail.SetRGBA(x, y, NewPixel(original.At(stepSize * x, yPos).RGBA()).GetColorRGBA())
+			thumbnail.SetRGBA(x, y, NewPixel(original.At(stepSize*x, yPos).RGBA()).GetColorRGBA())
 		}
 	}
 	return thumbnail

@@ -1,3 +1,10 @@
+/*
+ * DHBW Mosbach project of subject "Programmieren 2" from:
+ * 6439456
+ * 8093702
+ * 9752762
+ */
+
 package main
 
 import (
@@ -11,7 +18,7 @@ func ExampleReadJPEGsFromPath() {
 	// --------------
 	// Folder successfully read in
 	// --------------
-	// 
+	//
 	// --------------
 	// Successfully read 1 files
 	// --------------
@@ -26,7 +33,7 @@ func TestReadJPEGsFromPath(t *testing.T) {
 	}
 }
 
-func TestIsJpgCheck (t *testing.T) {
+func TestIsJpgCheck(t *testing.T) {
 	jpgFilenames := [4]string{"Test.jpg", "Image.jpeg", "Bild.jpg", "IMG_20201027_131455.jpg"}
 	otherFilenames := [4]string{"Image.png", "Test.gif", "Bild.svg", "IMG_20201027_131455.png"}
 

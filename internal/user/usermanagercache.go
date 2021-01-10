@@ -1,3 +1,10 @@
+/*
+ * DHBW Mosbach project of subject "Programmieren 2" from:
+ * 6439456
+ * 8093702
+ * 9752762
+ */
+
 package user
 
 var userManager *UserManager

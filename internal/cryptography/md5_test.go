@@ -1,3 +1,10 @@
+/*
+ * DHBW Mosbach project of subject "Programmieren 2" from:
+ * 6439456
+ * 8093702
+ * 9752762
+ */
+
 package cryptography
 
 import (
@@ -17,7 +24,7 @@ func TestHashImage(t *testing.T) {
 func TestHashToString(t *testing.T) {
 	raw := []byte{105, 4, 82, 118, 13, 169, 49, 43, 95, 62, 46, 250, 73, 161, 224, 172}
 	out := "690452760da9312b5f3e2efa49a1e0ac"
-	encoded :=  HashToString(raw)
+	encoded := HashToString(raw)
 	if encoded != out {
 		t.Errorf("HashToString(...) = %v, want %v", encoded, out)
 	}

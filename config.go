@@ -14,7 +14,7 @@ import (
 
 const (
 	// Image folder configuration
-	DefaultImageDir = "images" // absolut oder relativ zum Working Directory
+	DefaultImageDir = "images" // absolute or relative to working directory
 	ThumbDir        = "previews"
 	UserContent     = "content.csv"
 

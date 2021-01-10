@@ -1,3 +1,10 @@
+/*
+ * DHBW Mosbach project of subject "Programmieren 2" from:
+ * 6439456
+ * 8093702
+ * 9752762
+ */
+
 package util
 
 import (
@@ -9,7 +16,7 @@ import (
 
 func TestReadRawImage(t *testing.T) {
 	readcontent, err := ReadRawImage("../../test/readRawImageTest.txt")
-	if err != nil || bytes.Compare(readcontent, []byte{65,66,67,68,69,70,71,72}) != 0 {
+	if err != nil || bytes.Compare(readcontent, []byte{65, 66, 67, 68, 69, 70, 71, 72}) != 0 {
 		t.Errorf("Read content is not correct")
 	}
 

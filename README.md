@@ -61,17 +61,10 @@ JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
   2. Bild als Base64 -> Mehrere Bilder, da nur von A-Z, "/" und "+"
   
 **Aufgabenverteilung**
-- Backend:
-   - Konfigurierbarkeit durch Flags (David)
-      - Beide - Image directory path (hier kommen Benutzerordner hin)
-   - Prüfung POST req. Param (David) (eher weglassen?)
-- Konsolen-API-Kommunikation + Tests (Patricia)
 - Dokumentation
   - eigener Doku-Teil (Beiträge der Gruppenmitglieder)
   - Architektur-Doku
-  - Klassendiagramm?
-- optionale Anforderungen
-- Matrikelnummern in alle Source-Dateien
+  - Systemdiagramm (David)
 
 ### Anforderungen
 1. Nicht funktional

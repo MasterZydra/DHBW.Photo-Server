@@ -1,3 +1,10 @@
+/*
+ * DHBW Mosbach project of subject "Programmieren 2" from:
+ * 6439456
+ * 8093702
+ * 9752762
+ */
+
 package image
 
 import (
@@ -76,7 +83,7 @@ func (i *UploadImage) GenerateAndSaveThumbnailToDisk() error {
 
 	// Encode thumbnail to get byte slice and store it
 	var imageBuf bytes.Buffer
-	err = jpeg.Encode(&imageBuf,thumbnail, nil)
+	err = jpeg.Encode(&imageBuf, thumbnail, nil)
 	if err != nil {
 		return err
 	}

@@ -1,3 +1,10 @@
+/*
+ * DHBW Mosbach project of subject "Programmieren 2" from:
+ * 6439456
+ * 8093702
+ * 9752762
+ */
+
 package image
 
 import (
@@ -56,7 +63,7 @@ func parseRawExifDataFromFile(file io.Reader) ([]byte, error) {
 	return data, nil
 }
 
-func getDateFromData (data []byte) string {
+func getDateFromData(data []byte) string {
 	// DateTime Format: YYYY:MM:DD HH:MM:SS
 	dateRegex := regexp.MustCompile(`\d{4}\:(0[1-9]|1[012])\:(0[1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3]):([0-6][0-9]):([0-6][0-9])`)
 	// There are three Tags with this format in EXIF-Data: DateTime, DateTimeOriginal, DateTimeDigitized

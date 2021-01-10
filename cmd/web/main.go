@@ -3,6 +3,7 @@ package main
 import (
 	"DHBW.Photo-Server"
 	"DHBW.Photo-Server/internal/api"
+	"DHBW.Photo-Server/internal/auth"
 	"DHBW.Photo-Server/internal/user"
 	"bufio"
 	"bytes"
@@ -61,8 +62,8 @@ func main() {
 
 	// serve images directory
 	fs := http.FileServer(http.Dir(DHBW_Photo_Server.ImageDir()))
-	http.Handle("/images/", user.AuthFileServerWrapper(
-		user.AuthFileServer(),
+	http.Handle("/images/", auth.AuthFileServerWrapper(
+		auth.AuthFileServer(),
 		CacheWrapper(http.StripPrefix("/images", fs)),
 	))
 
@@ -73,9 +74,9 @@ func main() {
 	// Handlers with auth wrappers if needed
 	http.HandleFunc("/", RootHandler)
 	http.HandleFunc("/register", RegisterHandler)
-	http.HandleFunc("/home", user.AuthHandlerWrapper(user.AuthHandler(), HomeHandler))
-	http.HandleFunc("/upload", user.AuthHandlerWrapper(user.AuthHandler(), UploadHandler))
-	http.HandleFunc("/order-list", user.AuthHandlerWrapper(user.AuthHandler(), OrderListHandler))
+	http.HandleFunc("/home", auth.AuthHandlerWrapper(auth.AuthHandler(), HomeHandler))
+	http.HandleFunc("/upload", auth.AuthHandlerWrapper(auth.AuthHandler(), UploadHandler))
+	http.HandleFunc("/order-list", auth.AuthHandlerWrapper(auth.AuthHandler(), OrderListHandler))
 
 	// listen and start server
 	log.Println("web listening on https://localhost:" + portStr)

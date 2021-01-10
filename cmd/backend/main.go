@@ -1,6 +1,7 @@
 package main
 
 import (
+	"DHBW.Photo-Server/internal/auth"
 	"DHBW.Photo-Server/internal/util"
 	"encoding/base64"
 	"flag"
@@ -38,56 +39,56 @@ func main() {
 	http.HandleFunc("/register", MustParam(RegisterHandler, http.MethodPost))
 
 	// returns thumbnails from index to length of currently authenticated user
-	http.HandleFunc("/thumbnails", user.AuthHandlerWrapper(
-		user.AuthHandler(),
+	http.HandleFunc("/thumbnails", auth.AuthHandlerWrapper(
+		auth.AuthHandler(),
 		MustParam(ThumbnailsHandler, http.MethodGet, "index", "length"),
 	))
 
 	// uploads an image to the users image folder and generates a thumbnail
-	http.HandleFunc("/upload", user.AuthHandlerWrapper(
-		user.AuthHandler(),
+	http.HandleFunc("/upload", auth.AuthHandlerWrapper(
+		auth.AuthHandler(),
 		MustParam(UploadHandler, http.MethodPost),
 	))
 
 	// returns one image object with it's information
-	http.HandleFunc("/image", user.AuthHandlerWrapper(
-		user.AuthHandler(),
+	http.HandleFunc("/image", auth.AuthHandlerWrapper(
+		auth.AuthHandler(),
 		MustParam(imageHandler, http.MethodGet, "name"),
 	))
 
 	// GET request that returns all order list entries
-	http.HandleFunc("/orderList", user.AuthHandlerWrapper(
-		user.AuthHandler(),
+	http.HandleFunc("/orderList", auth.AuthHandlerWrapper(
+		auth.AuthHandler(),
 		MustParam(OrderListEntryHandler, http.MethodGet),
 	))
 
 	// adds a new entry to the order list of the current user with the passed ImageName
-	http.HandleFunc("/addOrderListEntry", user.AuthHandlerWrapper(
-		user.AuthHandler(),
+	http.HandleFunc("/addOrderListEntry", auth.AuthHandlerWrapper(
+		auth.AuthHandler(),
 		MustParam(AddOrderListEntryHandler, http.MethodPost),
 	))
 
 	// change parameter of a order list entry (e.g. Format or NumberOfPrints
-	http.HandleFunc("/changeOrderListEntry", user.AuthHandlerWrapper(
-		user.AuthHandler(),
+	http.HandleFunc("/changeOrderListEntry", auth.AuthHandlerWrapper(
+		auth.AuthHandler(),
 		MustParam(ChangeOrderListEntryHandler, http.MethodPost),
 	))
 
 	// remove a entry from the order list of the current user
-	http.HandleFunc("/removeOrderListEntry", user.AuthHandlerWrapper(
-		user.AuthHandler(),
+	http.HandleFunc("/removeOrderListEntry", auth.AuthHandlerWrapper(
+		auth.AuthHandler(),
 		MustParam(RemoveOrderListEntryHandler, http.MethodPost),
 	))
 
 	// delete the complete order list
-	http.HandleFunc("/deleteOrderList", user.AuthHandlerWrapper(
-		user.AuthHandler(),
+	http.HandleFunc("/deleteOrderList", auth.AuthHandlerWrapper(
+		auth.AuthHandler(),
 		MustParam(DeleteOrderListHandler, http.MethodPost),
 	))
 
 	// download the current order list as a zip file with a content.json containing it's metadata
-	http.HandleFunc("/downloadOrderList", user.AuthHandlerWrapper(
-		user.AuthHandler(),
+	http.HandleFunc("/downloadOrderList", auth.AuthHandlerWrapper(
+		auth.AuthHandler(),
 		MustParam(DownloadOrderList, http.MethodGet),
 	))
 

@@ -1,6 +1,7 @@
-package user
+package auth
 
 import (
+	"DHBW.Photo-Server/internal/user"
 	"net/http"
 	"strings"
 )
@@ -64,7 +65,7 @@ func AuthFileServer() AuthenticatorFunc {
 
 // Gets the imageManager from cache and executes Authenticate with the given username and password.
 func authenticate(username, password string, r *http.Request) bool {
-	um := UserManagerCache()
+	um := user.UserManagerCache()
 	ok := um.Authenticate(username, password)
 	return ok
 }

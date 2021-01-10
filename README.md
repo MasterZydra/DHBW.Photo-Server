@@ -59,12 +59,6 @@ JSON-Datei: Bild mit zugehörigen (Format, Anzahl)-Einträgen.
 - `POST` - Upload eines Fotos:  
   1. Ein Bild pro Aufruf (als Base64)
   2. Bild als Base64 -> Mehrere Bilder, da nur von A-Z, "/" und "+"
-  
-**Aufgabenverteilung**
-- Dokumentation
-  - eigener Doku-Teil (Beiträge der Gruppenmitglieder)
-  - Architektur-Doku
-  - Systemdiagramm (David)
 
 ### Anforderungen
 1. Nicht funktional

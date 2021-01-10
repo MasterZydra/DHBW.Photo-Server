@@ -23,7 +23,8 @@ func getImageManager(username string) (*image.ImageManager, error) {
 	username = strings.ToLower(username)
 	imgman, exists := imageManagers[username]
 	if !exists {
-		imgman, err := image.NewImageManager(username)
+		var err error
+		imgman, err = image.NewImageManager(username)
 		if err != nil {
 			return nil, err
 		}

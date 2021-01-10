@@ -57,11 +57,11 @@ func main() {
 		MustParam(UploadHandler, http.MethodPost),
 	))
 
-	// returns one image object with it's information
-	http.HandleFunc("/image", auth.AuthHandlerWrapper(
-		auth.AuthHandler(),
-		MustParam(imageHandler, http.MethodGet, "name"),
-	))
+	// returns one image object with it's information (unused: more information down below)
+	//http.HandleFunc("/image", auth.AuthHandlerWrapper(
+	//	auth.AuthHandler(),
+	//	MustParam(imageHandler, http.MethodGet, "name"),
+	//))
 
 	// GET request that returns all order list entries
 	http.HandleFunc("/orderList", auth.AuthHandlerWrapper(
@@ -251,32 +251,33 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // ATTENTION!
+// This function is commented out because it is unused.
 // There are NO TESTS for this function because this API endpoint would be used for the comment feature which is not implemented.
 // Request details to an image. The result is a JSON object.
 // The request need to be send via the GET method and contain the parameter name which is the file name.
-func imageHandler(w http.ResponseWriter, r *http.Request) {
-	var res api.ImageResData
-	defer jsonUtil.EncodeResponse(w, &res)
-
-	// Get username from basic authentication
-	username, _, ok := r.BasicAuth()
-	if !ok {
-		res.Error = "Could not get username"
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// Get parameter "name" from url
-	imgName := r.URL.Query().Get("name")
-
-	// Load image from associated ImageManager
-	var err error
-	res.Image, err = GetImage(strings.ToLower(username), imgName)
-	if err != nil {
-		log.Println(err)
-	}
-	return
-}
+//func imageHandler(w http.ResponseWriter, r *http.Request) {
+//	var res api.ImageResData
+//	defer jsonUtil.EncodeResponse(w, &res)
+//
+//	// Get username from basic authentication
+//	username, _, ok := r.BasicAuth()
+//	if !ok {
+//		res.Error = "Could not get username"
+//		w.WriteHeader(http.StatusBadRequest)
+//		return
+//	}
+//
+//	// Get parameter "name" from url
+//	imgName := r.URL.Query().Get("name")
+//
+//	// Load image from associated ImageManager
+//	var err error
+//	res.Image, err = GetImage(strings.ToLower(username), imgName)
+//	if err != nil {
+//		log.Println(err)
+//	}
+//	return
+//}
 
 // Gets all order list entries and writes it in OrderListResData.OrderList
 func OrderListEntryHandler(w http.ResponseWriter, r *http.Request) {

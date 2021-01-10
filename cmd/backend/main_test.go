@@ -270,6 +270,25 @@ func TestThumbnailsHandlerInvalidLength(t *testing.T) {
 	}
 }
 
+func TestThumbnailsHandlerWrongUsername(t *testing.T) {
+	DHBW_Photo_Server.SetImageDir("../../test/example_imgs")
+
+	server := createServer(func(w http.ResponseWriter, r *http.Request) {
+		ThumbnailsHandler(w, r)
+	})
+
+	req, _ := http.NewRequest(http.MethodGet, server.URL+"?index=0&length=25", nil)
+	req.SetBasicAuth("max-invalid", "pw")
+	response, _ := executeRequest(req)
+
+	var res api.ThumbnailsResData
+	_ = decodeJson(response, &res)
+
+	if response.StatusCode != http.StatusBadRequest {
+		t.Error("Status code wrong or wrong error message")
+	}
+}
+
 func TestUploadHandler(t *testing.T) {
 	DHBW_Photo_Server.SetImageDir("../../test/example_imgs")
 

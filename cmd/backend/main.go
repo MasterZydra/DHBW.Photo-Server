@@ -198,11 +198,15 @@ func ThumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	// Load thumbnails from associated ImageManager
 	res.Images, err = GetThumbnails(strings.ToLower(username), index, length)
 	if err != nil {
-		log.Println(err)
+		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	res.TotalImages, err = GetTotalImages(username)
 	if err != nil {
-		log.Println(err)
+		res.Error = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 	return
 }

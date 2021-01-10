@@ -33,7 +33,11 @@ func TestNewImageManager(t *testing.T) {
 	usercontent = "contentNewImageManagerTest.csv"
 
 	// Init ImageManager for given user path
-	imgMan := NewImageManager(testDir)
+	imgMan, err := NewImageManager(testDir)
+	if err != nil {
+		t.Errorf("Something went wrong creating a new ImageManager: %v", err)
+		return
+	}
 
 	if imgMan == nil {
 		t.Errorf("Something went wrong creating a ImageManager from user path")
@@ -273,11 +277,19 @@ func TestImageManager_GetImage(t *testing.T) {
 	usercontent = "contentGetImageTest.csv"
 
 	// Init ImageManager
-	imgMan := NewImageManager(testOutputDir)
+	imgMan, err := NewImageManager(testOutputDir)
+	if err != nil {
+		t.Errorf("Something went wrong creating a new ImageManager: %v", err)
+		return
+	}
 	_ = imgMan.AddImageUpload(&upimg)
 
 	// Get image and compare raw data
-	imgManRead := NewImageManager(testOutputDir)
+	imgManRead, err := NewImageManager(testOutputDir)
+	if err != nil {
+		t.Errorf("Something went wrong creating a new ImageManager: %v", err)
+		return
+	}
 	readimg := imgManRead.GetImage("img1.jpg")
 	if readimg.Name != "img1.jpg" || readimg.hash != upimg.hash {
 		t.Errorf("Image from GetImage is not equal to stored image")
@@ -296,7 +308,11 @@ func TestImageManager_TotalImages(t *testing.T) {
 	usercontent = "contentNewImageManagerTest.csv"
 
 	// Init ImageManager for given user path
-	imgMan := NewImageManager(testDir)
+	imgMan, err := NewImageManager(testDir)
+	if err != nil {
+		t.Errorf("Something went wrong creating a new ImageManager: %v", err)
+		return
+	}
 	totalImages := imgMan.TotalImages()
 
 	if totalImages != 2 {
@@ -310,7 +326,11 @@ func TestImageManager_GetThumbnails(t *testing.T) {
 	usercontent = "contentLongList.csv"
 
 	// Init ImageManager
-	imgMan := NewImageManager(testDir)
+	imgMan, err := NewImageManager(testDir)
+	if err != nil {
+		t.Errorf("Something went wrong creating a new ImageManager: %v", err)
+		return
+	}
 
 	// Test 0 to 4
 	thumbs := imgMan.GetThumbnails(0, 5)

@@ -27,9 +27,9 @@ func TestReadContent(t *testing.T) {
 	usercontent = "contentReadTest.csv"
 
 	// Read content file
-	readImages := ReadContent(testDir)
-	if readImages == nil || len(readImages.images) != 2 || readImages.user != testDir {
-		t.Errorf("File was not read correctly")
+	readImages, err := ReadContent(testDir)
+	if err != nil || readImages == nil || len(readImages.images) != 2 || readImages.user != testDir {
+		t.Errorf("File was not read correctly: %v", err)
 		return
 	}
 
@@ -46,9 +46,9 @@ func TestReadContent_UserFolderNotExist(t *testing.T) {
 	DHBW_Photo_Server.SetImageDir("")
 
 	// Read content file
-	readImages := ReadContent(user)
-	if readImages == nil || len(readImages.images) != 0 || readImages.user != user {
-		t.Errorf("File was not read correctly")
+	readImages, err := ReadContent(user)
+	if err != nil || readImages == nil || len(readImages.images) != 0 || readImages.user != user {
+		t.Errorf("File was not read correctly: %v", err)
 		return
 	}
 }
@@ -60,9 +60,9 @@ func TestReadContent_FileNotExist(t *testing.T) {
 	usercontent = "contentWhichDoesNotExist.csv"
 
 	// Read content file
-	readImages := ReadContent(user)
-	if readImages == nil || len(readImages.images) != 0 || readImages.user != user {
-		t.Errorf("File was not read correctly")
+	readImages, err := ReadContent(user)
+	if err != nil || readImages == nil || len(readImages.images) != 0 || readImages.user != user {
+		t.Errorf("File was not read correctly: %v", err)
 		return
 	}
 }
@@ -88,9 +88,9 @@ func TestWriteContent(t *testing.T) {
 	WriteContent(testOutputDir, &imgman)
 
 	// Read file again
-	readImages := ReadContent(testOutputDir)
-	if readImages == nil {
-		t.Errorf("Written file could not be read")
+	readImages, err := ReadContent(testOutputDir)
+	if err != nil || readImages == nil {
+		t.Errorf("Written file could not be read: %v", err)
 		return
 	}
 

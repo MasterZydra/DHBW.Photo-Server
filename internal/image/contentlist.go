@@ -21,19 +21,17 @@ import (
 	"path"
 	"time"
 )
-import "fmt"
 
 // Read content file for given user. The user has to be equal to the folder name.
 // It returns an initialized ImageManager struct.
-func ReadContent(user string) *ImageManager {
+func ReadContent(user string) (*ImageManager, error) {
 	// Open file
 	csvFile, err := os.Open(path.Join(dhbwphotoserver.ImageDir(), user, usercontent))
 	if os.IsNotExist(err) {
-		return &ImageManager{user: user}
+		return &ImageManager{user: user}, nil
 	}
 	if err != nil {
-		// Error stuff
-		fmt.Println(err)
+		return nil, err
 	}
 
 	// Initialize reader
@@ -43,8 +41,7 @@ func ReadContent(user string) *ImageManager {
 	// Read file
 	images, err := reader.ReadAll()
 	if err != nil {
-		// Error stuff
-		fmt.Println(err)
+		return nil, err
 	}
 
 	// Store all data in ImageManager struct
@@ -52,13 +49,12 @@ func ReadContent(user string) *ImageManager {
 	for _, img := range images {
 		date, err := time.Parse(dhbwphotoserver.TimeLayout, img[1])
 		if err != nil {
-			// Error stuff
-			fmt.Println(err)
+			return nil, err
 		}
 		imageManager.AddImage(NewImage(img[0], date, img[2]))
 	}
 
-	return imageManager
+	return imageManager, nil
 }
 
 // Write content file for given user. The user has to be equal to the folder name.

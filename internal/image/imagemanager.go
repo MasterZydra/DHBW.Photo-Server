@@ -25,7 +25,7 @@ type ImageManager struct {
 // The user name is needed to load an existing content file for the given user.
 // If no user directory exists or no content file exists for this user it
 // returns an empty ImageManager only filled with the user name.
-func NewImageManager(userName string) *ImageManager {
+func NewImageManager(userName string) (*ImageManager, error) {
 	return ReadContent(userName)
 }
 

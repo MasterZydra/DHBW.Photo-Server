@@ -196,8 +196,14 @@ func ThumbnailsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Load thumbnails from associated ImageManager
-	res.Images = GetThumbnails(strings.ToLower(username), index, length)
-	res.TotalImages = GetTotalImages(username)
+	res.Images, err = GetThumbnails(strings.ToLower(username), index, length)
+	if err != nil {
+		log.Println(err)
+	}
+	res.TotalImages, err = GetTotalImages(username)
+	if err != nil {
+		log.Println(err)
+	}
 	return
 }
 
@@ -240,7 +246,6 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// TODO: Jones: tests
 // ATTENTION!
 // There are NO TESTS for this function because this API endpoint would be used for the comment feature which is not implemented.
 // Request details to an image. The result is a JSON object.
@@ -261,7 +266,11 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	imgName := r.URL.Query().Get("name")
 
 	// Load image from associated ImageManager
-	res.Image = GetImage(strings.ToLower(username), imgName)
+	var err error
+	res.Image, err = GetImage(strings.ToLower(username), imgName)
+	if err != nil {
+		log.Println(err)
+	}
 	return
 }
 
@@ -304,7 +313,10 @@ func AddOrderListEntryHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	img := GetImage(username, data.ImageName)
+	img, err := GetImage(username, data.ImageName)
+	if err != nil {
+		log.Println(err)
+	}
 	if img == nil {
 		res.Error = "Could not get image '" + data.ImageName + "'"
 		w.WriteHeader(http.StatusBadRequest)

@@ -118,6 +118,7 @@ func DownloadOrderList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// download it to browser
+	w.Header().Set("Content-Disposition", "filename=\""+zipFileName+"\"")
 	http.ServeFile(w, r, zipFileName)
 
 	err = os.Remove(zipFileName)

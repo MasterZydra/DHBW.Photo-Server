@@ -1,6 +1,9 @@
 ![Go](https://github.com/MasterZydra/DHBW.Photo-Server/workflows/Go/badge.svg)
 # Photo-Server
 
+- [Screenshots](#screenshots)
+   - [Web-Frontend](#web-frontend)
+   - [Konsolenanwendung](#konsolenanwendung)
 - [Organisatorisches](#organisatorisches)
 - [Aufgabenstellung](#aufgabenstellung)
    - [Anforderungen](#anforderungen)
@@ -9,6 +12,29 @@
 - [Abgabeumfang](#abgabeumfang)
 - [Abgabe](#abgabe)
 - [Bewertungskriterien](#bewertungskriterien)
+
+## Screenshots
+### Web-Frontend
+**Startseite**  
+![Home](images/home.png)
+
+**Startseite nach Anmeldung mit Bildern**  
+![Home with image](images/home_images.png)
+
+**Bestellliste**  
+![Order list](images/orderlist.png)
+
+**Anmelden**  
+![Login window](images/login.png)
+
+**Registrieren**  
+![Registration](images/register.png)
+
+**Hochladen von Bildern**  
+![Image upload](images/image_upload.png)
+
+### Konsolenanwendung
+![console](images/console.png)
 
 ## Organisatorisches
 - Die Abgabe des Programmentwurfs erfolgt spätestens am Sonntag, den **10.01.2021** als gepackte Quellen im ZIP-Format per [pushci](https://infprogs2.dhbw-mosbach.de/).
